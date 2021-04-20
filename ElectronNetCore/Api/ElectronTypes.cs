@@ -245,7 +245,7 @@ namespace MZZT.ElectronNetCore.Api {
 		public string Copyright { get; set; }
 		public string Version { get; set; }
 		public string Credits { get; set; }
-		public string Authors { get; set; }
+		public string[] Authors { get; set; }
 		public string Website { get; set; }
 		public string IconPath { get; set; }
 	}
