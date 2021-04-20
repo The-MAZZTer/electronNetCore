@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31129.286
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElectronNetCore", "ElectronNetCore\ElectronNetCore.csproj", "{E2915A4F-6596-4A22-8FA4-02C5B0BD664F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example", "Example\Example.csproj", "{4419CAC5-8925-4F69-BFDE-D49EAC46405E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E2915A4F-6596-4A22-8FA4-02C5B0BD664F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E2915A4F-6596-4A22-8FA4-02C5B0BD664F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E2915A4F-6596-4A22-8FA4-02C5B0BD664F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E2915A4F-6596-4A22-8FA4-02C5B0BD664F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4419CAC5-8925-4F69-BFDE-D49EAC46405E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4419CAC5-8925-4F69-BFDE-D49EAC46405E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4419CAC5-8925-4F69-BFDE-D49EAC46405E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4419CAC5-8925-4F69-BFDE-D49EAC46405E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0FBFB536-B847-4923-BD6E-2D85380F045A}
+	EndGlobalSection
+EndGlobal
