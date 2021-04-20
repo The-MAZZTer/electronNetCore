@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
-using System;
 using System.Collections.Generic;
 
 namespace Example {
@@ -16,6 +15,7 @@ namespace Example {
 			Host.CreateDefaultBuilder(args)
 				.ConfigureWebHostDefaults(webBuilder => {
 					webBuilder.UseStartup<Startup>();
+					webBuilder.UseUrls("http://127.0.0.1:0");
 				});
 	}
 }

@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -24,7 +25,7 @@ namespace MZZT.ElectronNetCore {
 		}
 
 		internal void LaunchElectron(IApplicationBuilder app, LaunchElectronOptions options = null) {
-			IServerAddressesFeature seeverAddressesFeature = app.ServerFeatures.Get<IServerAddressesFeature>();
+			IServerAddressesFeature serverAddressesFeature = app.ServerFeatures.Get<IServerAddressesFeature>();
 
 			string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "electron");
 			this.electron = new Process();
@@ -51,32 +52,60 @@ namespace MZZT.ElectronNetCore {
 
 			this.electron.StartInfo.ArgumentList.Add(path);
 
-			string address = seeverAddressesFeature.Addresses.First();
-			BaseUri = new Uri(address);
-			this.electron.StartInfo.ArgumentList.Add(address);
+			Regex urlRegex = new(@"^(https?):\/\/(.*?)(:(\d+))?$", RegexOptions.IgnoreCase);
 
-			if (options != null) {
-				if (options.InitScriptPath != null) {
-					options.ElectronEnvironment = null;
-					options.ElectronCommandLineFlags = null;
-					options.InitScriptPath = Path.Combine("..", options.InitScriptPath);
+			Task.Run(async () => {
+				string scheme = "http";
+				int port = 0;
+				while (port == 0) {
+					Match match = serverAddressesFeature.Addresses.Select(x => urlRegex.Match(x)).FirstOrDefault(x => x.Success);
+					if (match == null) {
+						throw new InvalidOperationException("Can't find a bound port for ASP.NET Core!");
+					}
+					scheme = match.Groups[1].Value;
+					if (!match.Groups[4].Success) {
+						port = -1;
+						break;
+					}
+					port = int.Parse(match.Groups[4].Value);
+
+					if (port == 0) {
+						await Task.Delay(250);
+					}
 				}
-				this.electron.StartInfo.ArgumentList.Add(JsonSerializer.Serialize(options, new() {
-					PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-				}));
-			}
 
-			this.electron.ErrorDataReceived += this.Electron_ErrorDataReceived;
-			this.electron.OutputDataReceived += this.Electron_OutputDataReceived;
-			this.electron.Exited += this.Electron_Exited;
-			this.electron.EnableRaisingEvents = true;
-			this.electron.Start();
-			this.electron.BeginErrorReadLine();
-			this.electron.BeginOutputReadLine();
+				string address;
+				if (port < 0) {
+					address = $"{scheme}://127.0.0.1";
+				} else {
+					address = $"{scheme}://127.0.0.1:{port}";
+				}
+				BaseUri = new Uri(address);
+				this.electron.StartInfo.ArgumentList.Add(address);
 
-			if (this.electron.HasExited) {
-				this.Electron_Exited(this.electron, new EventArgs());
-			}
+				if (options != null) {
+					if (options.InitScriptPath != null) {
+						options.ElectronEnvironment = null;
+						options.ElectronCommandLineFlags = null;
+						options.InitScriptPath = Path.Combine("..", options.InitScriptPath);
+					}
+					this.electron.StartInfo.ArgumentList.Add(JsonSerializer.Serialize(options, new() {
+						PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+					}));
+				}
+
+				this.electron.ErrorDataReceived += this.Electron_ErrorDataReceived;
+				this.electron.OutputDataReceived += this.Electron_OutputDataReceived;
+				this.electron.Exited += this.Electron_Exited;
+				this.electron.EnableRaisingEvents = true;
+				this.electron.Start();
+				this.electron.BeginErrorReadLine();
+				this.electron.BeginOutputReadLine();
+
+				if (this.electron.HasExited) {
+					this.Electron_Exited(this.electron, new EventArgs());
+				}
+			});
 		}
 
 		private void Electron_OutputDataReceived(object sender, DataReceivedEventArgs e) {
