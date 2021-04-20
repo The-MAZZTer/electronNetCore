@@ -6,6 +6,9 @@ namespace MZZT.ElectronNetCore.Api {
 	public class BrowserWindow {
 		private static readonly Dictionary<int, BrowserWindow> instances = new();
 
+		public static Task<BrowserWindow> CreateAsync(BrowserWindowConstructorOptions options = null) =>
+			Electron.FuncAsync<BrowserWindow, BrowserWindowConstructorOptionsInternal>(x => x.BrowserWindow_Ctor, options.ToBrowserWindowConstructorOptionsInternal());
+
 		public static IEnumerable<BrowserWindow> GetAllWindows() {
 			return instances.Values;
 		}
@@ -308,5 +311,9 @@ namespace MZZT.ElectronNetCore.Api {
 			return Task.CompletedTask;
 		}
 
+		public Task LoadUrlAsync(string url, LoadUrlOptions options = null) {
+			url = new Uri(ElectronNetCoreService.BaseUri, url).AbsoluteUri;
+			return Electron.ActionAsync(x => x.BrowserWindow_LoadUrl, this.Id, url, options?.ToLoadUrlOptionsInternal());
+		}
 	}
 }

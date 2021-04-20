@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
+using System.Linq;
 using System.Text.Json.Serialization;
 
 namespace MZZT.ElectronNetCore.Api {
@@ -212,6 +214,11 @@ namespace MZZT.ElectronNetCore.Api {
 		public const string Right = "right";
 		public const string Down = "down";
 		public const string Left = "left";
+	}
+
+	public static class UploadDataTypes {
+		public const string File = "file";
+		public const string RawData = "rawData";
 	}
 
 	public static class V8CacheOptions {
@@ -722,6 +729,31 @@ namespace MZZT.ElectronNetCore.Api {
 		public bool Enabled { get; set; }
 	}
 
+	public class LoadUrlOptions {
+		public string HttpReferrer { get; set; }
+		public string UserAgent { get; set; }
+		public string ExtraHeaders { get; set; }
+		public UploadData[] PostData { get; set; }
+		public string BaseUrlForDataUrl { get; set; }
+
+		public LoadUrlOptionsInternal ToLoadUrlOptionsInternal() => new() {
+			HttpReferrer = this.HttpReferrer,
+			UserAgent = this.UserAgent,
+			ExtraHeaders = this.ExtraHeaders,
+			PostData = this.PostData?.Select(x => x.ToUploadDataInternal()).ToArray(),
+			BaseUrlForDataUrl = this.BaseUrlForDataUrl
+		};
+	}
+
+	public class LoadUrlOptionsInternal {
+		public string HttpReferrer { get; set; }
+		public string UserAgent { get; set; }
+		public string ExtraHeaders { get; set; }
+		public UploadDataInternal[] PostData { get; set; }
+		[JsonPropertyName("baseURLForDataURL")]
+		public string BaseUrlForDataUrl { get; set; }
+	}
+
 	public class LoginItemSettings {
 		public bool OpenAtLogin { get; set; }
 		public bool OpenAsHidden { get; set; }
@@ -860,6 +892,33 @@ namespace MZZT.ElectronNetCore.Api {
 
 	public class ToDataUrlOptions {
 		public double ScaleFactor { get; set; }
+	}
+
+	public class UploadData {
+		public string Type { get; set; }
+		public byte[] Bytes { get; set; }
+		public string FilePath { get; set; }
+		public long Offset { get; set; }
+		public long Length { get; set; }
+		public DateTime ModificationTime { get; set; }
+
+		internal UploadDataInternal ToUploadDataInternal() => new() {
+			Type = this.Type,
+			Bytes = this.Bytes != null ? Convert.ToBase64String(this.Bytes) : null,
+			FilePath = this.FilePath,
+			Offset = this.Offset,
+			Length = this.Length,
+			ModificationTime = (this.ModificationTime.ToUniversalTime() - DateTime.UnixEpoch).TotalSeconds
+		};
+	}
+
+	public class UploadDataInternal {
+		public string Type { get; set; }
+		public string Bytes { get; set; }
+		public string FilePath { get; set; }
+		public long Offset { get; set; }
+		public long Length { get; set; }
+		public double ModificationTime { get; set; }
 	}
 
 	public class VideoDecodeAcceleratorSupportedProfile {

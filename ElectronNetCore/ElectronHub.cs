@@ -143,6 +143,8 @@ namespace MZZT.ElectronNetCore {
 		Task BrowserWindow_FromWebContents(int requestId, int id, int webContents);
 		Task BrowserWindow_FromBrowserView(int requestId, int id, int browserView);
 
+		Task BrowserWindow_LoadUrl(int requestId, int id, string url, LoadUrlOptionsInternal options);
+
 		Task Function_Invoke(int requestId, int id, object[] args);
 
 		Task NativeImage_GetSize(int requestId, int id, double scaleFactor);

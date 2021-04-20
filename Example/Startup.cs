@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 using MZZT.ElectronNetCore.Api;
 using System;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
@@ -35,6 +36,9 @@ namespace Example {
 			Electron.App.Activate += (sender, e) => {
 				Console.WriteLine($"Activate");
 
+				if (!BrowserWindow.GetAllWindows().Any()) {
+					Task.Run(this.CreateWindowAsync);
+				}
 			};
 
 			Electron.App.BrowserWindowBlur += (sender, e) => { 
@@ -69,8 +73,17 @@ namespace Example {
 				Console.WriteLine($"Ready");
 
 				Task.Run(async () => {
+					await this.CreateWindowAsync();
 				});
 			};
+		}
+
+		private async Task CreateWindowAsync() {
+			BrowserWindow win = await BrowserWindow.CreateAsync(new() {
+				Width = 800,
+				Height = 600
+			});
+			await win.LoadUrlAsync("/");
 		}
 
 		public IConfiguration Configuration { get; }

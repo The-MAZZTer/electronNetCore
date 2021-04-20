@@ -1,5 +1,6 @@
 import { HubConnection, HubConnectionBuilder, HubConnectionState } from "@microsoft/signalr";
 import { app, autoUpdater, BrowserView, BrowserWindow, Menu, NativeImage, WebContents, BrowserViewConstructorOptions, BrowserWindowConstructorOptions, Session } from "electron";
+import { LoadURLOptions } from "electron/main";
 
 export class SignalR {
 	private appBeforeQuitPreventDefault = false;
@@ -215,6 +216,18 @@ export class SignalR {
 		"BrowserWindow_GetFocusedWdindow": (_: null) => BrowserWindow.getFocusedWindow()?.id ?? 0,
 		"BrowserWindow_FromWebContents": (_: null, webConntents) => BrowserWindow.fromWebContents(webConntents ? WebContents.fromId(webConntents) : null)?.id ?? 0,
 		"BrowserWindow_FromBrowserView": (_: null, browserView) => BrowserWindow.fromBrowserView(browserView ? <BrowserView>this.objects[browserView] : null)?.id ?? 0,
+
+		"BrowserWindow_LoadUrl": (id: number, url, options: LoadURLOptions) => {
+			const self = BrowserWindow.fromId(id);
+			if (options && options.postData) {
+				for (const data of options.postData) {
+					if (data.type === "rawData") {
+						data.bytes = Buffer.from(<any>data.bytes, "base64");
+					}
+				}
+			}
+			return self.loadURL(url, options);
+		},
 
 		"Function_Invoke": (self: Function, args: any[]) => self(...args),
 

@@ -1,4 +1,4 @@
-﻿import { app, BrowserWindow, crashReporter, protocol } from "electron";
+﻿import { app, crashReporter, protocol } from "electron";
 import process from "process";
 import { LaunchElectronOptions } from "./models/launchElectronOptions";
 import { SignalR } from "./signalr";
@@ -76,24 +76,6 @@ class ElectronNetCoreProxy {
     
     this.signalR = new SignalR();
     await this.signalR.start(url);
-
-    function createWindow() {
-      const win = new BrowserWindow({
-        width: 800,
-        height: 600
-      })
-    
-      win.loadURL(url);
-    }
-    
-    await app.whenReady();
-    createWindow();
-  
-    app.on('activate', () => {
-      if (BrowserWindow.getAllWindows().length === 0) {
-        createWindow();
-      }
-    })
   }
 }
 

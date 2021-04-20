@@ -13,6 +13,8 @@ using System.Threading.Tasks;
 
 namespace MZZT.ElectronNetCore {
 	internal class ElectronNetCoreService : IHostedService {
+		internal static Uri BaseUri { get; private set; }
+
 		public ElectronNetCoreService(ILogger<ElectronNetCoreService> logger) {
 			this.logger = logger;
 		}
@@ -50,6 +52,7 @@ namespace MZZT.ElectronNetCore {
 			this.electron.StartInfo.ArgumentList.Add(path);
 
 			string address = seeverAddressesFeature.Addresses.First();
+			BaseUri = new Uri(address);
 			this.electron.StartInfo.ArgumentList.Add(address);
 
 			if (options != null) {
