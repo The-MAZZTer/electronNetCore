@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace MZZT.ElectronNetCore {
-	internal interface IElectronInterface {
+	public interface IElectronInterface {
 		Task DisposeObject(int id);
 
 		Task AppCommandLine_AppendSwitch(int requestId, string @switch, string value);

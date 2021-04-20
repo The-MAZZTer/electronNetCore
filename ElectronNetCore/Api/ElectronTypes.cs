@@ -301,7 +301,7 @@ namespace MZZT.ElectronNetCore.Api {
 		};
 	}
 
-	internal class BrowserViewConstructorOptionsInternal {
+	public class BrowserViewConstructorOptionsInternal {
 		public WebPreferencesInternal WebPreferences { get; set; }
 	}
 
@@ -411,7 +411,7 @@ namespace MZZT.ElectronNetCore.Api {
 		};
 	}
 
-	internal class BrowserWindowConstructorOptionsInternal {
+	public class BrowserWindowConstructorOptionsInternal {
 		public int Width { get; set; } = 800;
 		public int Height { get; set; } = 600;
 		public int? X { get; set; }
@@ -972,7 +972,7 @@ namespace MZZT.ElectronNetCore.Api {
 		};
 	}
 
-	internal class WebPreferencesInternal {
+	public class WebPreferencesInternal {
 		public bool DevTools { get; set; } = true;
 		public bool NodeIntegration { get; set; }
 		public bool NodeIntegrationInWorker { get; set; }
