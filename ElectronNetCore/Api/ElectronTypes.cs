@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.IO;
 using System.Linq;
 using System.Text.Json.Serialization;
 
@@ -10,6 +9,17 @@ namespace MZZT.ElectronNetCore.Api {
 		public const string Regular = "regular";
 		public const string Accessory = "accessory";
 		public const string Prohibited = "prohibited";
+	}
+
+	public static class AlwaysOnTopLevels {
+		public const string Normal = "normal";
+		public const string Floating = "floating";
+		public const string TornOffMenu = "torn-off-menu";
+		public const string ModalPanel = "modal-panel";
+		public const string MainMenu = "main-menu";
+		public const string Status = "status";
+		public const string PopUpMenu = "pop-up-menu";
+		public const string ScreenSaver = "screen-saver";
 	}
 
 	public static class AutoplayPolicies {
@@ -209,11 +219,40 @@ namespace MZZT.ElectronNetCore.Api {
 		public const string Worker = "worker";
 	}
 
+	public static class ProgressBarModes {
+		public const string None = "none";
+		public const string Normal = "normal";
+		public const string Indeterminate = "indeterminate";
+		public const string Error = "error";
+		public const string Paused = "paused";
+	}
+
+	public static class RecordingModes {
+		public const string RecordUntilFull = "record-until-full";
+		public const string RecordContinuously = "record-continuously";
+		public const string RecordAsMuchAsPossible = "record-as-much-as-possible";
+		public const string TraceToConsole = "trace-to-console";
+	}
+
 	public static class SwipeDirections {
 		public const string Up = "up";
 		public const string Right = "right";
 		public const string Down = "down";
 		public const string Left = "left";
+	}
+
+	public static class ThumbarButtonFlags {
+		public const string Enabled = "enabled";
+		public const string Disabled = "disabled";
+		public const string DismissOnClick = "dismissonclick";
+		public const string NoBackground = "nobackground";
+		public const string Hidden = "hidden";
+		public const string NonInteractive = "noninteractive";
+	}
+
+	public static class TraceOptions {
+		public const string EnableSampling = "enable-sampling";
+		public const string EnableSystrace = "enable-systrace";
 	}
 
 	public static class UploadDataTypes {
@@ -257,6 +296,20 @@ namespace MZZT.ElectronNetCore.Api {
 		public string IconPath { get; set; }
 	}
 
+	public class AppDetailsOptions {
+		public string AppId { get; set; }
+		public string AppIconPath { get; set; }
+		public int AppIconIndex { get; set; }
+		public string RelaunchCommand { get; set; }
+		public string RelaunchDisplayName { get; set; }
+	}
+
+	public class ApplicationInfoForProtocolReturnValue {
+		public NativeImage Icon { get; set; }
+		public string Path { get; set; }
+		public string Name { get; set; }
+	}
+
 	internal class ApplicationInfoForProtocolReturnValueInternal {
 		public int Icon { get; set; }
 		public string Path { get; set; }
@@ -267,12 +320,6 @@ namespace MZZT.ElectronNetCore.Api {
 			Name = this.Name,
 			Path = this.Path
 		};
-	}
-
-	public class ApplicationInfoForProtocolReturnValue {
-		public NativeImage Icon { get; set; }
-		public string Path { get; set; }
-		public string Name { get; set; }
 	}
 
 	public class AuthenticationResponseDetails {
@@ -677,6 +724,10 @@ namespace MZZT.ElectronNetCore.Api {
 		public bool DoesZapGarbage { get; set; }
 	}
 
+	public class IgnoreMouseEventsOptions {
+		public bool Forward { get; set; }
+	}
+
 	public class ImageDecodeAcceleratorSupportedProfile {
 		public string ImageType { get; set; }
 		public string MinEncodedDimensions { get; set; }
@@ -727,6 +778,12 @@ namespace MZZT.ElectronNetCore.Api {
 		public string[] Args { get; set; }
 		public string Scope { get; set; }
 		public bool Enabled { get; set; }
+	}
+
+	public class LoadFileOptions {
+		public Dictionary<string, string> Query { get; set; }
+		public string Search { get; set; }
+		public string Hash { get; set; }
 	}
 
 	public class LoadUrlOptions {
@@ -819,7 +876,11 @@ namespace MZZT.ElectronNetCore.Api {
 		public bool Sandboxed { get; set; }
 		public string IntegrityLevel { get; set; }
 	}
-	
+
+	public class ProgressBarOptions {
+		public string Mode { get; set; }
+	}
+
 	public class Rectangle {
 		public double X { get; set; }
 		public double Y { get; set; }
@@ -838,6 +899,13 @@ namespace MZZT.ElectronNetCore.Api {
 			Width = x.Width,
 			Height = x.Height
 		};
+	}
+
+	public class PartialRectangle {
+		public double? X { get; set; }
+		public double? Y { get; set; }
+		public double? Width { get; set; }
+		public double? Height { get; set; }
 	}
 
 	public class RelaunchOptions {
@@ -890,8 +958,56 @@ namespace MZZT.ElectronNetCore.Api {
 		public string WorkingDirectory { get; set; }
 	}
 
+	public class ThumbarButton {
+		public NativeImage Icon { get; set; }
+		public Action Click { get; set; }
+		public string Tooltip { get; set; }
+		public string[] Flags { get; set; }
+
+		internal ThumbarButtonInternal ToThumbarButtonInternal() => new() {
+			Icon = this.Icon?.Id ?? 0,
+			Tooltip = this.Tooltip,
+			Flags = this.Flags
+		};
+	}
+
+	public class ThumbarButtonInternal {
+		public int Icon { get; set; }
+		public string Tooltip { get; set; }
+		public string[] Flags { get; set; }
+	}
+
 	public class ToDataUrlOptions {
 		public double ScaleFactor { get; set; }
+	}
+
+	public class TraceBufferUsageReturnValue {
+		public double Value { get; set; }
+		public double Percentage { get; set; }
+	}
+
+	public class TraceCategoriesAndOptions {
+		public string CategoryFilter { get; set; }
+		public string TraceOptions { get; set; }
+	}
+
+	public class TraceConfig {
+		[JsonPropertyName("recording__mode")]
+		public string RecordingMode { get; set; }
+		[JsonPropertyName("trace_buffer_size_in_kb")]
+		public double TraceBufferSizeInKb { get; set; }
+		[JsonPropertyName("enable_argument_filter")]
+		public bool EnableArgumentFilter { get; set; }
+		[JsonPropertyName("included_categories")]
+		public string[] IncludedCategories { get; set; }
+		[JsonPropertyName("excluded_categories")]
+		public string[] ExcludedCategories { get; set; }
+		[JsonPropertyName("included_process_ids")]
+		public int[] IncludedProcessIds { get; set; }
+		[JsonPropertyName("histogram_names")]
+		public string[] HistogramsNames { get; set; }
+		[JsonPropertyName("memory_dump_config")]
+		public Dictionary<string, object> MemoryDumpConfig { get; set; }
 	}
 
 	public class UploadData {
@@ -939,6 +1055,10 @@ namespace MZZT.ElectronNetCore.Api {
 		public int MinResolutionHeight { get; set; }
 		public int MaxFramerateNumerator { get; set; }
 		public int MaxFramerateDenominator { get; set; }
+	}
+
+	public class VisibleOnAllWorkspacesOptions {
+		public bool VisibleOnFullScreen { get; set; }
 	}
 
 	public class WebPreferences {

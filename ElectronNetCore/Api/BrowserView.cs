@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 namespace MZZT.ElectronNetCore.Api {
 	public class BrowserView : ElectronDisposable<BrowserView>, IDisposable, IAsyncDisposable {
 		public static Task<BrowserView> CreateAsync(BrowserViewConstructorOptions options = null) =>
-			Electron.FuncAsync<BrowserView, BrowserViewConstructorOptionsInternal>(x => x.BrowserView_Ctor, options.ToBrowserViewConstructorOptionsInternal());
+			Electron.FuncAsync<BrowserView, int, BrowserViewConstructorOptionsInternal>(x => x.BrowserView_Ctor, 0, options.ToBrowserViewConstructorOptionsInternal());
 
 		internal BrowserView(int id) : base(id) { }
 
@@ -13,7 +13,7 @@ namespace MZZT.ElectronNetCore.Api {
 		public ElectronProperty<WebContents> WebContents {
 			get {
 				if (this.webContents == null) {
-					this.webContents = new(x => (id) => x.BrowserView_WebContents_Get(id, this.Id),
+					this.webContents = new(x => id => x.BrowserView_WebContents_Get(id, this.Id),
 						x => (id, value) => x.BrowserView_WebContents_Set(id, this.Id, value.Id));
 				}
 				return this.webContents;

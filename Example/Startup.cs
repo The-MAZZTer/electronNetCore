@@ -76,6 +76,10 @@ namespace Example {
 					await this.CreateWindowAsync();
 				});
 			};
+
+			Task.Run(async () => {
+				await Electron.App.Name.SetAsync("Example");
+			});
 		}
 
 		private async Task CreateWindowAsync() {

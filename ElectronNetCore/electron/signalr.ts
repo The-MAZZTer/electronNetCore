@@ -1,6 +1,6 @@
 import { HubConnection, HubConnectionBuilder, HubConnectionState } from "@microsoft/signalr";
-import { app, autoUpdater, BrowserView, BrowserWindow, Menu, NativeImage, WebContents, BrowserViewConstructorOptions, BrowserWindowConstructorOptions, Session } from "electron";
-import { LoadURLOptions } from "electron/main";
+import { app, autoUpdater, BrowserView, BrowserWindow, LoadURLOptions, Menu, NativeImage, WebContents, BrowserViewConstructorOptions, BrowserWindowConstructorOptions, Session, TouchBar, contentTracing } from "electron";
+import * as os from "os";
 
 export class SignalR {
 	private appBeforeQuitPreventDefault = false;
@@ -163,7 +163,7 @@ export class SignalR {
 		"AutoUpdater_CheckForUpdates": () => autoUpdater.checkForUpdates(),
 		"AutoUpdater_QuitAndInstall": () => autoUpdater.quitAndInstall(),
 
-		"BrowserView_Ctor": (options:BrowserViewConstructorOptions) => {
+		"BrowserView_Ctor": (_: null, options: BrowserViewConstructorOptions) => {
 			if (options && options.webPreferences) {
 				if (options.webPreferences.session) {
 					options.webPreferences.session = <Session>this.objects[<any>options.webPreferences.session];
@@ -182,7 +182,7 @@ export class SignalR {
 		"BrowserView_GetBounds": (self: BrowserView) => self.getBounds(),
 		"BrowserView_SetBackgroundColor": (self: BrowserView, color) => self.setBackgroundColor(color),
 
-		"BrowserWindow_Ctor": (options: BrowserWindowConstructorOptions) => {
+		"BrowserWindow_Ctor": (_: null, options: BrowserWindowConstructorOptions) => {
 			if (options) {
 				if ((<any>options).iconImage) {
 					options.icon = <NativeImage>this.objects[(<any>options).iconImage];
@@ -213,12 +213,139 @@ export class SignalR {
 		"BrowserWindow_WillMove_PreventDefault": (self: BrowserWindow, value) => this.browserWindowWillMovePreventDefault[self.id] = value,
 		"BrowserWindow_SystemContextMenu_PreventDefault": (self: BrowserWindow, value) => this.browserWindowSystemContextMenuPreventDefault[self.id] = value,
 
-		"BrowserWindow_GetFocusedWdindow": (_: null) => BrowserWindow.getFocusedWindow()?.id ?? 0,
+		"BrowserWindow_GetFocusedWindow": (_: null) => BrowserWindow.getFocusedWindow()?.id ?? 0,
 		"BrowserWindow_FromWebContents": (_: null, webConntents) => BrowserWindow.fromWebContents(webConntents ? WebContents.fromId(webConntents) : null)?.id ?? 0,
 		"BrowserWindow_FromBrowserView": (_: null, browserView) => BrowserWindow.fromBrowserView(browserView ? <BrowserView>this.objects[browserView] : null)?.id ?? 0,
 
-		"BrowserWindow_LoadUrl": (id: number, url, options: LoadURLOptions) => {
-			const self = BrowserWindow.fromId(id);
+		"BrowserWindow_WebContents_Get": (self: BrowserWindow) => self.webContents?.id ?? 0,
+		"BrowserWindow_AutoHideMenuBar_Get": (self: BrowserWindow) => self.autoHideMenuBar,
+		"BrowserWindow_AutoHideMenuBar_Set": (self: BrowserWindow, value) => { self.autoHideMenuBar = value; },
+		"BrowserWindow_SimpleFullScreen_Get": (self: BrowserWindow) => self.simpleFullScreen,
+		"BrowserWindow_SimpleFullScreen_Set": (self: BrowserWindow, value) => { self.simpleFullScreen = value; },
+		"BrowserWindow_FullScreen_Get": (self: BrowserWindow) => self.fullScreen,
+		"BrowserWindow_FullScreen_Set": (self: BrowserWindow, value) => { self.fullScreen = value; },
+		"BrowserWindow_VisibleOnAllWorkspaces_Get": (self: BrowserWindow) => self.visibleOnAllWorkspaces,
+		"BrowserWindow_VisibleOnAllWorkspaces_Set": (self: BrowserWindow, value) => { self.visibleOnAllWorkspaces = value; },
+		"BrowserWindow_Shadow_Get": (self: BrowserWindow) => self.shadow,
+		"BrowserWindow_Shadow_Set": (self: BrowserWindow, value) => { self.shadow = value; },
+		"BrowserWindow_MenuBarVisible_Get": (self: BrowserWindow) => self.menuBarVisible,
+		"BrowserWindow_MenuBarVisible_Set": (self: BrowserWindow, value) => { self.menuBarVisible = value; },
+		"BrowserWindow_Kiosk_Get": (self: BrowserWindow) => self.kiosk,
+		"BrowserWindow_Kiosk_Set": (self: BrowserWindow, value) => { self.kiosk = value; },
+		"BrowserWindow_DocumentEdited_Get": (self: BrowserWindow) => self.documentEdited,
+		"BrowserWindow_DocumentEdited_Set": (self: BrowserWindow, value) => { self.documentEdited = value; },
+		"BrowserWindow_RepresentedFilename_Get": (self: BrowserWindow) => self.representedFilename,
+		"BrowserWindow_RepresentedFilename_Set": (self: BrowserWindow, value) => { self.representedFilename = value; },
+		"BrowserWindow_Title_Get": (self: BrowserWindow) => self.title,
+		"BrowserWindow_Title_Set": (self: BrowserWindow, value) => { self.title = value; },
+		"BrowserWindow_Minimizable_Get": (self: BrowserWindow) => self.minimizable,
+		"BrowserWindow_Minimizable_Set": (self: BrowserWindow, value) => { self.minimizable = value; },
+		"BrowserWindow_Maximizable_Get": (self: BrowserWindow) => self.maximizable,
+		"BrowserWindow_Maximizable_Set": (self: BrowserWindow, value) => { self.maximizable = value; },
+		"BrowserWindow_FullScreenable_Get": (self: BrowserWindow) => self.fullScreenable,
+		"BrowserWindow_FullScreenable_Set": (self: BrowserWindow, value) => { self.fullScreenable = value; },
+		"BrowserWindow_Resizable_Get": (self: BrowserWindow) => self.resizable,
+		"BrowserWindow_Resizable_Set": (self: BrowserWindow, value) => { self.resizable = value; },
+		"BrowserWindow_Closable_Get": (self: BrowserWindow) => self.closable,
+		"BrowserWindow_Closable_Set": (self: BrowserWindow, value) => { self.closable = value; },
+		"BrowserWindow_Movable_Get": (self: BrowserWindow) => self.movable,
+		"BrowserWindow_Movable_Set": (self: BrowserWindow, value) => { self.movable = value; },
+		"BrowserWindow_ExcludedFromShownWindowsMenu_Get": (self: BrowserWindow) => self.excludedFromShownWindowsMenu,
+		"BrowserWindow_ExcludedFromShownWindowsMenu_Set": (self: BrowserWindow, value) => { self.excludedFromShownWindowsMenu = value; },
+
+		"BrowserWindow_Destroy": (self: BrowserWindow) => self.destroy(),
+		"BrowserWindow_Close": (self: BrowserWindow) => self.close(),
+		"BrowserWindow_Focus": (self: BrowserWindow) => self.focus(),
+		"BrowserWindow_Blur": (self: BrowserWindow) => self.blur(),
+		"BrowserWindow_IsFocused": (self: BrowserWindow) => self.isFocused(),
+		"BrowserWindow_IsDestroyed": (self: BrowserWindow) => self.isDestroyed(),
+		"BrowserWindow_Show": (self: BrowserWindow) => self.show(),
+		"BrowserWindow_ShowInactive": (self: BrowserWindow) => self.showInactive(),
+		"BrowserWindow_Hide": (self: BrowserWindow) => self.hide(),
+		"BrowserWindow_IsVisible": (self: BrowserWindow) => self.isVisible(),
+		"BrowserWindow_IsModal": (self: BrowserWindow) => self.isModal(),
+		"BrowserWindow_Maximize": (self: BrowserWindow) => self.maximize(),
+		"BrowserWindow_Unmaximize": (self: BrowserWindow) => self.unmaximize(),
+		"BrowserWindow_IsMaximized": (self: BrowserWindow) => self.isMaximized(),
+		"BrowserWindow_Minimize": (self: BrowserWindow) => self.minimize(),
+		"BrowserWindow_Restore": (self: BrowserWindow) => self.restore(),
+		"BrowserWindow_IsMinimized": (self: BrowserWindow) => self.isMinimized(),
+		"BrowserWindow_SetFullScreen": (self: BrowserWindow, flag) => self.setFullScreen(flag),
+		"BrowserWindow_IsFullScreen": (self: BrowserWindow) => self.isFullScreen(),
+		"BrowserWindow_SetSimpleFullScreen": (self: BrowserWindow, flag) => self.setSimpleFullScreen(flag),
+		"BrowserWindow_IsSimpleFullScreen": (self: BrowserWindow) => self.isSimpleFullScreen(),
+		"BrowserWindow_IsNormal": (self: BrowserWindow) => self.isNormal(),
+		"BrowserWindow_SetAspectRatio": (self: BrowserWindow, aspectRatio, extraSize) => self.setAspectRatio(aspectRatio, extraSize),
+		"BrowserWindow_SetBackgroundColor": (self: BrowserWindow, backgroundColor) => self.setBackgroundColor(backgroundColor),
+		"BrowserWindow_PreviewFile": (self: BrowserWindow, path, displayName) => self.previewFile(path, displayName),
+		"BrowserWindow_CloseFilePreview": (self: BrowserWindow) => self.closeFilePreview(),
+		"BrowserWindow_SetBounds": (self: BrowserWindow, bounds, animate) => self.setBounds(bounds, animate),
+		"BrowserWindow_GetBounds": (self: BrowserWindow) => self.getBounds(),
+		"BrowserWindow_GetBackgroundColor": (self: BrowserWindow) => self.getBackgroundColor(),
+		"BrowserWindow_SetContentBounds": (self: BrowserWindow, bounds, animate) => self.setContentBounds(bounds, animate),
+		"BrowserWindow_GetContentBounds": (self: BrowserWindow) => self.getContentBounds(),
+		"BrowserWindow_GetNormalBounds": (self: BrowserWindow) => self.getNormalBounds(),
+		"BrowserWindow_SetEnabled": (self: BrowserWindow, enable) => self.setEnabled(enable),
+		"BrowserWindow_IsEnabled": (self: BrowserWindow) => self.isEnabled(),
+		"BrowserWindow_SetSize": (self: BrowserWindow, width, height, animate) => self.setSize(width, height, animate),
+		"BrowserWindow_GetSize": (self: BrowserWindow) => self.getSize(),
+		"BrowserWindow_SetContentSize": (self: BrowserWindow, width, height, animate) => self.setContentSize(width, height, animate),
+		"BrowserWindow_GetContentSize": (self: BrowserWindow) => self.getContentSize(),
+		"BrowserWindow_SetMinimumSize": (self: BrowserWindow, width, height) => self.setMinimumSize(width, height),
+		"BrowserWindow_GetMinimumSize": (self: BrowserWindow) => self.getMinimumSize(),
+		"BrowserWindow_SetMaximumSize": (self: BrowserWindow, width, height) => self.setMaximumSize(width, height),
+		"BrowserWindow_GetMaximumSize": (self: BrowserWindow) => self.getMaximumSize(),
+		"BrowserWindow_SetResizable": (self: BrowserWindow, resizable) => self.setResizable(resizable),
+		"BrowserWindow_IsResizable": (self: BrowserWindow) => self.isResizable(),
+		"BrowserWindow_SetMovable": (self: BrowserWindow, movable) => self.setMovable(movable),
+		"BrowserWindow_IsMovable": (self: BrowserWindow) => self.isMovable(),
+		"BrowserWindow_SetMinimizable": (self: BrowserWindow, minimizable) => self.setMinimizable(minimizable),
+		"BrowserWindow_IsMinimizable": (self: BrowserWindow) => self.isMinimizable(),
+		"BrowserWindow_SetMaximizable": (self: BrowserWindow, maximizable) => self.setMaximizable(maximizable),
+		"BrowserWindow_IsMaximizable": (self: BrowserWindow) => self.isMaximizable(),
+		"BrowserWindow_SetFullScreenable": (self: BrowserWindow, fullscreenable) => self.setFullScreenable(fullscreenable),
+		"BrowserWindow_IsFullScreenable": (self: BrowserWindow) => self.isFullScreenable(),
+		"BrowserWindow_SetClosable": (self: BrowserWindow, closable) => self.setClosable(closable),
+		"BrowserWindow_IsClosable": (self: BrowserWindow) => self.isClosable(),
+		"BrowserWindow_SetAlwaysOnTop": (self: BrowserWindow, flag, level, relativeLevel) => self.setAlwaysOnTop(flag, level, relativeLevel),
+		"BrowserWindow_IsAlwaysOnTop": (self: BrowserWindow) => self.isAlwaysOnTop(),
+		"BrowserWindow_MoveAbove": (self: BrowserWindow, mediaSourceId) => self.moveAbove(mediaSourceId),
+		"BrowserWindow_MoveTop": (self: BrowserWindow) => self.moveTop(),
+		"BrowserWindow_Center": (self: BrowserWindow) => self.center(),
+		"BrowserWindow_SetPosition": (self: BrowserWindow, x, y, animate) => self.setPosition(x, y, animate),
+		"BrowserWindow_GetPosition": (self: BrowserWindow) => self.getPosition(),
+		"BrowserWindow_SetTitle": (self: BrowserWindow, title) => self.setTitle(title),
+		"BrowserWindow_GetTitle": (self: BrowserWindow) => self.getTitle(),
+		"BrowserWindow_SetSheetOffset": (self: BrowserWindow, offsetY, offsetX) => self.setSheetOffset(offsetY, offsetX),
+		"BrowserWindow_FlashFrame": (self: BrowserWindow, flag) => self.flashFrame(flag),
+		"BrowserWindow_SetSkipTaskbar": (self: BrowserWindow, skip) => self.setSkipTaskbar(skip),
+		"BrowserWindow_SetKiosk": (self: BrowserWindow, flag) => self.setKiosk(flag),
+		"BrowserWindow_IsKiosk": (self: BrowserWindow) => self.isKiosk(),
+		"BrowserWindow_IsTabletMode": (self: BrowserWindow) => self.isTabletMode(),
+		"BrowserWindow_GetMediaSourceId": (self: BrowserWindow) => self.getMediaSourceId(),
+		"BrowserWindow_GetNativeWindowHandle": (self: BrowserWindow) => {
+			const buffer = self.getNativeWindowHandle();
+			if (os.endianness() === "LE") {
+				return buffer.readIntLE(0, buffer.byteLength);
+			} else {
+				return buffer.readIntBE(0, buffer.byteLength);
+			}
+		},
+		"BrowserWindow_HookWindowMessage": (self: BrowserWindow, message, id) =>
+			self.hookWindowMessage(message, (wParam, lParam) => {
+				this.send("BrowserWindow_HookWindowMessage_Callback", self.id, id, wParam, lParam);
+			}),
+		"BrowserWindow_IsWindowMessageHooked": (self: BrowserWindow, message) => self.isWindowMessageHooked(message),
+		"BrowserWindow_UnhookWindowMessage": (self: BrowserWindow, message) => self.unhookWindowMessage(message),
+		"BrowserWindow_UnhookAllWindowMessages": (self: BrowserWindow) => self.unhookAllWindowMessages(),
+		"BrowserWindow_SetRepresentedFilename": (self: BrowserWindow, filename) => self.setRepresentedFilename(filename),
+		"BrowserWindow_GetRepresentedFilename": (self: BrowserWindow) => self.getRepresentedFilename(),
+		"BrowserWindow_SetDocumentEdited": (self: BrowserWindow, edited) => self.setDocumentEdited(edited),
+		"BrowserWindow_IsDocumentEdited": (self: BrowserWindow) => self.isDocumentEdited(),
+		"BrowserWindow_FocusOnWebView": (self: BrowserWindow) => self.focusOnWebView(),
+		"BrowserWindow_BlurWebView": (self: BrowserWindow) => self.blurWebView(),
+		"BrowserWindow_CapturePage": (self: BrowserWindow, rect) => self.capturePage(rect),
+		"BrowserWindow_LoadUrl": (self: BrowserWindow, url, options: LoadURLOptions) => {
 			if (options && options.postData) {
 				for (const data of options.postData) {
 					if (data.type === "rawData") {
@@ -228,6 +355,76 @@ export class SignalR {
 			}
 			return self.loadURL(url, options);
 		},
+		"BrowserWindow_LoadFile": (self: BrowserWindow, filePath, options) => self.loadFile(filePath, options),
+		"BrowserWindow_Reload": (self: BrowserWindow) => self.reload(),
+		"BrowserWindow_SetMenu": (self: BrowserWindow, menu) => self.setMenu(menu ? <Menu>this.objects[menu] : null),
+		"BrowserWindow_RemoveMenu": (self: BrowserWindow) => self.removeMenu(),
+		"BrowserWindow_SetProgressBar": (self: BrowserWindow, progress, options) => self.setProgressBar(progress, options),
+		"BrowserWindow_SetOverlayIcon": (self: BrowserWindow, overlay, description) => {
+			overlay = overlay ? this.objects[overlay] : null;
+			return self.setOverlayIcon(overlay, description);
+		},
+		"BrowserWindow_SetHasShadow": (self: BrowserWindow, hasShadow) => self.setHasShadow(hasShadow),
+		"BrowserWindow_HasShadow": (self: BrowserWindow) => self.hasShadow(),
+		"BrowserWindow_SetOpacity": (self: BrowserWindow, opacity) => self.setOpacity(opacity),
+		"BrowserWindow_GetOpacity": (self: BrowserWindow) => self.getOpacity(),
+		"BrowserWindow_SetShape": (self: BrowserWindow, rects) => self.setShape(rects),
+		"BrowserWindow_SetThumbarButtons": (self: BrowserWindow, buttons) => {
+			buttons ??= [];
+			for (let i = 0; i < buttons.length; i++) {
+				const button = buttons[i];
+				button.icon = button.icon ? this.objects[button.icon] : null,
+				button.click = () => {
+					this.send("BrowserWindow_SetThumbarButtons_Click", self.id, i);
+				};
+			}
+			return self.setThumbarButtons(buttons);
+		},
+		"BrowserWindow_SetThumbnailClip": (self: BrowserWindow, region) => self.setThumbnailClip(region),
+		"BrowserWindow_SetThumbnailToolTip": (self: BrowserWindow, toolTip) => self.setThumbnailToolTip(toolTip),
+		"BrowserWindow_SetAppDetails": (self: BrowserWindow, options) => self.setAppDetails(options),
+		"BrowserWindow_ShowDefinitionForSelection": (self: BrowserWindow) => self.showDefinitionForSelection(),
+		"BrowserWindow_SetIcon": (self: BrowserWindow, icon) => self.setIcon(icon ? <NativeImage>this.objects[icon] : null),
+		"BrowserWindow_SetWindowButtonVisibility": (self: BrowserWindow, visible) => self.setWindowButtonVisibility(visible),
+		"BrowserWindow_SetAutoHideMenuBar": (self: BrowserWindow, hide) => self.setAutoHideMenuBar(hide),
+		"BrowserWindow_IsMenuBarAutoHide": (self: BrowserWindow) => self.isMenuBarAutoHide(),
+		"BrowserWindow_SetMenuBarVisibility": (self: BrowserWindow, visible) => self.setMenuBarVisibility(visible),
+		"BrowserWindow_IsMenuBarVisible": (self: BrowserWindow) => self.isMenuBarVisible(),
+		"BrowserWindow_SetVisibleOnAllWorkspaces": (self: BrowserWindow, visible, options) => self.setVisibleOnAllWorkspaces(visible, options),
+		"BrowserWindow_IsVisibleOnAllWorkspaces": (self: BrowserWindow) => self.isVisibleOnAllWorkspaces(),
+		"BrowserWindow_SetIgnoreMouseEvents": (self: BrowserWindow, ignore, options) => self.setIgnoreMouseEvents(ignore, options),
+		"BrowserWindow_SetContentProtection": (self: BrowserWindow, enable) => self.setContentProtection(enable),
+		"BrowserWindow_SetFocusable": (self: BrowserWindow, focusable) => self.setFocusable(focusable),
+		"BrowserWindow_SetParentWindow": (self: BrowserWindow, parent) => self.setParentWindow(parent ? BrowserWindow.fromId(parent) : null),
+		"BrowserWindow_GetParentWindow": (self: BrowserWindow) => self.getParentWindow(),
+		"BrowserWindow_GetChildWindows": (self: BrowserWindow) => self.getChildWindows().map(x => x.id),
+		"BrowserWindow_SetAutoHideCursor": (self: BrowserWindow, autoHide) => self.setAutoHideCursor(autoHide),
+		"BrowserWindow_SelectPreviousTab": (self: BrowserWindow) => self.selectPreviousTab(),
+		"BrowserWindow_SelectNextTab": (self: BrowserWindow) => self.selectNextTab(),
+		"BrowserWindow_MergeAllWindows": (self: BrowserWindow) => self.mergeAllWindows(),
+		"BrowserWindow_MoveTabToNewWindow": (self: BrowserWindow) => self.moveTabToNewWindow(),
+		"BrowserWindow_ToggleTabBar": (self: BrowserWindow) => self.toggleTabBar(),
+		"BrowserWindow_AddTabbedWindow": (self: BrowserWindow, browserWindow) => self.addTabbedWindow(browserWindow ? BrowserWindow.fromId(browserWindow) : null),
+		"BrowserWindow_SetVibrancy": (self: BrowserWindow, type) => self.setVibrancy(type),
+		"BrowserWindow_SetTrafficLightPosition": (self: BrowserWindow, position) => self.setTrafficLightPosition(position),
+		"BrowserWindow_GetTrafficLightPosition": (self: BrowserWindow) => self.getTrafficLightPosition(),
+		"BrowserWindow_SetTouchBar": (self: BrowserWindow, touchBar) => self.setTouchBar(touchBar ? <TouchBar>this.objects[touchBar] : null),
+		"BrowserWindow_SetBrowserView": (self: BrowserWindow, browserView) => self.setBrowserView(browserView ? <BrowserView>this.objects[browserView] : null),
+		"BrowserWindow_GetBrowserView": (self: BrowserWindow) => self.getBrowserView(),
+		"BrowserWindow_AddBrowserView": (self: BrowserWindow, browserView) => self.addBrowserView(browserView ? <BrowserView>this.objects[browserView] : null),
+		"BrowserWindow_RemoveBrowserView": (self: BrowserWindow, browserView) => self.removeBrowserView(browserView ? <BrowserView>this.objects[browserView] : null),
+		"BrowserWindow_SetTopBrowserView": (self: BrowserWindow, browserView) => self.setTopBrowserView(browserView ? <BrowserView>this.objects[browserView] : null),
+		"BrowserWindow_GetBrowserViews": (self: BrowserWindow) => self.getBrowserViews().map(x => {
+			const id = this.nextGeneratedObjectId++;
+			this.objects[id] = x;
+			return id;	
+		}),
+
+		"ContentTracing_GetCategories": () => contentTracing.getCategories(),
+		"ContentTracing_StartRecording_TraceConfig": options => contentTracing.startRecording(options),
+		"ContentTracing_StartRecording_TraceCategoriesAndOptions": options => contentTracing.startRecording(options),
+		"ContentTracing_StopRecording": resultFilePath => contentTracing.startRecording(resultFilePath),
+		"ContentTracing_GetTraceBufferUsage": () => contentTracing.getTraceBufferUsage(),
 
 		"Function_Invoke": (self: Function, args: any[]) => self(...args),
 
@@ -277,7 +474,8 @@ export class SignalR {
 		"Function": true,
 		"Menu": true,
 		"NativeImage": true,
-		"Session": true
+		"Session": true,
+		"TouchBar": true
 	};
 
 	private signalr: HubConnection;
@@ -299,12 +497,12 @@ export class SignalR {
 					const index = name.indexOf("_");
 					if (index >= 0) {
 						const type = name.substr(0, index);
-						if (this.trackedTypes[type]) {
-							if (!args[1]) {
-								args[1] = null;
-							} else {
-								args[1] = this.objects[args[1]];
-							}
+						if (type === "BrowserWindow") {
+							args[1] = args[1] ? BrowserWindow.fromId(args[1]) : null;
+						} else if (type === "WebContents") {
+							args[1] = args[1] ? WebContents.fromId(args[1]) : null;
+						} else if (this.trackedTypes[type]) {
+							args[1] = args[1] ? this.objects[args[1]] : null;
 						}
 					}
 	
@@ -313,7 +511,7 @@ export class SignalR {
 						ret = await ret;
 					}
 					if (ret === undefined) {
-						await this.send(`Return`, args[0]);
+						await this.send("Return", args[0], "undefined");
 					} else {
 						//console.log(ret);
 
@@ -335,7 +533,7 @@ export class SignalR {
 							//}
 						}
 	
-						await this.send(`Return_${name}`, args[0], ret);
+						await this.send("Return", args[0], JSON.stringify(ret));
 					}
 				} catch (e) {
 					console.error(e);

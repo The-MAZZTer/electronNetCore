@@ -16,8 +16,9 @@ namespace MZZT.ElectronNetCore {
 	internal class ElectronNetCoreService : IHostedService {
 		internal static Uri BaseUri { get; private set; }
 
-		public ElectronNetCoreService(ILogger<ElectronNetCoreService> logger) {
+		public ElectronNetCoreService(ILogger<ElectronNetCoreService> logger, ILoggerFactory logFactory) {
 			this.logger = logger;
+			Electron.Log = logFactory.CreateLogger(typeof(Electron).FullName);
 		}
 
 		public Task StartAsync(CancellationToken cancellationToken) {
