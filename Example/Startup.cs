@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace Example {
 	public class Startup {
 		public Startup(IConfiguration configuration) {
-			Configuration = configuration;
+			this.Configuration = configuration;
 
 			Electron.Process.Loaded += (sender, e) => {
 				Console.WriteLine("Loaded");
@@ -29,7 +29,7 @@ namespace Example {
 				Console.WriteLine($"WindowAllClosed");
 
 				if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) {
-					Task.Run(async () => await Electron.App.QuitAsync());
+					Task.Run(Electron.App.QuitAsync);
 				}
 			};
 
@@ -73,21 +73,21 @@ namespace Example {
 				Console.WriteLine($"Ready");
 
 				Task.Run(async () => {
-					await this.CreateWindowAsync();
+					BrowserWindow win = await this.CreateWindowAsync();
+
 				});
 			};
 
-			Task.Run(async () => {
-				await Electron.App.Name.SetAsync("Example");
-			});
+			Task.Run(() => Electron.App.Name.SetAsync("Example"));
 		}
 
-		private async Task CreateWindowAsync() {
+		private async Task<BrowserWindow> CreateWindowAsync() {
 			BrowserWindow win = await BrowserWindow.CreateAsync(new() {
-				Width = 800,
-				Height = 600
+				Width = 1280,
+				Height = 720
 			});
 			await win.LoadUrlAsync("/");
+			return win;
 		}
 
 		public IConfiguration Configuration { get; }

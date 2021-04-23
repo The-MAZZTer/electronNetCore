@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace MZZT.ElectronNetCore.Api {
 		private static readonly Dictionary<int, BrowserWindow> instances = new();
 
 		public static Task<BrowserWindow> CreateAsync(BrowserWindowConstructorOptions options = null) =>
-			Electron.FuncAsync<BrowserWindow, int, BrowserWindowConstructorOptionsInternal>(x => x.BrowserWindow_Ctor, 0, options.ToBrowserWindowConstructorOptionsInternal());
+			Electron.FuncAsync<BrowserWindow, int, BrowserWindowConstructorOptionsDto>(x => x.BrowserWindow_Ctor, 0, options.ToBrowserWindowConstructorOptionsDto());
 
 		public static IEnumerable<BrowserWindow> GetAllWindows() {
 			return instances.Values;
@@ -652,21 +653,29 @@ namespace MZZT.ElectronNetCore.Api {
 			Electron.FuncAsync<bool, int>(x => x.BrowserWindow_IsTabletMode, this.Id);
 		public Task<string> GetMediaSourceIdAsync() =>
 			Electron.FuncAsync<string, int>(x => x.BrowserWindow_GetMediaSourceId, this.Id);
-		public async Task<IntPtr> GetNativeWindowHandleAsync() =>
-			new IntPtr(await Electron.FuncAsync<long, int>(x => x.BrowserWindow_GetNativeWindowHandle, this.Id));
+		public async Task<IntPtr> GetNativeWindowHandleAsync() {
+			Buffer buffer = await Electron.FuncAsync<Buffer, int>(x => x.BrowserWindow_GetNativeWindowHandle, this.Id);
+			byte[] bytes = buffer.Bytes;
+			return bytes.Length switch {
+				4 => new IntPtr(BitConverter.ToInt32(bytes)),
+				8 => new IntPtr(BitConverter.ToInt64(bytes)),
+				_ => throw new InvalidDataException($"Unexpected handle size {bytes.Length}!"),
+			};
+		}
 		private readonly Dictionary<int, List<int>> hookWindowMessageMap = new();
 		private readonly Dictionary<int, Action<int, int>> hookWindowMessageCallbacks = new();
 		internal Task OnWindowMessage(int requestId, int wParam, int lParam) {
 			Action<int, int> callback = this.hookWindowMessageCallbacks.GetValueOrDefault(requestId);
-			if (callback != null) {
-				callback(wParam, lParam);
-			}
+			callback?.Invoke(wParam, lParam);
 			return Task.CompletedTask;
 		}
 		public async Task HookWindowMessageAsync(int message, Action<int, int> callback) {
 			int requestId = Electron.NextRequestId;
-			this.hookWindowMessageMap[message] ??= new();
-			this.hookWindowMessageMap[message].Add(requestId);
+			List<int> map = this.hookWindowMessageMap.GetValueOrDefault(message);
+			if (map == null) {
+				this.hookWindowMessageMap[message] = map = new List<int>();
+			}
+			map.Add(requestId);
 			this.hookWindowMessageCallbacks[requestId] = callback;
 			await Electron.ActionAsync(x => x.BrowserWindow_HookWindowMessage, this.Id, message);
 		}
@@ -703,7 +712,7 @@ namespace MZZT.ElectronNetCore.Api {
 			Electron.FuncAsync<NativeImage, int, Rectangle>(x => x.BrowserWindow_CapturePage, this.Id, rect);
 		public Task LoadUrlAsync(string url, LoadUrlOptions options = null) {
 			url = new Uri(ElectronNetCoreService.BaseUri, url).AbsoluteUri;
-			return Electron.ActionAsync(x => x.BrowserWindow_LoadUrl, this.Id, url, options?.ToLoadUrlOptionsInternal());
+			return Electron.ActionAsync(x => x.BrowserWindow_LoadUrl, this.Id, url, options?.ToLoadUrlOptionsDto());
 		}
 		public Task LoadFileAsync(string filePath, LoadFileOptions options) {
 			filePath = Path.Combine(Path.GetDirectoryName(Electron.AppPath), filePath);
@@ -731,15 +740,12 @@ namespace MZZT.ElectronNetCore.Api {
 			Electron.ActionAsync(x => x.BrowserWindow_SetShape, this.Id, rects);
 		private Action[] setThumbarButtonsCallbacks;
 		internal Task OnThumbarButtonClick(int index) {
-			Action callback = this.setThumbarButtonsCallbacks[index];
-			if (callback != null) {
-				callback();
-			}
+			this.setThumbarButtonsCallbacks[index]?.Invoke();
 			return Task.CompletedTask;
 		}
 		public async Task<bool> SetThumbarButtonsAsync(ThumbarButton[] buttons) {
-			bool ret = await Electron.FuncAsync<bool, int, ThumbarButtonInternal[]>(x => x.BrowserWindow_SetThumbarButtons, this.Id,
-				buttons.Select(x => x.ToThumbarButtonInternal()).ToArray());
+			bool ret = await Electron.FuncAsync<bool, int, ThumbarButtonDto[]>(x => x.BrowserWindow_SetThumbarButtons, this.Id,
+				buttons.Select(x => x.ToThumbarButtonDto()).ToArray());
 			if (ret) {
 				this.setThumbarButtonsCallbacks = buttons.Select(x => x.Click).ToArray();
 			}

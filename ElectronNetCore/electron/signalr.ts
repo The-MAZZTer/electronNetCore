@@ -1,6 +1,7 @@
 import { HubConnection, HubConnectionBuilder, HubConnectionState } from "@microsoft/signalr";
-import { app, autoUpdater, BrowserView, BrowserWindow, LoadURLOptions, Menu, NativeImage, WebContents, BrowserViewConstructorOptions, BrowserWindowConstructorOptions, Session, TouchBar, contentTracing } from "electron";
-import * as os from "os";
+import { app, autoUpdater, BrowserView, BrowserWindow, LoadURLOptions, Menu, NativeImage, WebContents,
+	BrowserViewConstructorOptions, BrowserWindowConstructorOptions, Session, TouchBar, contentTracing,
+	dialog, MessageBoxOptions, globalShortcut, inAppPurchase, Transaction } from "electron";
 
 export class SignalR {
 	private appBeforeQuitPreventDefault = false;
@@ -323,17 +324,10 @@ export class SignalR {
 		"BrowserWindow_IsKiosk": (self: BrowserWindow) => self.isKiosk(),
 		"BrowserWindow_IsTabletMode": (self: BrowserWindow) => self.isTabletMode(),
 		"BrowserWindow_GetMediaSourceId": (self: BrowserWindow) => self.getMediaSourceId(),
-		"BrowserWindow_GetNativeWindowHandle": (self: BrowserWindow) => {
-			const buffer = self.getNativeWindowHandle();
-			if (os.endianness() === "LE") {
-				return buffer.readIntLE(0, buffer.byteLength);
-			} else {
-				return buffer.readIntBE(0, buffer.byteLength);
-			}
-		},
-		"BrowserWindow_HookWindowMessage": (self: BrowserWindow, message, id) =>
+		"BrowserWindow_GetNativeWindowHandle": (self: BrowserWindow) => self.getNativeWindowHandle(),
+		"BrowserWindow_HookWindowMessage": (self: BrowserWindow, message, requestId) =>
 			self.hookWindowMessage(message, (wParam, lParam) => {
-				this.send("BrowserWindow_HookWindowMessage_Callback", self.id, id, wParam, lParam);
+				this.send("BrowserWindow_HookWindowMessage_Callback", self.id, requestId, wParam, lParam);
 			}),
 		"BrowserWindow_IsWindowMessageHooked": (self: BrowserWindow, message) => self.isWindowMessageHooked(message),
 		"BrowserWindow_UnhookWindowMessage": (self: BrowserWindow, message) => self.unhookWindowMessage(message),
@@ -426,7 +420,39 @@ export class SignalR {
 		"ContentTracing_StopRecording": resultFilePath => contentTracing.startRecording(resultFilePath),
 		"ContentTracing_GetTraceBufferUsage": () => contentTracing.getTraceBufferUsage(),
 
+		"Dialog_ShowOpenDialog": async (browserWindow: number, options) => dialog.showOpenDialog(browserWindow > 0 ? BrowserWindow.fromId(browserWindow) : null, options),
+		"Dialog_ShowSaveDialog": (browserWindow: number, options) => dialog.showSaveDialog(browserWindow > 0 ? BrowserWindow.fromId(browserWindow) : null, options),
+		"Dialog_ShowMessageBox": (browserWindow: number, options: MessageBoxOptions) => {
+			if (options) {
+				options.icon = <any>options.icon > 0 ? <NativeImage>this.objects[<any>options.icon] : null;
+			}
+			return dialog.showMessageBox(browserWindow > 0 ? BrowserWindow.fromId(browserWindow) : null, options);
+		},
+		"Dialog_ShowErrorBox": (title, content) => dialog.showErrorBox(title, content),
+		"Dialog_ShowCertificateTrustDialog": (browserWindow: number, options) => dialog.showCertificateTrustDialog(browserWindow > 0 ? BrowserWindow.fromId(browserWindow) : null, options),
+
 		"Function_Invoke": (self: Function, args: any[]) => self(...args),
+
+		"GlobalShortcut_Register": (accelerator, requestId) => {
+			return globalShortcut.register(accelerator, () => {
+				this.send("GlobalShortcut_Register_Callback", requestId);
+			});
+		},
+		"GlobalShortcut_RegisterAll": (accelerators, requestId) =>
+			globalShortcut.registerAll(accelerators, () => {
+				this.send("GlobalShortcut_Register_Callback", requestId);
+			}),
+		"GlobalShortcut_IsRegistered": accelerator => globalShortcut.isRegistered(accelerator),
+		"GlobalShortcut_Unregister": accelerator => globalShortcut.unregister(accelerator),
+		"GlobalShortcut_UnregisterAll": () => globalShortcut.unregisterAll(),
+
+		"InAppPurchase_PurchaseProduct": (productId, quantity) => inAppPurchase.purchaseProduct(productId, quantity),
+		"InAppPurchase_GetProducts": productIds => inAppPurchase.getProducts(productIds),
+		"InAppPurchase_CanMakePayments": () => inAppPurchase.canMakePayments(),
+		"InAppPurchase_RestoreCompletedTransactions": () => inAppPurchase.restoreCompletedTransactions(),
+		"InAppPurchase_GetReceiptUrl": () => inAppPurchase.getReceiptURL(),
+		"InAppPurchase_FinishAllTransactions": () => inAppPurchase.finishAllTransactions(),
+		"InAppPurchase_FinishTransactionByDate": date => inAppPurchase.finishTransactionByDate(date),
 
 		"NativeImage_GetSize": (self: NativeImage, scaleFactor) => self.getSize(scaleFactor),
 		"NativeImage_ToDataUrl": (self: NativeImage, options) => self.toDataURL(options),
@@ -546,381 +572,330 @@ export class SignalR {
 			});
 		}
 
-		app.on("will-finish-launching", async () => {
-			await this.send("App_WillFinishLaunching_Event");
-		})
+		app.on("will-finish-launching", () =>
+			this.send("App_WillFinishLaunching_Event"))
 
-		app.on("ready", async (_, launchInfo) => {
-			await this.send("App_Ready_Event", launchInfo);
-		});
+		app.on("ready", (_, launchInfo) =>
+			this.send("App_Ready_Event", launchInfo));
 
-		app.on("window-all-closed", async () => {
-			await this.send("App_WindowAllClosed_Event");
-		});
+		app.on("window-all-closed", () =>
+			this.send("App_WindowAllClosed_Event"));
 
-		app.on("before-quit", async e => {
+		app.on("before-quit", e => {
 			if (this.appBeforeQuitPreventDefault) {
 				e.preventDefault();
 			}
-			await this.send("App_BeforeQuit_Event");
+			return this.send("App_BeforeQuit_Event");
 		});
 
-		app.on("will-quit", async e => {
+		app.on("will-quit", e => {
 			if (this.appWillQuitPreventDefault) {
 				e.preventDefault();
 			}
-			await this.send("App_WillQuit_Event");
+			return this.send("App_WillQuit_Event");
 		});
 
-		app.on("quit", async (_, exitCode) => {
-			await this.send("App_Quit_Event", exitCode);
-		});
+		app.on("quit", (_, exitCode) =>
+			this.send("App_Quit_Event", exitCode));
 
-		app.on("open-file", async (e, path) => {
+		app.on("open-file", (e, path) => {
 			if (this.appOpenFilePreventDefault) {
 				e.preventDefault();
 			}
-			await this.send("App_OpenFile_Event", path);
+			return this.send("App_OpenFile_Event", path);
 		});
 
-		app.on("open-url", async (e, url) => {
+		app.on("open-url", (e, url) => {
 			if (this.appOpenUrlPreventDefault) {
 				e.preventDefault();
 			}
-			await this.send("App_OpenUrl_Event", url);
+			return this.send("App_OpenUrl_Event", url);
 		});
 
-		app.on("activate", async (_, hasVisibleWindows) => {
-			await this.send("App_Activate_Event", hasVisibleWindows);
-		});
+		app.on("activate", (_, hasVisibleWindows) =>
+			this.send("App_Activate_Event", hasVisibleWindows));
 
-		app.on("did-become-active", async _ => {
-			await this.send("App_DidBecomeActive_Event");
-		});
+		app.on("did-become-active", _ =>
+			this.send("App_DidBecomeActive_Event"));
 
-		app.on("continue-activity", async (e, type, userInfo) => {
+		app.on("continue-activity", (e, type, userInfo) => {
 			if (this.appContinueActivityPreventDefault) {
 				e.preventDefault();
 			}
 
-			await this.send("App_ContinueActivity_Event", type, userInfo);
+			return this.send("App_ContinueActivity_Event", type, userInfo);
 		});
 
-		app.on("will-continue-activity", async (e, type) => {
+		app.on("will-continue-activity", (e, type) => {
 			if (this.appWillContinueActivityPreventDefault) {
 				e.preventDefault();
 			}
 
-			await this.send("App_WillContinueActivity_Event", type);
+			return this.send("App_WillContinueActivity_Event", type);
 		});
 
-		app.on("continue-activity-error", async (_, type, error) => {
-			await this.send("App_ContinueActivityError_Event", type, error);
-		});
+		app.on("continue-activity-error", (_, type, error) =>
+			this.send("App_ContinueActivityError_Event", type, error));
 
-		app.on("activity-was-continued", async (_, type, userInfo) => {
-			await this.send("App_ActivityWasContinued_Event", type, userInfo);
-		});
+		app.on("activity-was-continued", (_, type, userInfo) =>
+			this.send("App_ActivityWasContinued_Event", type, userInfo));
 
-		app.on("update-activity-state", async (e, type, userInfo) => {
+		app.on("update-activity-state", (e, type, userInfo) => {
 			if (this.appUpdateActivityStatePreventDefault) {
 				e.preventDefault();
 			}
 
-			await this.send("App_UpdateActivityState_Event", type, userInfo);
+			return this.send("App_UpdateActivityState_Event", type, userInfo);
 		});
 
-		app.on("new-window-for-tab", async _ => {
-			await this.send("App_NewWindowForTab_Event");
-		});
+		app.on("new-window-for-tab", _ =>
+			this.send("App_NewWindowForTab_Event"));
 
-		app.on("browser-window-blur", async (_, window) => {
-			await this.send("App_BrowserWindowBlur_Event", window.id);
-		});
+		app.on("browser-window-blur", (_, window) =>
+			this.send("App_BrowserWindowBlur_Event", window.id));
 
-		app.on("browser-window-focus", async (_, window) => {
-			await this.send("App_BrowserWindowFocus_Event", window.id);
-		});
+		app.on("browser-window-focus", (_, window) =>
+			this.send("App_BrowserWindowFocus_Event", window.id));
 
-		app.on("browser-window-created", async (_, window) => {
+		app.on("browser-window-created", (_, window) => {
 			const id = window.id;
-			window.on("page-title-updated", async (e, title, explicitSet) => {
+			window.on("page-title-updated", (e, title, explicitSet) => {
 				if (this.browserWindowPageTitleUpdatedPreventDefault[id]) {
 					e.preventDefault();
 				}
 
-				await this.send("BrowserWindow_PageTitleUpdated_Event", id, title, explicitSet);
+				return this.send("BrowserWindow_PageTitleUpdated_Event", id, title, explicitSet);
 			});
 
-			window.on("close", async e => {
+			window.on("close", e => {
 				if (this.browserWindowClosePreventDefault[id]) {
 					e.preventDefault();
 				}
 
-				await this.send("BrowserWindow_Close_Event", id);
+				return this.send("BrowserWindow_Close_Event", id);
 			});
 
-			window.on("closed", async () => {
+			window.on("closed", () => {
 				delete this.browserWindowPageTitleUpdatedPreventDefault[id];
 				delete this.browserWindowClosePreventDefault[id];
 				delete this.browserWindowWillResizePreventDefault[id];
 				delete this.browserWindowWillMovePreventDefault[id];
 				delete this.browserWindowSystemContextMenuPreventDefault[id];
 			
-				await this.send("BrowserWindow_Closed_Event", id);
+				return this.send("BrowserWindow_Closed_Event", id);
 			});
 
-			window.on("session-end", async () => {
-				await this.send("BrowserWindow_SessionEnd_Event", id);
-			});
+			window.on("session-end", () =>
+				this.send("BrowserWindow_SessionEnd_Event", id));
 
-			window.on("unresponsive", async () => {
-				await this.send("BrowserWindow_Unresponsive_Event", id);
-			});
+			window.on("unresponsive", () =>
+				this.send("BrowserWindow_Unresponsive_Event", id));
 
-			window.on("responsive", async () => {
-				await this.send("BrowserWindow_Responsive_Event", id);
-			});
+			window.on("responsive", () =>
+				this.send("BrowserWindow_Responsive_Event", id));
 
-			window.on("blur", async () => {
-				await this.send("BrowserWindow_Blur_Event", id);
-			});
+			window.on("blur", () =>
+				this.send("BrowserWindow_Blur_Event", id));
 
-			window.on("focus", async () => {
-				await this.send("BrowserWindow_Focus_Event", id);
-			});
+			window.on("focus", () =>
+				this.send("BrowserWindow_Focus_Event", id));
 
-			window.on("show", async () => {
-				await this.send("BrowserWindow_Show_Event", id);
-			});
+			window.on("show", () =>
+				this.send("BrowserWindow_Show_Event", id));
 
-			window.on("hide", async () => {
-				await this.send("BrowserWindow_Hide_Event", id);
-			});
+			window.on("hide", () =>
+				this.send("BrowserWindow_Hide_Event", id));
 
-			window.on("ready-to-show", async () => {
-				await this.send("BrowserWindow_ReadyToShow_Event", id);
-			});
+			window.on("ready-to-show", () =>
+				this.send("BrowserWindow_ReadyToShow_Event", id));
 
-			window.on("maximize", async () => {
-				await this.send("BrowserWindow_Maximize_Event", id);
-			});
+			window.on("maximize", () =>
+				this.send("BrowserWindow_Maximize_Event", id));
 
-			window.on("unmaximize", async () => {
-				await this.send("BrowserWindow_Unmaximize_Event", id);
-			});
+			window.on("unmaximize", () =>
+				this.send("BrowserWindow_Unmaximize_Event", id));
 
-			window.on("minimize", async () => {
-				await this.send("BrowserWindow_Minimize_Event", id);
-			});
+			window.on("minimize", () =>
+				this.send("BrowserWindow_Minimize_Event", id));
 
-			window.on("restore", async () => {
-				await this.send("BrowserWindow_Restore_Event", id);
-			});
+			window.on("restore", () =>
+				this.send("BrowserWindow_Restore_Event", id));
 
-			window.on("will-resize", async (e, newBounds) => {
+			window.on("will-resize", (e, newBounds) => {
 				if (this.browserWindowWillResizePreventDefault[id]) {
 					e.preventDefault();
 				}
 
-				await this.send("BrowserWindow_WillResize_Event", id, newBounds);
+				return this.send("BrowserWindow_WillResize_Event", id, newBounds);
 			});
 
-			window.on("resize", async () => {
-				await this.send("BrowserWindow_Resize_Event", id);
-			});
+			window.on("resize", () =>
+				this.send("BrowserWindow_Resize_Event", id));
 
-			window.on("resized", async () => {
-				await this.send("BrowserWindow_Resized_Event", id);
-			});
+			window.on("resized", () =>
+				this.send("BrowserWindow_Resized_Event", id));
 
-			window.on("will-move", async (e, newBounds) => {
+			window.on("will-move", (e, newBounds) => {
 				if (this.browserWindowWillMovePreventDefault[id]) {
 					e.preventDefault();
 				}
 
-				await this.send("BrowserWindow_WillMove_Event", id, newBounds);
+				return this.send("BrowserWindow_WillMove_Event", id, newBounds);
 			});
 
-			window.on("move", async () => {
-				await this.send("BrowserWindow_Move_Event", id);
-			});
+			window.on("move", () =>
+				this.send("BrowserWindow_Move_Event", id));
 
-			window.on("moved", async () => {
-				await this.send("BrowserWindow_Moved_Event", id);
-			});
+			window.on("moved", () =>
+				this.send("BrowserWindow_Moved_Event", id));
 
-			window.on("enter-full-screen", async () => {
-				await this.send("BrowserWindow_EnterFullScreen_Event", id);
-			});
+			window.on("enter-full-screen", () =>
+				this.send("BrowserWindow_EnterFullScreen_Event", id));
 
-			window.on("leave-full-screen", async () => {
-				await this.send("BrowserWindow_LeaveFullScreen_Event", id);
-			});
+			window.on("leave-full-screen", () =>
+				this.send("BrowserWindow_LeaveFullScreen_Event", id));
 
-			window.on("enter-html-full-screen", async () => {
-				await this.send("BrowserWindow_EnterHtmlFullScreen_Event", id);
-			});
+			window.on("enter-html-full-screen", () =>
+				this.send("BrowserWindow_EnterHtmlFullScreen_Event", id));
 
-			window.on("leave-html-full-screen", async () => {
-				await this.send("BrowserWindow_LeaveHtmlFullScreen_Event", id);
-			});
+			window.on("leave-html-full-screen", () =>
+				this.send("BrowserWindow_LeaveHtmlFullScreen_Event", id));
 
-			window.on("always-on-top-changed", async (_, isAlwaysOnTop) => {
-				await this.send("BrowserWindow_AlwaysOnTopChanged_Event", id, isAlwaysOnTop);
-			});
+			window.on("always-on-top-changed", (_, isAlwaysOnTop) =>
+				this.send("BrowserWindow_AlwaysOnTopChanged_Event", id, isAlwaysOnTop));
 
-			window.on("app-command", async (_, command) => {
-				await this.send("BrowserWindow_AppCommand_Event", id, command);
-			});
+			window.on("app-command", (_, command) =>
+				this.send("BrowserWindow_AppCommand_Event", id, command));
 
-			window.on("scroll-touch-begin", async () => {
-				await this.send("BrowserWindow_ScrollTouchBegin_Event", id);
-			});
+			window.on("scroll-touch-begin", () =>
+				this.send("BrowserWindow_ScrollTouchBegin_Event", id));
 
-			window.on("scroll-touch-end", async () => {
-				await this.send("BrowserWindow_ScrollTouchEnd_Event", id);
-			});
+			window.on("scroll-touch-end", () =>
+				this.send("BrowserWindow_ScrollTouchEnd_Event", id));
 
-			window.on("scroll-touch-edge", async () => {
-				await this.send("BrowserWindow_ScrollTouchEdge_Event", id);
-			});
+			window.on("scroll-touch-edge", () =>
+				this.send("BrowserWindow_ScrollTouchEdge_Event", id));
 
-			window.on("swipe", async (_, direction) => {
-				await this.send("BrowserWindow_Swipe_Event", id, direction);
-			});
+			window.on("swipe", (_, direction) =>
+				this.send("BrowserWindow_Swipe_Event", id, direction));
 
-			window.on("rotate-gesture", async (_, rotation) => {
-				await this.send("BrowserWindow_RotateGesture_Event", id, rotation);
-			});
+			window.on("rotate-gesture", (_, rotation) =>
+				this.send("BrowserWindow_RotateGesture_Event", id, rotation));
 
-			window.on("sheet-begin", async () => {
-				await this.send("BrowserWindow_SheetBegin_Event", id);
-			});
+			window.on("sheet-begin", () =>
+				this.send("BrowserWindow_SheetBegin_Event", id));
 
-			window.on("sheet-end", async () => {
-				await this.send("BrowserWindow_SheetEnd_Event", id);
-			});
+			window.on("sheet-end", () =>
+				this.send("BrowserWindow_SheetEnd_Event", id));
 
-			window.on("new-window-for-tab", async () => {
-				await this.send("BrowserWindow_NewWindowForTab_Event", id);
-			});
+			window.on("new-window-for-tab", () =>
+				this.send("BrowserWindow_NewWindowForTab_Event", id));
 
-			window.on("system-context-menu", async (e, point) => {
+			window.on("system-context-menu", (e, point) => {
 				if (this.browserWindowSystemContextMenuPreventDefault[id]) {
 					e.preventDefault();
 				}
 
-				await this.send("BrowserWindow_SystemContextMenu_Event", id, point);
+				return this.send("BrowserWindow_SystemContextMenu_Event", id, point);
 			});
 
-			await this.send("App_BrowserWindowCreated_Event", id);
+			return this.send("App_BrowserWindowCreated_Event", id);
 		});
 
-		app.on("web-contents-created", async (_, contents) => {
+		app.on("web-contents-created", (_, contents) => {
 			const id = contents.id;
-			contents.on("destroyed", async () => {
-				await this.send("WebContents_Destroyed_Event", id);
-			});
+			contents.on("destroyed", () =>
+				this.send("WebContents_Destroyed_Event", id));
 
-			await this.send("App_WebContentsCreated_Event", id);
+			return this.send("App_WebContentsCreated_Event", id);
 		});
 
-		app.on("certificate-error", async (e, webContents, url, error, certficate, callback) => {
+		app.on("certificate-error", (e, webContents, url, error, certficate, callback) => {
 			if (this.appCertificateErrorPreventDefault) {
 				e.preventDefault();
 			}
 
 			const id = this.nextGeneratedObjectId++;
 			this.objects[id] = callback;
-			await this.send("App_CertificateError_Event", webContents.id, url, error, certficate, id);
+			return this.send("App_CertificateError_Event", webContents.id, url, error, certficate, id);
 		});
 
-		app.on("select-client-certificate", async (e, webContents, url, certificateList, callback) => {
+		app.on("select-client-certificate", (e, webContents, url, certificateList, callback) => {
 			if (this.appSelectClientCertificatePreventDefault) {
 				e.preventDefault();
 			}
 
 			const id = this.nextGeneratedObjectId++;
 			this.objects[id] = callback;
-			await this.send("App_SelectClientCertificate_Event", webContents.id, url, certificateList, id);
+			return this.send("App_SelectClientCertificate_Event", webContents.id, url, certificateList, id);
 		});
 
-		app.on("login", async (e, webContents, authenticationResponseDetails, authInfo, callback) => {
+		app.on("login", (e, webContents, authenticationResponseDetails, authInfo, callback) => {
 			if (this.appLoginPreventDefault) {
 				e.preventDefault();
 			}
 
 			const id = this.nextGeneratedObjectId++;
 			this.objects[id] = callback;
-			await this.send("App_Login_Event", webContents.id, authenticationResponseDetails, authInfo, id);
+			return this.send("App_Login_Event", webContents.id, authenticationResponseDetails, authInfo, id);
 		});
 
-		app.on("gpu-info-update", async () => {
-			await this.send("App_GpuInfoUpdate_Event");
-		});
+		app.on("gpu-info-update", () =>
+			this.send("App_GpuInfoUpdate_Event"));
 
-		app.on("render-process-gone", async (_, webContents, details) => {
-			await this.send("App_RenderProcessGone_Event", webContents.id, details);
-		});
+		app.on("render-process-gone", (_, webContents, details) =>
+			this.send("App_RenderProcessGone_Event", webContents.id, details));
 
-		app.on("child-process-gone", async (_, details) => {
-			await this.send("App_ChildProcessGone_Event", details);
-		});
+		app.on("child-process-gone", (_, details) =>
+			this.send("App_ChildProcessGone_Event", details));
 
-		app.on("accessibility-support-changed", async (_, accessibilitySupportEnabled) => {
-			await this.send("App_AccessibilitySupportChanged_Event", accessibilitySupportEnabled);
-		});
+		app.on("accessibility-support-changed", (_, accessibilitySupportEnabled) =>
+			this.send("App_AccessibilitySupportChanged_Event", accessibilitySupportEnabled));
 
-		app.on("session-created", async session => {
+		app.on("session-created", session => {
 			const id = this.nextGeneratedObjectId++;
 			this.objects[id] = session;
-			await this.send("App_SessionCreated_Event", id);
-		})
-
-		app.on("second-instance", async (_, argv, workingDirectory) => {
-			await this.send("App_SecondInstance_Event", argv, workingDirectory);
+			return this.send("App_SessionCreated_Event", id);
 		});
 
-		app.on("desktop-capturer-get-sources", async (e, webContents) => {		
+		app.on("second-instance", (_, argv, workingDirectory) =>
+			this.send("App_SecondInstance_Event", argv, workingDirectory));
+
+		app.on("desktop-capturer-get-sources", (e, webContents) => {		
 			if (this.appDesktopCapturerGetSourcesPreventDefault) {
 				e.preventDefault();
 			}
 
-			await this.send("App_DesktopCapturerGetSources_Event", webContents.id);
+			return this.send("App_DesktopCapturerGetSources_Event", webContents.id);
 		});
 
-		autoUpdater.on("error", async e => {
-			await this.send("AutoUpdater_Error", {
+		autoUpdater.on("error", e =>
+			this.send("AutoUpdater_Error", {
 				name: e.name,
 				message: e.message,
 				stack: e.stack
-			});
-		});
+			}));
+		
+		autoUpdater.on("checking-for-update", () =>
+			this.send("AutoUpdater_CheckingForUpdate_Event"));
 
-		autoUpdater.on("checking-for-update", async () => {
-			await this.send("AutoUpdater_CheckingForUpdate_Event");
-		});
+		autoUpdater.on("update-available", () =>
+			this.send("AutoUpdater_UpdateAvailable_Event"));
 
-		autoUpdater.on("update-available", async () => {
-			await this.send("AutoUpdater_UpdateAvailable_Event");
-		});
+		autoUpdater.on("update-not-available", () =>
+			this.send("AutoUpdater_UpdateNotAvailable_Event"));
 
-		autoUpdater.on("update-not-available", async () => {
-			await this.send("AutoUpdater_UpdateNotAvailable_Event");
-		});
+		autoUpdater.on("update-downloaded", (_, releaseNotes, releaseName, releaseDate, updateUrl) =>
+			this.send("AutoUpdater_UpdateDownloaded_Event", releaseNotes, releaseName, releaseDate.valueOf(), updateUrl));
 
-		autoUpdater.on("update-downloaded", async (_, releaseNotes, releaseName, releaseDate, updateUrl) => {
-			await this.send("AutoUpdater_UpdateDownloaded_Event", releaseNotes, releaseName, releaseDate.valueOf(), updateUrl);
-		});
+		autoUpdater.on("before-quit-for-update", () => 
+			this.send("AutoUpdater_BeforeQuitForUpdate_Event"));
 
-		autoUpdater.on("before-quit-for-update", async () => {
-			await this.send("AutoUpdater_BeforeQuitForUpdate_Event");
-		});
+		inAppPurchase.on("transactions-updated", (_: Event, transactions: Transaction[]) =>
+			this.send("InAppPurchase_TransactionsUpdated_Event", transactions));
 
-		process.on("loaded", async () => {
-			await this.send("Process_Loaded_Event");
-		})
+		process.on("loaded", () =>
+			this.send("Process_Loaded_Event"));
 
 		signalr.onclose(e => {
 			console.error("Can't reconnect to ASP.NET Core!");

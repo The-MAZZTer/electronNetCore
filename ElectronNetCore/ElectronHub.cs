@@ -121,7 +121,7 @@ namespace MZZT.ElectronNetCore {
 		Task AutoUpdater_CheckForUpdates(int requestId);
 		Task AutoUpdater_QuitAndInstall(int requestId);
 
-		Task BrowserView_Ctor(int requestId, int id, BrowserViewConstructorOptionsInternal options);
+		Task BrowserView_Ctor(int requestId, int id, BrowserViewConstructorOptionsDto options);
 
 		Task BrowserView_WebContents_Get(int requestId, int id);
 		Task BrowserView_WebContents_Set(int requestId, int id, int value);
@@ -131,7 +131,7 @@ namespace MZZT.ElectronNetCore {
 		Task BrowserView_GetBounds(int requestId, int id);
 		Task BrowserView_SetBackgroundColor(int requestId, int id, string color);
 
-		Task BrowserWindow_Ctor(int requestId, int id, BrowserWindowConstructorOptionsInternal options);
+		Task BrowserWindow_Ctor(int requestId, int id, BrowserWindowConstructorOptionsDto options);
 
 		Task BrowserWindow_PageTitleUpdated_PreventDefault(int requestId, bool value);
 		Task BrowserWindow_Close_PreventDefault(int requestId, bool value);
@@ -261,7 +261,7 @@ namespace MZZT.ElectronNetCore {
 		Task BrowserWindow_FocusOnWebView(int requestId, int id);
 		Task BrowserWindow_BlurWebView(int requestId, int id);
 		Task BrowserWindow_CapturePage(int requestId, int id, Rectangle rect);
-		Task BrowserWindow_LoadUrl(int requestId, int id, string url, LoadUrlOptionsInternal options);
+		Task BrowserWindow_LoadUrl(int requestId, int id, string url, LoadUrlOptionsDto options);
 		Task BrowserWindow_LoadFile(int requestId, int id, string filePath, LoadFileOptions options);
 		Task BrowserWindow_Reload(int requestId, int id);
 		Task BrowserWindow_SetMenu(int requestId, int id, int menu);
@@ -273,7 +273,7 @@ namespace MZZT.ElectronNetCore {
 		Task BrowserWindow_SetOpacity(int requestId, int id, double opacity);
 		Task BrowserWindow_GetOpacity(int requestId, int id);
 		Task BrowserWindow_SetShape(int requestId, int id, Rectangle[] rects);
-		Task BrowserWindow_SetThumbarButtons(int requestId, int id, ThumbarButtonInternal[] buttons);
+		Task BrowserWindow_SetThumbarButtons(int requestId, int id, ThumbarButtonDto[] buttons);
 		Task BrowserWindow_SetThumbnailClip(int requestId, int id, Rectangle region);
 		Task BrowserWindow_SetThumbnailToolTip(int requestId, int id, string toolTip);
 		Task BrowserWindow_SetAppDetails(int requestId, int id, AppDetailsOptions options);
@@ -316,7 +316,27 @@ namespace MZZT.ElectronNetCore {
 		Task ContentTracing_StopRecording(int requestId, string resultFilePath);
 		Task ContentTracing_GetTraceBufferUsage(int requestId);
 
+		Task Dialog_ShowOpenDialog(int requestId, int browserWindow, OpenDialogOptions options);
+		Task Dialog_ShowSaveDialog(int requestId, int browserWindow, SaveDialogOptions options);
+		Task Dialog_ShowMessageBox(int requestId, int browserWindow, MessageBoxOptionsDto options);
+		Task Dialog_ShowErrorBox(int requestId, string title, string content);
+		Task Dialog_ShowCertificateTrustDialog(int requestId, int browserWindow, CertificateTrustDialogOptions options);
+
 		Task Function_Invoke(int requestId, int id, object[] args);
+
+		Task GlobalShortcut_Register(int requestId, string accelerator);
+		Task GlobalShortcut_RegisterAll(int requestId, string[] accelerators);
+		Task GlobalShortcut_IsRegistered(int requestId, string accelerator);
+		Task GlobalShortcut_Unregister(int requestId, string accelerator);
+		Task GlobalShortcut_UnregisterAll(int requestId);
+
+		Task InAppPurchase_PurchaseProduct(int requestId, string productId, int quantity);
+		Task InAppPurchase_GetProducts(int requestId, string[] productIds);
+		Task InAppPurchase_CanMakePayments(int requestId);
+		Task InAppPurchase_RestoreCompletedTransactions(int requestId);
+		Task InAppPurchase_GetReceiptUrl(int requestId);
+		Task InAppPurchase_FinishAllTransactions(int requestId);
+		Task InAppPurchase_FinishTransactionByDate(int requestId, string date);
 
 		Task NativeImage_GetSize(int requestId, int id, double scaleFactor);
 		Task NativeImage_ToDataUrl(int requestId, int id, ToDataUrlOptions options);
@@ -540,6 +560,12 @@ namespace MZZT.ElectronNetCore {
 			BrowserWindow.FromId(id)?.OnWindowMessage(requestId, wParam, lParam) ?? Task.CompletedTask;
 		public Task BrowserWindow_SetThumbarButtons_Click(int id, int index) =>
 			BrowserWindow.FromId(id)?.OnThumbarButtonClick(index) ?? Task.CompletedTask;
+
+		public Task GlobalShortcut_Register_Callback(int requestId) =>
+			Api.Electron.GlobalShortcut.OnCallback(requestId) ?? Task.CompletedTask;
+
+		public Task InAppPurchase_TransactionsUpdated_Event(Transaction[] transactions) =>
+			Api.Electron.InAppPurchase.OnTransactionsUpdated(transactions);
 
 		public Task Process_Loaded_Event() =>
 			Api.Electron.Process.OnLoaded();

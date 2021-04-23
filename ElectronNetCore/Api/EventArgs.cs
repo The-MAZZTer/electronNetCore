@@ -219,6 +219,14 @@ namespace MZZT.ElectronNetCore.Api {
 		public string Direction { get; }
 	}
 
+	public class TransactionsEventArgs : EventArgs {
+		public TransactionsEventArgs(Transaction[] transactions) : base() {
+			this.Transactions = transactions;
+		}
+
+		public Transaction[] Transactions { get; }
+	}
+
 	public class UrlEventArgs : EventArgs {
 		public UrlEventArgs(string url) : base() {
 			this.Url = url;

@@ -7,6 +7,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -30,7 +31,10 @@ namespace MZZT.ElectronNetCore {
 
 			string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "electron");
 			this.electron = new Process();
-			this.electron.StartInfo.FileName = Path.Combine(path, "node_modules", "electron", "dist", "electron");
+			this.electron.StartInfo.FileName = Path.Combine(path, "node_modules", ".bin", "electron");
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
+				this.electron.StartInfo.FileName += ".cmd";
+			}
 			this.electron.StartInfo.CreateNoWindow = true;
 			this.electron.StartInfo.RedirectStandardError = true;
 			this.electron.StartInfo.RedirectStandardOutput = true;

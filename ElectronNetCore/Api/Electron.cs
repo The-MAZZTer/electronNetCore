@@ -97,15 +97,16 @@ namespace MZZT.ElectronNetCore.Api {
 				return (T)(object)WebContents.FromId(id);
 			}
 
-			while (type != null) {
-				if (type.IsConstructedGenericType && type.GetGenericTypeDefinition() == typeof(ElectronDisposable<>)) {
+			Type electeonType = type;
+			while (electeonType != null) {
+				if (electeonType.IsConstructedGenericType && electeonType.GetGenericTypeDefinition() == typeof(ElectronDisposable<>)) {
 					int id = (int)JsonSerializer.Deserialize(json, typeof(int), new() {
 						PropertyNameCaseInsensitive = true,
 						PropertyNamingPolicy = JsonNamingPolicy.CamelCase
 					});
 					return (T)ElectronDisposable.FromId(typeof(T), id);
 				}
-				type = type.BaseType;
+				electeonType = electeonType.BaseType;
 			}
 
 			return (T)JsonSerializer.Deserialize(json, type, new() {
@@ -242,6 +243,8 @@ namespace MZZT.ElectronNetCore.Api {
 		public static ElectronAutoUpdater AutoUpdater { get; } = new();
 		public static ElectronContentTracing ContentTracing { get; } = new();
 		public static ElectronDialog Dialog { get; } = new();
+		public static ElectronGlobalShortcut GlobalShortcut { get; } = new();
+		public static ElectronInAppPurchase InAppPurchase { get; } = new();
 		public static ElectronProcess Process { get; } = new();
 
 		public static event EventHandler<ExitCodeEventArgs> ProcessExited;

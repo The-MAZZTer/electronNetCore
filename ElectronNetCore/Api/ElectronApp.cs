@@ -422,7 +422,7 @@ namespace MZZT.ElectronNetCore.Api {
 		public Task<string> GetApplicationNameForProtocolAsync(string url) =>
 			Electron.FuncAsync<string, string>(x => x.App_GetApplicationNameForProtocol, url);
 		public async Task<ApplicationInfoForProtocolReturnValue> GetApplicationInfoForProtocolAsync(string url) =>
-			(await Electron.FuncAsync<ApplicationInfoForProtocolReturnValueInternal, string>(x => x.App_GetApplicationInfoForProtocol, url))
+			(await Electron.FuncAsync<ApplicationInfoForProtocolReturnValueDto, string>(x => x.App_GetApplicationInfoForProtocol, url))
 			?.ToApplicationInfoForProtocolReturnValue();
 		public Task<bool> SetUserTasksAsync(JumpListTask[] tasks) =>
 			Electron.FuncAsync<bool, JumpListTask[]>(x => x.App_SetUserTasks, tasks);

@@ -1,7 +1,9 @@
-﻿using System;
+﻿using Microsoft.VisualBasic.CompilerServices;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Security.Policy;
 using System.Text.Json.Serialization;
 
 namespace MZZT.ElectronNetCore.Api {
@@ -166,6 +168,26 @@ namespace MZZT.ElectronNetCore.Api {
 		public const string Machine = "machine";
 	}
 
+	public static class MessageBoxTypes {
+		public const string None = "none";
+		public const string Info = "info";
+		public const string Error = "error";
+		public const string Question = "question";
+		public const string Warning = "warning";
+	}
+
+	public static class OpenDialogProperties {
+		public const string OpenFile = "openFile";
+		public const string OpenDirectory = "openDirectory";
+		public const string MultiSelections = "multiSelections";
+		public const string ShowHiddenFiles = "showHiddenFiles";
+		public const string CreateDirectory = "createDirectory";
+		public const string PromptToCreate = "promptToCreate";
+		public const string NoResolveAliases = "noResolveAliases";
+		public const string TreatPackageAsDirectory = "treatPackageAsDirectory";
+		public const string DontAddToRecent = "dontAddToRecent";
+	}
+
 	public static class OverlaySupports {
 		public const string None = "NONE";
 		public const string Direct = "DIRECT";
@@ -234,6 +256,14 @@ namespace MZZT.ElectronNetCore.Api {
 		public const string TraceToConsole = "trace-to-console";
 	}
 
+	public static class SaveDialogProperties {
+		public const string ShowHiddenFiles = "showHiddenFiles";
+		public const string CreateDirectory = "createDirectory";
+		public const string TreatPackageAsDirectory = "treatPackageAsDirectory";
+		public const string ShowOverwriteConfirmation = "showOverwriteConfirmation";
+		public const string DontAddToRecent = "dontAddToRecent";
+	}
+
 	public static class SwipeDirections {
 		public const string Up = "up";
 		public const string Right = "right";
@@ -253,6 +283,14 @@ namespace MZZT.ElectronNetCore.Api {
 	public static class TraceOptions {
 		public const string EnableSampling = "enable-sampling";
 		public const string EnableSystrace = "enable-systrace";
+	}
+
+	public static class TransactionStates {
+		public const string Purchasing = "purchasing";
+		public const string Purchased = "purchased";
+		public const string Failed = "failed";
+		public const string Restored = "restored";
+		public const string Deferred = "deferred";
 	}
 
 	public static class UploadDataTypes {
@@ -310,7 +348,7 @@ namespace MZZT.ElectronNetCore.Api {
 		public string Name { get; set; }
 	}
 
-	internal class ApplicationInfoForProtocolReturnValueInternal {
+	internal class ApplicationInfoForProtocolReturnValueDto {
 		public int Icon { get; set; }
 		public string Path { get; set; }
 		public string Name { get; set; }
@@ -347,16 +385,24 @@ namespace MZZT.ElectronNetCore.Api {
 		public int Total { get; set; }
 	}
 
+	public class Buffer {
+		public string Type { get; set; }
+		public short[] Data { get; set; }
+
+		[JsonIgnore]
+		public byte[] Bytes => this.Data.Select(x => (byte)x).ToArray();
+	}
+
 	public class BrowserViewConstructorOptions {
 		public WebPreferences WebPreferences { get; set; }
 
-		internal BrowserViewConstructorOptionsInternal ToBrowserViewConstructorOptionsInternal() => new() {
-			WebPreferences = WebPreferences?.ToWebPreferencesInternal()
+		internal BrowserViewConstructorOptionsDto ToBrowserViewConstructorOptionsDto() => new() {
+			WebPreferences = this.WebPreferences?.ToWebPreferencesDto()
 		};
 	}
 
-	public class BrowserViewConstructorOptionsInternal {
-		public WebPreferencesInternal WebPreferences { get; set; }
+	public class BrowserViewConstructorOptionsDto {
+		public WebPreferencesDto WebPreferences { get; set; }
 	}
 
 	public class BrowserWindowConstructorOptions {
@@ -411,7 +457,7 @@ namespace MZZT.ElectronNetCore.Api {
 		public string TabbingIdentifier { get; set; }
 		public WebPreferences WebPreferences { get; set; }
 
-		internal BrowserWindowConstructorOptionsInternal ToBrowserWindowConstructorOptionsInternal() => new() {
+		internal BrowserWindowConstructorOptionsDto ToBrowserWindowConstructorOptionsDto() => new() {
 			Width = this.Width,
 			Height = this.Height,
 			X = this.X,
@@ -461,11 +507,11 @@ namespace MZZT.ElectronNetCore.Api {
 			Vibrancy = this.Vibrancy,
 			ZoomToPageWidth = this.ZoomToPageWidth,
 			TabbingIdentifier = this.TabbingIdentifier,
-			WebPreferences = this.WebPreferences?.ToWebPreferencesInternal()
+			WebPreferences = this.WebPreferences?.ToWebPreferencesDto()
 		};
 	}
 
-	public class BrowserWindowConstructorOptionsInternal {
+	public class BrowserWindowConstructorOptionsDto {
 		public int Width { get; set; } = 800;
 		public int Height { get; set; } = 600;
 		public int? X { get; set; }
@@ -515,7 +561,7 @@ namespace MZZT.ElectronNetCore.Api {
 		public string Vibrancy { get; set; }
 		public bool ZoomToPageWidth { get; set; }
 		public string TabbingIdentifier { get; set; }
-		public WebPreferencesInternal WebPreferences { get; set; }
+		public WebPreferencesDto WebPreferences { get; set; }
 	}
 
 	public class Certificate {
@@ -543,6 +589,11 @@ namespace MZZT.ElectronNetCore.Api {
 		public string Locality { get; set; }
 		public string State { get; set; }
 		public string Country { get; set; }
+	}
+
+	public class CertificateTrustDialogOptions {
+		public Certificate Certificate { get; set; }
+		public string Message { get; set; }
 	}
 
 	public class ChildProcessGone : RenderProcessGone {
@@ -609,6 +660,11 @@ namespace MZZT.ElectronNetCore.Api {
 
 	public class FileIconOptions {
 		public string Size { get; set; }
+	}
+
+	public class FileFilter {
+		public string Name { get; set; }
+		public string[] Extensions { get; set; }
 	}
 
 	public class FocusOptions {
@@ -793,20 +849,20 @@ namespace MZZT.ElectronNetCore.Api {
 		public UploadData[] PostData { get; set; }
 		public string BaseUrlForDataUrl { get; set; }
 
-		public LoadUrlOptionsInternal ToLoadUrlOptionsInternal() => new() {
+		public LoadUrlOptionsDto ToLoadUrlOptionsDto() => new() {
 			HttpReferrer = this.HttpReferrer,
 			UserAgent = this.UserAgent,
 			ExtraHeaders = this.ExtraHeaders,
-			PostData = this.PostData?.Select(x => x.ToUploadDataInternal()).ToArray(),
+			PostData = this.PostData?.Select(x => x.ToUploadDataDto()).ToArray(),
 			BaseUrlForDataUrl = this.BaseUrlForDataUrl
 		};
 	}
 
-	public class LoadUrlOptionsInternal {
+	public class LoadUrlOptionsDto {
 		public string HttpReferrer { get; set; }
 		public string UserAgent { get; set; }
 		public string ExtraHeaders { get; set; }
-		public UploadDataInternal[] PostData { get; set; }
+		public UploadDataDto[] PostData { get; set; }
 		[JsonPropertyName("baseURLForDataURL")]
 		public string BaseUrlForDataUrl { get; set; }
 	}
@@ -832,11 +888,82 @@ namespace MZZT.ElectronNetCore.Api {
 		public int PrivateBytes { get; set; }
 	}
 
+	public class MessageBoxOptions {
+		public string Message { get; set; }
+		public string Type { get; set; }
+		public string[] Buttons { get; set; }
+		public int? DefaultId { get; set; }
+		public string Title { get; set; }
+		public string Detail { get; set; }
+		public string CheckboxLabel { get; set; }
+		public bool CheckboxChecked { get; set; }
+		public NativeImage Icon { get; set; }
+		public int? CancelId { get; set; }
+		public bool NoLink { get; set; }
+		public bool NormalizeAccessKeys { get; set; }
+
+		internal MessageBoxOptionsDto ToMessageBoxOptionsDto() => new() {
+			Message = this.Message,
+			Type = this.Type,
+			Buttons = this.Buttons,
+			DefaultId = this.DefaultId,
+			Title = this.Title,
+			Detail = this.Detail,
+			CheckboxLabel = this.CheckboxLabel,
+			CheckboxChecked = this.CheckboxChecked,
+			Icon = this.Icon?.Id ?? 0,
+			CancelId = this.CancelId,
+			NoLink = this.NoLink,
+			NormalizeAccessKeys = this.NormalizeAccessKeys
+		};
+	}
+
+	public class MessageBoxOptionsDto {
+		public string Message { get; set; }
+		public string Type { get; set; }
+		public string[] Buttons { get; set; }
+		public int? DefaultId { get; set; }
+		public string Title { get; set; }
+		public string Detail { get; set; }
+		public string CheckboxLabel { get; set; }
+		public bool CheckboxChecked { get; set; }
+		public int Icon { get; set; }
+		public int? CancelId { get; set; }
+		public bool NoLink { get; set; }
+		public bool NormalizeAccessKeys { get; set; }
+	}
+
+	public class MessageBoxReturnValue {
+		public int Response { get; set; }
+		public bool CheckboxChecked { get; set; }
+	}
+
+	public class OpenDialogOptions {
+		public string Title { get; set; }
+		public string DefaultPath { get; set; }
+		public string ButtonLabel { get; set; }
+		public FileFilter[] Filters { get; set; }
+		public string[] Properties { get; set; }
+		public string Message { get; set; }
+		public bool SecurityScopedBookmarks { get; set; }
+	}
+
+	public class OpenDialogReturnValue {
+		public bool Canceled { get; set; }
+		public string[] FilePaths { get; set; }
+		public string[] Bookmarks { get; set; }
+	}
+
 	public class OverlayInfo {
 		public bool DirectComposition { get; set; }
 		public bool SupportsOverlays { get; set; }
 		public string Yuy2OverlaySupport { get; set; }
 		public string Nv12OverlaySupport { get; set; }
+	}
+
+	public class Payment {
+		public string ProductIdentifier { get; set; }
+		public int Quantity { get; set; }
 	}
 
 	public class Point {
@@ -875,6 +1002,18 @@ namespace MZZT.ElectronNetCore.Api {
 		public MemoryInfo Memory { get; set; }
 		public bool Sandboxed { get; set; }
 		public string IntegrityLevel { get; set; }
+	}
+
+	public class Product {
+		public string ProductIdentifier { get; set; }
+		public string LocalizedDescription { get; set; }
+		public string LocalizedTitle { get; set; }
+		public string ContentVersion { get; set; }
+		public int[] ContentLengths { get; set; }
+		public double Price { get; set; }
+		public string FormattedPrice { get; set; }
+		public string CurrencyCode { get; set; }
+		public bool IsDownloadable { get; set; }
 	}
 
 	public class ProgressBarOptions {
@@ -916,6 +1055,24 @@ namespace MZZT.ElectronNetCore.Api {
 	public class RenderProcessGone {
 		public string Reason { get; set; }
 		public int ExitCode { get; set; }
+	}
+
+	public class SaveDialogOptions {
+		public string Title { get; set; }
+		public string DefaultPath { get; set; }
+		public string ButtonLabel { get; set; }
+		public FileFilter[] Filters { get; set; }
+		public string Message { get; set; }
+		public string NameFieldLabel { get; set; }
+		public bool ShowsTagField { get; set; } = true;
+		public string[] Properties { get; set; }
+		public bool SecurityScopedBookmarks { get; set; }
+	}
+
+	public class SaveDialogReturnValue {
+		public bool Canceled { get; set; }
+		public string FilePath { get; set; }
+		public string Bookmark { get; set; }
 	}
 
 	public class Settings {
@@ -964,14 +1121,14 @@ namespace MZZT.ElectronNetCore.Api {
 		public string Tooltip { get; set; }
 		public string[] Flags { get; set; }
 
-		internal ThumbarButtonInternal ToThumbarButtonInternal() => new() {
+		internal ThumbarButtonDto ToThumbarButtonDto() => new() {
 			Icon = this.Icon?.Id ?? 0,
 			Tooltip = this.Tooltip,
 			Flags = this.Flags
 		};
 	}
 
-	public class ThumbarButtonInternal {
+	public class ThumbarButtonDto {
 		public int Icon { get; set; }
 		public string Tooltip { get; set; }
 		public string[] Flags { get; set; }
@@ -1010,6 +1167,16 @@ namespace MZZT.ElectronNetCore.Api {
 		public Dictionary<string, object> MemoryDumpConfig { get; set; }
 	}
 
+	public class Transaction {
+		public string TransactionIdentifier { get; set; }
+		public string TransactionDate { get; set; }
+		public string OriginalTransactionIdentifier { get; set; }
+		public string TransactionState { get; set; }
+		public int ErrorCode { get; set; }
+		public string ErrorMessage { get; set; }
+		public Payment Payment { get; set; }
+	}
+
 	public class UploadData {
 		public string Type { get; set; }
 		public byte[] Bytes { get; set; }
@@ -1018,7 +1185,7 @@ namespace MZZT.ElectronNetCore.Api {
 		public long Length { get; set; }
 		public DateTime ModificationTime { get; set; }
 
-		internal UploadDataInternal ToUploadDataInternal() => new() {
+		internal UploadDataDto ToUploadDataDto() => new() {
 			Type = this.Type,
 			Bytes = this.Bytes != null ? Convert.ToBase64String(this.Bytes) : null,
 			FilePath = this.FilePath,
@@ -1028,7 +1195,7 @@ namespace MZZT.ElectronNetCore.Api {
 		};
 	}
 
-	public class UploadDataInternal {
+	public class UploadDataDto {
 		public string Type { get; set; }
 		public string Bytes { get; set; }
 		public string FilePath { get; set; }
@@ -1105,7 +1272,7 @@ namespace MZZT.ElectronNetCore.Api {
 		public string V8CacheOptions { get; set; }
 		public bool EnablePreferredSizeMode { get; set; }
 
-		internal WebPreferencesInternal ToWebPreferencesInternal() => new() {
+		internal WebPreferencesDto ToWebPreferencesDto() => new() {
 			DevTools = this.DevTools,
 			NodeIntegration = this.NodeIntegration,
 			NodeIntegrationInWorker = this.NodeIntegrationInWorker,
@@ -1151,7 +1318,7 @@ namespace MZZT.ElectronNetCore.Api {
 		};
 	}
 
-	public class WebPreferencesInternal {
+	public class WebPreferencesDto {
 		public bool DevTools { get; set; } = true;
 		public bool NodeIntegration { get; set; }
 		public bool NodeIntegrationInWorker { get; set; }
