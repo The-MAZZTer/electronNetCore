@@ -12,7 +12,7 @@ namespace MZZT.ElectronNetCore {
 
 namespace MZZT.ElectronNetCore.Api {
 	public class NativeImage : ElectronDisposable<NativeImage> {
-		public Task<NativeImage> CreateFromPathAsync(string path) =>
+		public static Task<NativeImage> CreateFromPathAsync(string path) =>
 			Electron.FuncAsync<NativeImage, int, string>(x => x.NativeImage_CreateFromPath, 0, path);
 
 		internal NativeImage(int id) : base(id) { }
