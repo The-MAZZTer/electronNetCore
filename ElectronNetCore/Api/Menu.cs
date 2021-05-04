@@ -44,7 +44,7 @@ namespace MZZT.ElectronNetCore.Api {
 			Electron.FuncAsync<Menu, int>(x => x.Menu_GetApplicationMenu, 0);
 		public static Task SendActionToFirstResponderAsync(string action) =>
 			Electron.ActionAsync(x => x.Menu_SendActionToFirstResponder, 0, action);
-		public async static Task<Menu> BuildFromTemplate(object[] template) {
+		public async static Task<Menu> BuildFromTemplateAsync(object[] template) {
 			Menu menu = await Electron.FuncAsync<Menu, int, object[]>(x => x.Menu_BuildFromTemplate, 0, template.Select<object, object>(x => {
 				if (x is MenuItem menuItem) {
 					return menuItem.Id;
