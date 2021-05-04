@@ -45,11 +45,20 @@ export const ElectronTray : ElectronApi = {
 			api.send("MouseMove_Event", id, e, position));
 	},
 	handlers: {
-		"Ctor_Image": (_: null, image, guid) =>
-			new Tray(api.get<NativeImage>(image), guid),
-		"Ctor_Path": (_: null, image, guid) =>
-			new Tray(image, guid),
-
+		"Ctor_Image": (_: null, image, guid) => {
+			if (guid) {
+				return new Tray(api.get<NativeImage>(image), guid);
+			} else {
+				return new Tray(api.get<NativeImage>(image));
+			}
+		},
+		"Ctor_Path": (_: null, image, guid) => {
+			if (guid) {
+				return new Tray(image, guid);
+			} else {
+				return new Tray(image);
+			}
+		},
 		"Destroy": (self: Tray) =>
 			self.destroy(),
 		"SetImage_Image": (self: Tray, image) =>
