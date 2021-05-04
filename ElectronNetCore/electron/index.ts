@@ -1,7 +1,17 @@
-﻿import { app, crashReporter, protocol } from "electron";
+﻿import { app, crashReporter, CrashReporterStartOptions, CustomScheme, protocol } from "electron";
 import process from "process";
-import { LaunchElectronOptions } from "./models/launchElectronOptions";
 import { SignalR } from "./signalr";
+
+type LaunchElectronOptions = {
+	chromiumCommandLineFlags?: Record<string, string>;
+	paths?: Record<string, string>;
+	hardwareAcceleration?: boolean;
+	unstableDomainBlockingFor3dApis?: boolean;
+	forceSandbox?: boolean;
+	privilegedSchemes?: CustomScheme[];
+	crashReporterOptions?: CrashReporterStartOptions;
+	initScriptPath?: string
+};
 
 class ElectronNetCoreProxy {
   private constructor() {}

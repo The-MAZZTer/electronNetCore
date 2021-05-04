@@ -19,8 +19,8 @@ namespace Microsoft.AspNetCore.Builder {
 
 		public static IEndpointRouteBuilder MapElectron(this IEndpointRouteBuilder endpoints) {
 			endpoints.MapHub<ElectronHub>("/electronnetcoreproxy", options => {
-				/*options.ApplicationMaxBufferSize = 0;
-				options.TransportMaxBufferSize = 0;*/
+				options.ApplicationMaxBufferSize = 0;
+				options.TransportMaxBufferSize = 0;
 			});
 			return endpoints;
 		}

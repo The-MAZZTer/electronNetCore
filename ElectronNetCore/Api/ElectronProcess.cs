@@ -1,6 +1,48 @@
 ﻿using System;
 using System.Threading.Tasks;
 
+namespace MZZT.ElectronNetCore {
+	public partial interface IElectronInterface {
+		Task Process_DefaultApp_Get(int requestId);
+		Task Process_IsMainFrame_Get(int requestId);
+		Task Process_Mas_Get(int requestId);
+		Task Process_NoAsar_Get(int requestId);
+		Task Process_NoAsar_Set(int requestId, bool value);
+		Task Process_NoDeprecation_Get(int requestId);
+		Task Process_NoDeprecation_Set(int requestId, bool value);
+		Task Process_ResourcesPath_Get(int requestId);
+		Task Process_Sandboxed_Get(int requestId);
+		Task Process_ThrowDeprecation_Get(int requestId);
+		Task Process_ThrowDeprecation_Set(int requestId, bool value);
+		Task Process_TraceDeprecation_Get(int requestId);
+		Task Process_TraceDeprecation_Set(int requestId, bool value);
+		Task Process_TraceProcessWarnings_Get(int requestId);
+		Task Process_TraceProcessWarnings_Set(int requestId, bool value);
+		Task Process_Type_Get(int requestId);
+		Task ProcessVersions_Chrome_Get(int requestId);
+		Task ProcessVersions_Electron_Get(int requestId);
+		Task Process_WindowsStore_Get(int requestId);
+
+		Task Process_Crash(int requestId);
+		Task Process_GetCreationTime(int requestId);
+		Task Process_GetCpuUsage(int requestId);
+		Task Process_GetIoCounters(int requestId);
+		Task Process_GetHeapStatistics(int requestId);
+		Task Process_GetBlinkMemoryInfo(int requestId);
+		Task Process_GetProcessMemoryInfo(int requestId);
+		Task Process_GetSystemMemoryInfo(int requestId);
+		Task Process_GetSystemVersion(int requestId);
+		Task Process_TakeHeapSnapshot(int requestId, string filePath);
+		Task Process_Hang(int requestId);
+		Task Process_SetFdLimit(int requestId, int maxDescriptors);
+	}
+
+	internal partial class ElectronHub {
+		public Task Process_Loaded_Event() =>
+			Api.Electron.Process.OnLoaded();
+	}
+}
+
 namespace MZZT.ElectronNetCore.Api {
 	public class ElectronProcess {
 		internal ElectronProcess() { }
@@ -67,14 +109,5 @@ namespace MZZT.ElectronNetCore.Api {
 			Electron.ActionAsync(x => x.Process_Hang);
 		public Task SetFdLimitAsync(int maxDescriptors) =>
 			Electron.ActionAsync<int>(x => x.Process_SetFdLimit, maxDescriptors);
-	}
-
-	public class ElectronProcessVersions {
-		internal ElectronProcessVersions() { }
-
-		public ElectronReadOnlyProperty<string> Chrome { get; } =
-			new(x => x.ProcessVersions_Chrome_Get);
-		public ElectronReadOnlyProperty<string> Electron { get; } =
-			new(x => x.ProcessVersions_Electron_Get);
 	}
 }

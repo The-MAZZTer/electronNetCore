@@ -69,12 +69,26 @@ namespace Example {
 				Console.WriteLine($"GpuInfoUpdate");
 			};
 
+			Electron.App.SecondInstance += (sender, e) => {
+				Console.WriteLine("SecondInstance");
+
+				Task.Run(async () => {
+					await this.CreateWindowAsync();
+				});
+			};
+
 			Electron.App.Ready += (sender, e) => {
 				Console.WriteLine($"Ready");
 
 				Task.Run(async () => {
-					BrowserWindow win = await this.CreateWindowAsync();
+					await Electron.App.Name.SetAsync("Example");
+					await Electron.App.SetAppUserModelIdAsync("Example");
+					if (!await Electron.App.RequestSingleInstanceLockAsync()) {
+						Environment.Exit(0);
+						return;
+					}
 
+					BrowserWindow win = await this.CreateWindowAsync();
 				});
 			};
 

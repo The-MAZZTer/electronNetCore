@@ -1,10 +1,276 @@
-﻿using System;
+﻿using MZZT.ElectronNetCore.Api;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Point = MZZT.ElectronNetCore.Api.Point;
+using Rectangle = MZZT.ElectronNetCore.Api.Rectangle;
+using Size = MZZT.ElectronNetCore.Api.Size;
+
+namespace MZZT.ElectronNetCore {
+	public partial interface IElectronInterface {
+		Task BrowserWindow_Ctor(int requestId, int id, BrowserWindowConstructorOptionsDto options);
+
+		Task BrowserWindow_PageTitleUpdated_PreventDefault(int requestId, bool value);
+		Task BrowserWindow_Close_PreventDefault(int requestId, bool value);
+		Task BrowserWindow_WillResize_PreventDefault(int requestId, bool value);
+		Task BrowserWindow_WillMove_PreventDefault(int requestId, bool value);
+		Task BrowserWindow_SystemContextMenu_PreventDefault(int requestId, bool value);
+
+		Task BrowserWindow_GetFocusedWindow(int requestId, int id);
+		Task BrowserWindow_FromWebContents(int requestId, int id, int webContents);
+		Task BrowserWindow_FromBrowserView(int requestId, int id, int browserView);
+
+		Task BrowserWindow_WebContents_Get(int requestId, int id);
+		Task BrowserWindow_AutoHideMenuBar_Get(int requestId, int id);
+		Task BrowserWindow_AutoHideMenuBar_Set(int requestId, int id, bool value);
+		Task BrowserWindow_SimpleFullScreen_Get(int requestId, int id);
+		Task BrowserWindow_SimpleFullScreen_Set(int requestId, int id, bool value);
+		Task BrowserWindow_FullScreen_Get(int requestId, int id);
+		Task BrowserWindow_FullScreen_Set(int requestId, int id, bool value);
+		Task BrowserWindow_VisibleOnAllWorkspaces_Get(int requestId, int id);
+		Task BrowserWindow_VisibleOnAllWorkspaces_Set(int requestId, int id, bool value);
+		Task BrowserWindow_Shadow_Get(int requestId, int id);
+		Task BrowserWindow_Shadow_Set(int requestId, int id, bool value);
+		Task BrowserWindow_MenuBarVisible_Get(int requestId, int id);
+		Task BrowserWindow_MenuBarVisible_Set(int requestId, int id, bool value);
+		Task BrowserWindow_Kiosk_Get(int requestId, int id);
+		Task BrowserWindow_Kiosk_Set(int requestId, int id, bool value);
+		Task BrowserWindow_DocumentEdited_Get(int requestId, int id);
+		Task BrowserWindow_DocumentEdited_Set(int requestId, int id, bool value);
+		Task BrowserWindow_RepresentedFilename_Get(int requestId, int id);
+		Task BrowserWindow_RepresentedFilename_Set(int requestId, int id, string value);
+		Task BrowserWindow_Title_Get(int requestId, int id);
+		Task BrowserWindow_Title_Set(int requestId, int id, string value);
+		Task BrowserWindow_Minimizable_Get(int requestId, int id);
+		Task BrowserWindow_Minimizable_Set(int requestId, int id, bool value);
+		Task BrowserWindow_Maximizable_Get(int requestId, int id);
+		Task BrowserWindow_Maximizable_Set(int requestId, int id, bool value);
+		Task BrowserWindow_FullScreenable_Get(int requestId, int id);
+		Task BrowserWindow_FullScreenable_Set(int requestId, int id, bool value);
+		Task BrowserWindow_Resizable_Get(int requestId, int id);
+		Task BrowserWindow_Resizable_Set(int requestId, int id, bool value);
+		Task BrowserWindow_Closable_Get(int requestId, int id);
+		Task BrowserWindow_Closable_Set(int requestId, int id, bool value);
+		Task BrowserWindow_Movable_Get(int requestId, int id);
+		Task BrowserWindow_Movable_Set(int requestId, int id, bool value);
+		Task BrowserWindow_ExcludedFromShownWindowsMenu_Get(int requestId, int id);
+		Task BrowserWindow_ExcludedFromShownWindowsMenu_Set(int requestId, int id, bool value);
+
+		Task BrowserWindow_Destroy(int requestId, int id);
+		Task BrowserWindow_Close(int requestId, int id);
+		Task BrowserWindow_Focus(int requestId, int id);
+		Task BrowserWindow_Blur(int requestId, int id);
+		Task BrowserWindow_IsFocused(int requestId, int id);
+		Task BrowserWindow_IsDestroyed(int requestId, int id);
+		Task BrowserWindow_Show(int requestId, int id);
+		Task BrowserWindow_ShowInactive(int requestId, int id);
+		Task BrowserWindow_Hide(int requestId, int id);
+		Task BrowserWindow_IsVisible(int requestId, int id);
+		Task BrowserWindow_IsModal(int requestId, int id);
+		Task BrowserWindow_Maximize(int requestId, int id);
+		Task BrowserWindow_Unmaximize(int requestId, int id);
+		Task BrowserWindow_IsMaximized(int requestId, int id);
+		Task BrowserWindow_Minimize(int requestId, int id);
+		Task BrowserWindow_Restore(int requestId, int id);
+		Task BrowserWindow_IsMinimized(int requestId, int id);
+		Task BrowserWindow_SetFullScreen(int requestId, int id, bool flag);
+		Task BrowserWindow_IsFullScreen(int requestId, int id);
+		Task BrowserWindow_SetSimpleFullScreen(int requestId, int id, bool flag);
+		Task BrowserWindow_IsSimpleFullScreen(int requestId, int id);
+		Task BrowserWindow_IsNormal(int requestId, int id);
+		Task BrowserWindow_SetAspectRatio(int requestId, int id, double aspectRatio, Size extraSize);
+		Task BrowserWindow_SetBackgroundColor(int requestId, int id, string backgroundColor);
+		Task BrowserWindow_PreviewFile(int requestId, int id, string path, string displayName);
+		Task BrowserWindow_CloseFilePreview(int requestId, int id);
+		Task BrowserWindow_SetBounds(int requestId, int id, PartialRectangle bounds, bool animate);
+		Task BrowserWindow_GetBounds(int requestId, int id);
+		Task BrowserWindow_GetBackgroundColor(int requestId, int id);
+		Task BrowserWindow_SetContentBounds(int requestId, int id, Rectangle bounds, bool annimate);
+		Task BrowserWindow_GetContentBounds(int requestId, int id);
+		Task BrowserWindow_GetNormalBounds(int requestId, int id);
+		Task BrowserWindow_SetEnabled(int requestId, int id, bool enabled);
+		Task BrowserWindow_IsEnabled(int requestId, int id);
+		Task BrowserWindow_SetSize(int requestId, int id, int width, int height, bool animate);
+		Task BrowserWindow_GetSize(int requestId, int id);
+		Task BrowserWindow_SetContentSize(int requestId, int id, int width, int height, bool animate);
+		Task BrowserWindow_GetContentSize(int requestId, int id);
+		Task BrowserWindow_SetMinimumSize(int requestId, int id, int width, int height);
+		Task BrowserWindow_GetMinimumSize(int requestId, int id);
+		Task BrowserWindow_SetMaximumSize(int requestId, int id, int width, int height);
+		Task BrowserWindow_GetMaximumSize(int requestId, int id);
+		Task BrowserWindow_SetResizable(int requestId, int id, bool resizable);
+		Task BrowserWindow_IsResizable(int requestId, int id);
+		Task BrowserWindow_SetMovable(int requestId, int id, bool movable);
+		Task BrowserWindow_IsMovable(int requestId, int id);
+		Task BrowserWindow_SetMinimizable(int requestId, int id, bool minimizable);
+		Task BrowserWindow_IsMinimizable(int requestId, int id);
+		Task BrowserWindow_SetMaximizable(int requestId, int id, bool maximizable);
+		Task BrowserWindow_IsMaximizable(int requestId, int id);
+		Task BrowserWindow_SetFullScreenable(int requestId, int id, bool fullscreenable);
+		Task BrowserWindow_IsFullScreenable(int requestId, int id);
+		Task BrowserWindow_SetClosable(int requestId, int id, bool closable);
+		Task BrowserWindow_IsClosable(int requestId, int id);
+		Task BrowserWindow_SetAlwaysOnTop(int requestId, int id, bool flag, string level, int relativeLevel);
+		Task BrowserWindow_IsAlwaysOnTop(int requestId, int id);
+		Task BrowserWindow_MoveAbove(int requestId, int id, string mediaSourceId);
+		Task BrowserWindow_MoveTop(int requestId, int id);
+		Task BrowserWindow_Center(int requestId, int id);
+		Task BrowserWindow_SetPosition(int requestId, int id, int x, int y, bool animate);
+		Task BrowserWindow_GetPosition(int requestId, int id);
+		Task BrowserWindow_SetTitle(int requestId, int id, string title);
+		Task BrowserWindow_GetTitle(int requestId, int id);
+		Task BrowserWindow_SetSheetOffset(int requestId, int id, double offsetY, double offsetX);
+		Task BrowserWindow_FlashFrame(int requestId, int id, bool flag);
+		Task BrowserWindow_SetSkipTaskbar(int requestId, int id, bool skip);
+		Task BrowserWindow_SetKiosk(int requestId, int id, bool flag);
+		Task BrowserWindow_IsKiosk(int requestId, int id);
+		Task BrowserWindow_IsTabletMode(int requestId, int id);
+		Task BrowserWindow_GetMediaSourceId(int requestId, int id);
+		Task BrowserWindow_GetNativeWindowHandle(int requestId, int id);
+		Task BrowserWindow_HookWindowMessage(int requestId, int id, int message);
+		Task BrowserWindow_IsWindowMessageHooked(int requestId, int id, int message);
+		Task BrowserWindow_UnhookWindowMessage(int requestId, int id, int message);
+		Task BrowserWindow_UnhookAllWindowMessages(int requestId, int id);
+		Task BrowserWindow_SetRepresentedFilename(int requestId, int id, string filename);
+		Task BrowserWindow_GetRepresentedFilename(int requestId, int id);
+		Task BrowserWindow_SetDocumentEdited(int requestId, int id, bool edited);
+		Task BrowserWindow_IsDocumentEdited(int requestId, int id);
+		Task BrowserWindow_FocusOnWebView(int requestId, int id);
+		Task BrowserWindow_BlurWebView(int requestId, int id);
+		Task BrowserWindow_CapturePage(int requestId, int id, Rectangle rect);
+		Task BrowserWindow_LoadUrl(int requestId, int id, string url, LoadUrlOptionsDto options);
+		Task BrowserWindow_LoadFile(int requestId, int id, string filePath, LoadFileOptions options);
+		Task BrowserWindow_Reload(int requestId, int id);
+		Task BrowserWindow_SetMenu(int requestId, int id, int menu);
+		Task BrowserWindow_RemoveMenu(int requestId, int id);
+		Task BrowserWindow_SetProgressBar(int requestId, int id, double progress, ProgressBarOptions options);
+		Task BrowserWindow_SetOverlayIcon(int requestId, int id, int overlay, string description);
+		Task BrowserWindow_SetHasShadow(int requestId, int id, bool hasShadow);
+		Task BrowserWindow_HasShadow(int requestId, int id);
+		Task BrowserWindow_SetOpacity(int requestId, int id, double opacity);
+		Task BrowserWindow_GetOpacity(int requestId, int id);
+		Task BrowserWindow_SetShape(int requestId, int id, Rectangle[] rects);
+		Task BrowserWindow_SetThumbarButtons(int requestId, int id, ThumbarButtonDto[] buttons);
+		Task BrowserWindow_SetThumbnailClip(int requestId, int id, Rectangle region);
+		Task BrowserWindow_SetThumbnailToolTip(int requestId, int id, string toolTip);
+		Task BrowserWindow_SetAppDetails(int requestId, int id, AppDetailsOptions options);
+		Task BrowserWindow_ShowDefinitionForSelection(int requestId, int id);
+		Task BrowserWindow_SetIcon(int requestId, int id, int icon);
+		Task BrowserWindow_SetWindowButtonVisibility(int requestId, int id, bool visible);
+		Task BrowserWindow_SetAutoHideMenuBar(int requestId, int id, bool hide);
+		Task BrowserWindow_IsMenuBarAutoHide(int requestId, int id);
+		Task BrowserWindow_SetMenuBarVisibility(int requestId, int id, bool visible);
+		Task BrowserWindow_IsMenuBarVisible(int requestId, int id);
+		Task BrowserWindow_SetVisibleOnAllWorkspaces(int requestId, int id, bool visible, VisibleOnAllWorkspacesOptions options);
+		Task BrowserWindow_IsVisibleOnAllWorkspaces(int requestId, int id);
+		Task BrowserWindow_SetIgnoreMouseEvents(int requestId, int id, bool ignore, IgnoreMouseEventsOptions options);
+		Task BrowserWindow_SetContentProtection(int requestId, int id, bool enable);
+		Task BrowserWindow_SetFocusable(int requestId, int id, bool focusable);
+		Task BrowserWindow_SetParentWindow(int requestId, int id, int parent);
+		Task BrowserWindow_GetParentWindow(int requestId, int id);
+		Task BrowserWindow_GetChildWindows(int requestId, int id);
+		Task BrowserWindow_SetAutoHideCursor(int requestId, int id, bool autoHide);
+		Task BrowserWindow_SelectPreviousTab(int requestId, int id);
+		Task BrowserWindow_SelectNextTab(int requestId, int id);
+		Task BrowserWindow_MergeAllWindows(int requestId, int id);
+		Task BrowserWindow_MoveTabToNewWindow(int requestId, int id);
+		Task BrowserWindow_ToggleTabBar(int requestId, int id);
+		Task BrowserWindow_AddTabbedWindow(int requestId, int id, int browserWindow);
+		Task BrowserWindow_SetVibrancy(int requestId, int id, string type);
+		Task BrowserWindow_SetTrafficLightPosition(int requestId, int id, Point position);
+		Task BrowserWindow_GetTrafficLightPosition(int requestId, int id);
+		Task BrowserWindow_SetTouchBar(int requestId, int id, int touchBar);
+		Task BrowserWindow_SetBrowserView(int requestId, int id, int browserView);
+		Task BrowserWindow_GetBrowserView(int requestId, int id);
+		Task BrowserWindow_AddBrowserView(int requestId, int id, int browserView);
+		Task BrowserWindow_RemoveBrowserView(int requestId, int id, int browserView);
+		Task BrowserWindow_SetTopBrowserView(int requestId, int id, int browserView);
+		Task BrowserWindow_GetBrowserViews(int requestId, int id);
+	}
+
+	internal partial class ElectronHub {
+		public Task BrowserWindow_PageTitleUpdated_Event(int id, string title, bool explicitSet) =>
+			BrowserWindow.FromId(id)?.OnPageTitleUpdated(title, explicitSet) ?? Task.CompletedTask;
+		public Task BrowserWindow_Close_Event(int id) =>
+			BrowserWindow.FromId(id)?.OnClose() ?? Task.CompletedTask;
+		public Task BrowserWindow_Closed_Event(int id) =>
+			BrowserWindow.FromId(id)?.OnClosed() ?? Task.CompletedTask;
+		public Task BrowserWindow_SessionEnd_Event(int id) =>
+			BrowserWindow.FromId(id)?.OnSessionEnd() ?? Task.CompletedTask;
+		public Task BrowserWindow_Unresponsive_Event(int id) =>
+			BrowserWindow.FromId(id)?.OnUnresponsive() ?? Task.CompletedTask;
+		public Task BrowserWindow_Responsive_Event(int id) =>
+			BrowserWindow.FromId(id)?.OnResponsive() ?? Task.CompletedTask;
+		public Task BrowserWindow_Blur_Event(int id) =>
+			BrowserWindow.FromId(id)?.OnBlur() ?? Task.CompletedTask;
+		public Task BrowserWindow_Focus_Event(int id) =>
+			BrowserWindow.FromId(id)?.OnFocus() ?? Task.CompletedTask;
+		public Task BrowserWindow_Show_Event(int id) =>
+			BrowserWindow.FromId(id)?.OnShow() ?? Task.CompletedTask;
+		public Task BrowserWindow_Hide_Event(int id) =>
+			BrowserWindow.FromId(id)?.OnHide() ?? Task.CompletedTask;
+		public Task BrowserWindow_ReadyToShow_Event(int id) =>
+			BrowserWindow.FromId(id)?.OnReadyToShow() ?? Task.CompletedTask;
+		public Task BrowserWindow_Maximize_Event(int id) =>
+			BrowserWindow.FromId(id)?.OnMaximize() ?? Task.CompletedTask;
+		public Task BrowserWindow_Unmaximize_Event(int id) =>
+			BrowserWindow.FromId(id)?.OnUnmaximize() ?? Task.CompletedTask;
+		public Task BrowserWindow_Minimize_Event(int id) =>
+			BrowserWindow.FromId(id)?.OnMinimize() ?? Task.CompletedTask;
+		public Task BrowserWindow_Restore_Event(int id) =>
+			BrowserWindow.FromId(id)?.OnRestore() ?? Task.CompletedTask;
+		public Task BrowserWindow_WillResize_Event(int id, Rectangle newBounds) =>
+			BrowserWindow.FromId(id)?.OnWillResize(newBounds) ?? Task.CompletedTask;
+		public Task BrowserWindow_Resize_Event(int id) =>
+			BrowserWindow.FromId(id)?.OnResize() ?? Task.CompletedTask;
+		public Task BrowserWindow_Resized_Event(int id) =>
+			BrowserWindow.FromId(id)?.OnResized() ?? Task.CompletedTask;
+		public Task BrowserWindow_WillMove_Event(int id, Rectangle newBounds) =>
+			BrowserWindow.FromId(id)?.OnWillMove(newBounds) ?? Task.CompletedTask;
+		public Task BrowserWindow_Move_Event(int id) =>
+			BrowserWindow.FromId(id)?.OnMove() ?? Task.CompletedTask;
+		public Task BrowserWindow_Moved_Event(int id) =>
+			BrowserWindow.FromId(id)?.OnMoved() ?? Task.CompletedTask;
+		public Task BrowserWindow_EnterFullScreen_Event(int id) =>
+			BrowserWindow.FromId(id)?.OnEnterFullScreen() ?? Task.CompletedTask;
+		public Task BrowserWindow_LeaveFullScreen_Event(int id) =>
+			BrowserWindow.FromId(id)?.OnLeaveFullScreen() ?? Task.CompletedTask;
+		public Task BrowserWindow_EnterHtmlFullScreen_Event(int id) =>
+			BrowserWindow.FromId(id)?.OnEnterHtmlFullScreen() ?? Task.CompletedTask;
+		public Task BrowserWindow_LeaveHtmlFullScreen_Event(int id) =>
+			BrowserWindow.FromId(id)?.OnLeaveHtmlFullScreen() ?? Task.CompletedTask;
+		public Task BrowserWindow_AlwaysOnTopChanged_Event(int id, bool isAlwaysOnTop) =>
+			BrowserWindow.FromId(id)?.OnAlwaysOnTopChanged(isAlwaysOnTop) ?? Task.CompletedTask;
+		public Task BrowserWindow_AppCommand_Event(int id, string command) =>
+			BrowserWindow.FromId(id)?.OnAppCommand(command) ?? Task.CompletedTask;
+		public Task BrowserWindow_ScrollTouchBegin_Event(int id) =>
+			BrowserWindow.FromId(id)?.OnScrollTouchBegin() ?? Task.CompletedTask;
+		public Task BrowserWindow_ScrollTouchEnd_Event(int id) =>
+			BrowserWindow.FromId(id)?.OnScrollTouchEnd() ?? Task.CompletedTask;
+		public Task BrowserWindow_ScrollTouchEdge_Event(int id) =>
+			BrowserWindow.FromId(id)?.OnScrollTouchEdge() ?? Task.CompletedTask;
+		public Task BrowserWindow_Swipe_Event(int id, string direction) =>
+			BrowserWindow.FromId(id)?.OnSwipe(direction) ?? Task.CompletedTask;
+		public Task BrowserWindow_RotateGesture_Event(int id, double rotation) =>
+			BrowserWindow.FromId(id)?.OnRotateGesture(rotation) ?? Task.CompletedTask;
+		public Task BrowserWindow_SheetBegin_Event(int id) =>
+			BrowserWindow.FromId(id)?.OnSheetBegin() ?? Task.CompletedTask;
+		public Task BrowserWindow_SheetEnd_Event(int id) =>
+			BrowserWindow.FromId(id)?.OnSheetEnd() ?? Task.CompletedTask;
+		public Task BrowserWindow_NewWindowForTab_Event(int id) =>
+			BrowserWindow.FromId(id)?.OnNewWindowForTab() ?? Task.CompletedTask;
+		public Task BrowserWindow_SystemContextMenu_Event(int id, Point point) =>
+			BrowserWindow.FromId(id)?.OnSystemContextMenu(point) ?? Task.CompletedTask;
+
+		public Task BrowserWindow_HookWindowMessage_Callback(int id, int requestId, int wParam, int lParam) =>
+			BrowserWindow.FromId(id)?.OnWindowMessage(requestId, wParam, lParam) ?? Task.CompletedTask;
+		public Task BrowserWindow_SetThumbarButtons_Click(int id, int index) =>
+			BrowserWindow.FromId(id)?.OnThumbarButtonClick(index) ?? Task.CompletedTask;
+	}
+}
 
 namespace MZZT.ElectronNetCore.Api {
 	public class BrowserWindow {
@@ -13,18 +279,16 @@ namespace MZZT.ElectronNetCore.Api {
 		public static Task<BrowserWindow> CreateAsync(BrowserWindowConstructorOptions options = null) =>
 			Electron.FuncAsync<BrowserWindow, int, BrowserWindowConstructorOptionsDto>(x => x.BrowserWindow_Ctor, 0, options.ToBrowserWindowConstructorOptionsDto());
 
-		public static IEnumerable<BrowserWindow> GetAllWindows() {
-			return instances.Values;
-		}
+		public static IEnumerable<BrowserWindow> GetAllWindows() =>
+			instances.Values;
 		public static Task<BrowserWindow> GetFocusedWindowAsync() =>
 			Electron.FuncAsync<BrowserWindow, int>(x => x.BrowserWindow_GetFocusedWindow, 0);
 		public static Task<BrowserWindow> FromWebContentsAsync(WebContents webContents) =>
 			Electron.FuncAsync<BrowserWindow, int, int>(x => x.BrowserWindow_FromWebContents, 0, webContents?.Id ?? 0);
 		public static Task<BrowserWindow> FromBrowserViewAsync(BrowserView browserView) =>
-			Electron.FuncAsync<BrowserWindow, int, int>(x => x.BrowserWindow_FromBrowserView, 0, browserView?.Id ?? 0);
-		public static BrowserWindow FromId(int id) {
-			return instances.GetValueOrDefault(id);
-		}
+			Electron.FuncAsync<BrowserWindow, int, int>(x => x.BrowserWindow_FromBrowserView, 0, browserView?.InternalId ?? 0);
+		public static BrowserWindow FromId(int id) =>
+			instances.GetValueOrDefault(id);
 
 		internal BrowserWindow(int id) {
 			this.Id = id;
@@ -46,7 +310,7 @@ namespace MZZT.ElectronNetCore.Api {
 			}
 		}
 
-		public event EventHandler<BrowserWindowPageTitleUpdatedEventArgs> PageTitleUpdated;
+		public event EventHandler<PageTitleUpdatedEventArgs> PageTitleUpdated;
 		internal Task OnPageTitleUpdated(string title, bool explicitSet) {
 			this.PageTitleUpdated?.Invoke(this, new(title, explicitSet));
 			return Task.CompletedTask;
@@ -315,198 +579,198 @@ namespace MZZT.ElectronNetCore.Api {
 			return Task.CompletedTask;
 		}
 
-		private ElectronReadOnlyProperty<WebContents> webContents;
-		public ElectronReadOnlyProperty<WebContents> WebContents {
+		private ElectronInstanceReadOnlyProperty<WebContents> webContents;
+		public ElectronInstanceReadOnlyProperty<WebContents> WebContents {
 			get {
 				if (this.webContents == null) {
-					this.webContents = new(x => id => x.BrowserWindow_WebContents_Get(id, this.Id));
+					this.webContents = new(this.Id, x => x.BrowserWindow_WebContents_Get);
 				}
 				return this.webContents;
 			}
 		}
 
-		private ElectronProperty<bool> autoHideMenuBar;
-		public ElectronProperty<bool> AutoHideMenuBar {
+		private ElectronInstanceProperty<bool> autoHideMenuBar;
+		public ElectronInstanceProperty<bool> AutoHideMenuBar {
 			get {
 				if (this.autoHideMenuBar == null) {
-					this.autoHideMenuBar = new(x => id => x.BrowserWindow_AutoHideMenuBar_Get(id, this.Id),
-						x => (id, value) => x.BrowserWindow_AutoHideMenuBar_Set(id, this.Id, value));
+					this.autoHideMenuBar = new(this.Id, x => x.BrowserWindow_AutoHideMenuBar_Get,
+						x => x.BrowserWindow_AutoHideMenuBar_Set);
 				}
 				return this.autoHideMenuBar;
 			}
 		}
 
-		private ElectronProperty<bool> simpleFullScreen;
-		public ElectronProperty<bool> SimpleFullScreen {
+		private ElectronInstanceProperty<bool> simpleFullScreen;
+		public ElectronInstanceProperty<bool> SimpleFullScreen {
 			get {
 				if (this.simpleFullScreen == null) {
-					this.simpleFullScreen = new(x => id => x.BrowserWindow_SimpleFullScreen_Get(id, this.Id),
-						x => (id, value) => x.BrowserWindow_SimpleFullScreen_Set(id, this.Id, value));
+					this.simpleFullScreen = new(this.Id, x => x.BrowserWindow_SimpleFullScreen_Get,
+						x => x.BrowserWindow_SimpleFullScreen_Set);
 				}
 				return this.simpleFullScreen;
 			}
 		}
 
-		private ElectronProperty<bool> fullScreen;
-		public ElectronProperty<bool> FullScreen {
+		private ElectronInstanceProperty<bool> fullScreen;
+		public ElectronInstanceProperty<bool> FullScreen {
 			get {
 				if (this.fullScreen == null) {
-					this.fullScreen = new(x => id => x.BrowserWindow_FullScreen_Get(id, this.Id),
-						x => (id, value) => x.BrowserWindow_FullScreen_Set(id, this.Id, value));
+					this.fullScreen = new(this.Id, x => x.BrowserWindow_FullScreen_Get,
+						x => x.BrowserWindow_FullScreen_Set);
 				}
 				return this.fullScreen;
 			}
 		}
 
-		private ElectronProperty<bool> visibleOnAllWorkspaces;
-		public ElectronProperty<bool> VisibleOnAllWorkspaces {
+		private ElectronInstanceProperty<bool> visibleOnAllWorkspaces;
+		public ElectronInstanceProperty<bool> VisibleOnAllWorkspaces {
 			get {
 				if (this.visibleOnAllWorkspaces == null) {
-					this.visibleOnAllWorkspaces = new(x => id => x.BrowserWindow_VisibleOnAllWorkspaces_Get(id, this.Id),
-						x => (id, value) => x.BrowserWindow_VisibleOnAllWorkspaces_Set(id, this.Id, value));
+					this.visibleOnAllWorkspaces = new(this.Id, x => x.BrowserWindow_VisibleOnAllWorkspaces_Get,
+						x => x.BrowserWindow_VisibleOnAllWorkspaces_Set);
 				}
 				return this.visibleOnAllWorkspaces;
 			}
 		}
 
-		private ElectronProperty<bool> shadow;
-		public ElectronProperty<bool> Shadow {
+		private ElectronInstanceProperty<bool> shadow;
+		public ElectronInstanceProperty<bool> Shadow {
 			get {
 				if (this.shadow == null) {
-					this.shadow = new(x => id => x.BrowserWindow_Shadow_Get(id, this.Id),
-						x => (id, value) => x.BrowserWindow_Shadow_Set(id, this.Id, value));
+					this.shadow = new(this.Id, x => x.BrowserWindow_Shadow_Get,
+						x => x.BrowserWindow_Shadow_Set);
 				}
 				return this.shadow;
 			}
 		}
 
-		private ElectronProperty<bool> menuBarVisible;
-		public ElectronProperty<bool> MenuBarVisible {
+		private ElectronInstanceProperty<bool> menuBarVisible;
+		public ElectronInstanceProperty<bool> MenuBarVisible {
 			get {
 				if (this.menuBarVisible == null) {
-					this.menuBarVisible = new(x => id => x.BrowserWindow_MenuBarVisible_Get(id, this.Id),
-						x => (id, value) => x.BrowserWindow_MenuBarVisible_Set(id, this.Id, value));
+					this.menuBarVisible = new(this.Id, x => x.BrowserWindow_MenuBarVisible_Get,
+						x => x.BrowserWindow_MenuBarVisible_Set);
 				}
 				return this.menuBarVisible;
 			}
 		}
 
-		private ElectronProperty<bool> kiosk;
-		public ElectronProperty<bool> Kiosk {
+		private ElectronInstanceProperty<bool> kiosk;
+		public ElectronInstanceProperty<bool> Kiosk {
 			get {
 				if (this.kiosk == null) {
-					this.kiosk = new(x => id => x.BrowserWindow_Kiosk_Get(id, this.Id),
-						x => (id, value) => x.BrowserWindow_Kiosk_Set(id, this.Id, value));
+					this.kiosk = new(this.Id, x => x.BrowserWindow_Kiosk_Get,
+						x => x.BrowserWindow_Kiosk_Set);
 				}
 				return this.kiosk;
 			}
 		}
 
-		private ElectronProperty<bool> documentEdited;
-		public ElectronProperty<bool> DocumentEdited {
+		private ElectronInstanceProperty<bool> documentEdited;
+		public ElectronInstanceProperty<bool> DocumentEdited {
 			get {
 				if (this.documentEdited == null) {
-					this.documentEdited = new(x => id => x.BrowserWindow_DocumentEdited_Get(id, this.Id),
-						x => (id, value) => x.BrowserWindow_DocumentEdited_Set(id, this.Id, value));
+					this.documentEdited = new(this.Id, x => x.BrowserWindow_DocumentEdited_Get,
+						x => x.BrowserWindow_DocumentEdited_Set);
 				}
 				return this.documentEdited;
 			}
 		}
 
-		private ElectronProperty<string> representedFilename;
-		public ElectronProperty<string> RepresentedFilename {
+		private ElectronInstanceProperty<string> representedFilename;
+		public ElectronInstanceProperty<string> RepresentedFilename {
 			get {
 				if (this.representedFilename == null) {
-					this.representedFilename = new(x => id => x.BrowserWindow_RepresentedFilename_Get(id, this.Id),
-						x => (id, value) => x.BrowserWindow_RepresentedFilename_Set(id, this.Id, value));
+					this.representedFilename = new(this.Id, x => x.BrowserWindow_RepresentedFilename_Get,
+						x => x.BrowserWindow_RepresentedFilename_Set);
 				}
 				return this.representedFilename;
 			}
 		}
 
-		private ElectronProperty<string> title;
-		public ElectronProperty<string> Title {
+		private ElectronInstanceProperty<string> title;
+		public ElectronInstanceProperty<string> Title {
 			get {
 				if (this.title == null) {
-					this.title = new(x => id => x.BrowserWindow_Title_Get(id, this.Id),
-						x => (id, value) => x.BrowserWindow_Title_Set(id, this.Id, value));
+					this.title = new(this.Id, x => x.BrowserWindow_Title_Get,
+						x => x.BrowserWindow_Title_Set);
 				}
 				return this.title;
 			}
 		}
 
-		private ElectronProperty<bool> minimizable;
-		public ElectronProperty<bool> Minimizable {
+		private ElectronInstanceProperty<bool> minimizable;
+		public ElectronInstanceProperty<bool> Minimizable {
 			get {
 				if (this.minimizable == null) {
-					this.minimizable = new(x => id => x.BrowserWindow_Minimizable_Get(id, this.Id),
-						x => (id, value) => x.BrowserWindow_Minimizable_Set(id, this.Id, value));
+					this.minimizable = new(this.Id, x => x.BrowserWindow_Minimizable_Get,
+						x => x.BrowserWindow_Minimizable_Set);
 				}
 				return this.minimizable;
 			}
 		}
 
-		private ElectronProperty<bool> maximizable;
-		public ElectronProperty<bool> Maximizable {
+		private ElectronInstanceProperty<bool> maximizable;
+		public ElectronInstanceProperty<bool> Maximizable {
 			get {
 				if (this.maximizable == null) {
-					this.maximizable = new(x => id => x.BrowserWindow_Maximizable_Get(id, this.Id),
-						x => (id, value) => x.BrowserWindow_Maximizable_Set(id, this.Id, value));
+					this.maximizable = new(this.Id, x => x.BrowserWindow_Maximizable_Get,
+						x => x.BrowserWindow_Maximizable_Set);
 				}
 				return this.maximizable;
 			}
 		}
 
-		private ElectronProperty<bool> fullScreenable;
-		public ElectronProperty<bool> FullScreenable {
+		private ElectronInstanceProperty<bool> fullScreenable;
+		public ElectronInstanceProperty<bool> FullScreenable {
 			get {
 				if (this.fullScreenable == null) {
-					this.fullScreenable = new(x => id => x.BrowserWindow_FullScreenable_Get(id, this.Id),
-						x => (id, value) => x.BrowserWindow_FullScreenable_Set(id, this.Id, value));
+					this.fullScreenable = new(this.Id, x => x.BrowserWindow_FullScreenable_Get,
+						x => x.BrowserWindow_FullScreenable_Set);
 				}
 				return this.fullScreenable;
 			}
 		}
 
-		private ElectronProperty<bool> resizable;
-		public ElectronProperty<bool> Resizable {
+		private ElectronInstanceProperty<bool> resizable;
+		public ElectronInstanceProperty<bool> Resizable {
 			get {
 				if (this.resizable == null) {
-					this.resizable = new(x => id => x.BrowserWindow_Resizable_Get(id, this.Id),
-						x => (id, value) => x.BrowserWindow_Resizable_Set(id, this.Id, value));
+					this.resizable = new(this.Id, x => x.BrowserWindow_Resizable_Get,
+						x => x.BrowserWindow_Resizable_Set);
 				}
 				return this.resizable;
 			}
 		}
 
-		private ElectronProperty<bool> closable;
-		public ElectronProperty<bool> Closable {
+		private ElectronInstanceProperty<bool> closable;
+		public ElectronInstanceProperty<bool> Closable {
 			get {
 				if (this.closable == null) {
-					this.closable = new(x => id => x.BrowserWindow_Closable_Get(id, this.Id),
-						x => (id, value) => x.BrowserWindow_Closable_Set(id, this.Id, value));
+					this.closable = new(this.Id, x => x.BrowserWindow_Closable_Get,
+						x => x.BrowserWindow_Closable_Set);
 				}
 				return this.closable;
 			}
 		}
 
-		private ElectronProperty<bool> movable;
-		public ElectronProperty<bool> Movable {
+		private ElectronInstanceProperty<bool> movable;
+		public ElectronInstanceProperty<bool> Movable {
 			get {
 				if (this.movable == null) {
-					this.movable = new(x => id => x.BrowserWindow_Movable_Get(id, this.Id),
-						x => (id, value) => x.BrowserWindow_Movable_Set(id, this.Id, value));
+					this.movable = new(this.Id, x => x.BrowserWindow_Movable_Get,
+						x => x.BrowserWindow_Movable_Set);
 				}
 				return this.movable;
 			}
 		}
 
-		private ElectronProperty<bool> excludedFromShownWindowsMenu;
-		public ElectronProperty<bool> ExcludedFromShownWindowsMenu {
+		private ElectronInstanceProperty<bool> excludedFromShownWindowsMenu;
+		public ElectronInstanceProperty<bool> ExcludedFromShownWindowsMenu {
 			get {
 				if (this.excludedFromShownWindowsMenu == null) {
-					this.excludedFromShownWindowsMenu = new(x => id => x.BrowserWindow_ExcludedFromShownWindowsMenu_Get(id, this.Id),
-						x => (id, value) => x.BrowserWindow_ExcludedFromShownWindowsMenu_Set(id, this.Id, value));
+					this.excludedFromShownWindowsMenu = new(this.Id, x => x.BrowserWindow_ExcludedFromShownWindowsMenu_Get,
+						x => x.BrowserWindow_ExcludedFromShownWindowsMenu_Set);
 				}
 				return this.excludedFromShownWindowsMenu;
 			}
@@ -677,7 +941,7 @@ namespace MZZT.ElectronNetCore.Api {
 			}
 			map.Add(requestId);
 			this.hookWindowMessageCallbacks[requestId] = callback;
-			await Electron.ActionAsync(x => x.BrowserWindow_HookWindowMessage, this.Id, message);
+			await Electron.ActionAsync(requestId, x => x.BrowserWindow_HookWindowMessage, this.Id, message);
 		}
 		public Task<bool> IsWindowMessageHookedAsync(int message) =>
 			Electron.FuncAsync<bool, int, int>(x => x.BrowserWindow_IsWindowMessageHooked, this.Id, message);
@@ -721,13 +985,13 @@ namespace MZZT.ElectronNetCore.Api {
 		public Task ReloadAsync() =>
 			Electron.ActionAsync(x => x.BrowserWindow_Reload, this.Id);
 		public Task SetMenuAsync(Menu menu) =>
-			Electron.ActionAsync(x => x.BrowserWindow_SetMenu, this.Id, menu?.Id ?? 0);
+			Electron.ActionAsync(x => x.BrowserWindow_SetMenu, this.Id, menu?.InternalId ?? 0);
 		public Task RemoveMenuAsync() =>
 			Electron.ActionAsync(x => x.BrowserWindow_RemoveMenu, this.Id);
 		public Task SetProgressBarAsync(double progress, ProgressBarOptions options) =>
 			Electron.ActionAsync(x => x.BrowserWindow_SetProgressBar, this.Id, progress, options);
 		public Task SetOverlayIconAsync(NativeImage overlay, string description) =>
-			Electron.ActionAsync(x => x.BrowserWindow_SetOverlayIcon, this.Id, overlay?.Id ?? 0, description);
+			Electron.ActionAsync(x => x.BrowserWindow_SetOverlayIcon, this.Id, overlay?.InternalId ?? 0, description);
 		public Task SetHasShadowAsync(bool hasShadow) =>
 			Electron.ActionAsync(x => x.BrowserWindow_SetHasShadow, this.Id, hasShadow);
 		public Task<bool> HasShadowAsync() =>
@@ -760,7 +1024,7 @@ namespace MZZT.ElectronNetCore.Api {
 		public Task ShowDefinitionForSelectionAsync() =>
 			Electron.ActionAsync(x => x.BrowserWindow_ShowDefinitionForSelection, this.Id);
 		public Task SetIconAsync(NativeImage icon) =>
-			Electron.ActionAsync(x => x.BrowserWindow_SetIcon, this.Id, icon?.Id ?? 0);
+			Electron.ActionAsync(x => x.BrowserWindow_SetIcon, this.Id, icon?.InternalId ?? 0);
 		public Task SetWindowButtonVisibilityAsync(bool visible) =>
 			Electron.ActionAsync(x => x.BrowserWindow_SetWindowButtonVisibility, this.Id, visible);
 		public Task SetAutoHideMenuBarAsync(bool hide) =>
@@ -809,17 +1073,17 @@ namespace MZZT.ElectronNetCore.Api {
 		public Task<Point> GetTrafficLightPositionAsync() =>
 			Electron.FuncAsync<Point, int>(x => x.BrowserWindow_GetTrafficLightPosition, this.Id);
 		public Task SetTouchBarAsync(TouchBar touchBar) =>
-			Electron.ActionAsync(x => x.BrowserWindow_SetTouchBar, this.Id, touchBar?.Id ?? 0);
+			Electron.ActionAsync(x => x.BrowserWindow_SetTouchBar, this.Id, touchBar?.InternalId ?? 0);
 		public Task SetBrowserViewAsync(BrowserView browserView) =>
-			Electron.ActionAsync(x => x.BrowserWindow_SetBrowserView, this.Id, browserView?.Id ?? 0);
+			Electron.ActionAsync(x => x.BrowserWindow_SetBrowserView, this.Id, browserView?.InternalId ?? 0);
 		public Task<BrowserView> GetBrowserViewAsync() =>
 			Electron.FuncAsync<BrowserView, int>(x => x.BrowserWindow_GetBrowserView, this.Id);
 		public Task AddBrowserViewAsync(BrowserView browserView) =>
-			Electron.ActionAsync(x => x.BrowserWindow_AddBrowserView, this.Id, browserView?.Id ?? 0);
+			Electron.ActionAsync(x => x.BrowserWindow_AddBrowserView, this.Id, browserView?.InternalId ?? 0);
 		public Task RemoveBrowserViewAsync(BrowserView browserView) =>
-			Electron.ActionAsync(x => x.BrowserWindow_RemoveBrowserView, this.Id, browserView?.Id ?? 0);
+			Electron.ActionAsync(x => x.BrowserWindow_RemoveBrowserView, this.Id, browserView?.InternalId ?? 0);
 		public Task SetTopBrowserViewAsync(BrowserView browserView) =>
-			Electron.ActionAsync(x => x.BrowserWindow_SetTopBrowserView, this.Id, browserView?.Id ?? 0);
+			Electron.ActionAsync(x => x.BrowserWindow_SetTopBrowserView, this.Id, browserView?.InternalId ?? 0);
 		public async Task<BrowserView[]> GetBrowserViewsAsync() =>
 			(await Electron.FuncAsync<int[], int>(x => x.BrowserWindow_GetBrowserViews, this.Id))
 			.Select(x => ElectronDisposable.FromId<BrowserView>(x)).ToArray();

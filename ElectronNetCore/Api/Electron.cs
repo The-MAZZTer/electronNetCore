@@ -25,11 +25,11 @@ namespace MZZT.ElectronNetCore.Api {
 			}
 		}
 
-		internal static async Task DisposeObjectAsync<T>(T obj) where T : ElectronDisposable<T> {
+		internal static async Task DisposeObjectAsync<T>(ElectronDisposable<T> obj) where T : ElectronDisposable<T> {
 			while (!Connected) {
 				await Task.Delay(5);
 			}
-			await ElectronHub.Electron.DisposeObject(obj.Id);
+			await ElectronHub.Electron.DisposeObject(obj.InternalId);
 		}
 
 		private static readonly Dictionary<int, ReturnData> returnData = new();
@@ -41,7 +41,9 @@ namespace MZZT.ElectronNetCore.Api {
 			return Task.CompletedTask;
 		}
 
-		internal static int NextRequestId { get; set; } = 1;
+		private static int RequestId { get; set; } = 1;
+		internal static int NextRequestId => RequestId++;
+
 		internal static Task OnReturn(int requestId, string response = "null") {
 			lock (returnData) {
 				returnData[requestId].Json = response;
@@ -68,7 +70,6 @@ namespace MZZT.ElectronNetCore.Api {
 				throw new ElectronException(data.Error);
 			}
 
-
 			return data;
 		}
 		internal static async Task WaitUntilVoidAsync(int requestId) {
@@ -87,26 +88,41 @@ namespace MZZT.ElectronNetCore.Api {
 					PropertyNamingPolicy = JsonNamingPolicy.CamelCase
 				});
 				return (T)(object)BrowserWindow.FromId(id);
-			} 
-
-			if (type == typeof(WebContents)) {
+			} else if (type == typeof(WebContents)) {
 				int id = (int)JsonSerializer.Deserialize(json, typeof(int), new() {
 					PropertyNameCaseInsensitive = true,
 					PropertyNamingPolicy = JsonNamingPolicy.CamelCase
 				});
 				return (T)(object)WebContents.FromId(id);
-			}
+			} else if (type == typeof(WebFrameMain)) {
+				WebFrameMainId id = (WebFrameMainId)JsonSerializer.Deserialize(json, typeof(WebFrameMainId), new() {
+					PropertyNameCaseInsensitive = true,
+					PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+				});
+				if (id == null) {
+					return default;
+				}
+				return (T)(object)new WebFrameMain(id.ProcessId, id.RoutingId);
+			} 
 
-			Type electeonType = type;
-			while (electeonType != null) {
-				if (electeonType.IsConstructedGenericType && electeonType.GetGenericTypeDefinition() == typeof(ElectronDisposable<>)) {
+			Type electronType = type;
+			while (electronType != null) {
+				if (electronType.IsConstructedGenericType && electronType.GetGenericTypeDefinition() == typeof(ElectronDisposable<>)) {
 					int id = (int)JsonSerializer.Deserialize(json, typeof(int), new() {
 						PropertyNameCaseInsensitive = true,
 						PropertyNamingPolicy = JsonNamingPolicy.CamelCase
 					});
-					return (T)ElectronDisposable.FromId(typeof(T), id);
+					return (T)ElectronDisposable.FromId(type, id);
 				}
-				electeonType = electeonType.BaseType;
+				electronType = electronType.BaseType;
+			}
+			
+			if (typeof(ElectronDisposable).IsAssignableFrom(type)) {
+				int id = (int)JsonSerializer.Deserialize(json, typeof(int), new() {
+					PropertyNameCaseInsensitive = true,
+					PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+				});
+				return (T)ElectronDisposable.FromId(typeof(T), id);
 			}
 
 			return (T)JsonSerializer.Deserialize(json, type, new() {
@@ -115,8 +131,7 @@ namespace MZZT.ElectronNetCore.Api {
 			});
 		}
 
-		internal async static Task ActionAsync(Func<IElectronInterface, Func<int, Task>> resolver) {
-			int id = NextRequestId++;
+		internal async static Task ActionAsync(int id, Func<IElectronInterface, Func<int, Task>> resolver) {
 			lock (returnData) {
 				returnData[id] = new($"{resolver.Target.GetType().Name}::{resolver.Method.Name}");
 			}
@@ -126,8 +141,9 @@ namespace MZZT.ElectronNetCore.Api {
 			await resolver(ElectronHub.Electron)(id);
 			await WaitUntilVoidAsync(id);
 		}
-		internal async static Task ActionAsync<TArg>(Func<IElectronInterface, Func<int, TArg, Task>> resolver, TArg arg) {
-			int id = NextRequestId++;
+		internal static Task ActionAsync(Func<IElectronInterface, Func<int, Task>> resolver) =>
+			ActionAsync(NextRequestId, resolver);
+		internal async static Task ActionAsync<TArg>(int id, Func<IElectronInterface, Func<int, TArg, Task>> resolver, TArg arg) {
 			lock (returnData) {
 				returnData[id] = new($"{resolver.Target.GetType().Name}::{resolver.Method.Name}");
 			}
@@ -137,10 +153,11 @@ namespace MZZT.ElectronNetCore.Api {
 			await resolver(ElectronHub.Electron)(id, arg);
 			await WaitUntilVoidAsync(id);
 		}
-		internal async static Task ActionAsync<TArg1, TArg2>(Func<IElectronInterface, Func<int, TArg1, TArg2, Task>> resolver,
+		internal static Task ActionAsync<TArg>(Func<IElectronInterface, Func<int, TArg, Task>> resolver, TArg arg) =>
+			ActionAsync(NextRequestId, resolver, arg);
+		internal async static Task ActionAsync<TArg1, TArg2>(int id, Func<IElectronInterface, Func<int, TArg1, TArg2, Task>> resolver,
 			TArg1 arg1, TArg2 arg2) {
 
-			int id = NextRequestId++;
 			lock (returnData) {
 				returnData[id] = new($"{resolver.Target.GetType().Name}::{resolver.Method.Name}");
 			}
@@ -150,10 +167,11 @@ namespace MZZT.ElectronNetCore.Api {
 			await resolver(ElectronHub.Electron)(id, arg1, arg2);
 			await WaitUntilVoidAsync(id);
 		}
-		internal async static Task ActionAsync<TArg1, TArg2, TArg3>(Func<IElectronInterface, Func<int, TArg1, TArg2, TArg3, Task>> resolver,
+		internal static Task ActionAsync<TArg1, TArg2>(Func<IElectronInterface, Func<int, TArg1, TArg2, Task>> resolver, TArg1 arg1, TArg2 arg2) =>
+			ActionAsync(NextRequestId, resolver, arg1, arg2);
+		internal async static Task ActionAsync<TArg1, TArg2, TArg3>(int id, Func<IElectronInterface, Func<int, TArg1, TArg2, TArg3, Task>> resolver,
 			TArg1 arg1, TArg2 arg2, TArg3 arg3) {
 
-			int id = NextRequestId++;
 			lock (returnData) {
 				returnData[id] = new($"{resolver.Target.GetType().Name}::{resolver.Method.Name}");
 			}
@@ -163,10 +181,11 @@ namespace MZZT.ElectronNetCore.Api {
 			await resolver(ElectronHub.Electron)(id, arg1, arg2, arg3);
 			await WaitUntilVoidAsync(id);
 		}
-		internal async static Task ActionAsync<TArg1, TArg2, TArg3, TArg4>(Func<IElectronInterface, Func<int, TArg1, TArg2, TArg3, TArg4, Task>> resolver,
+		internal static Task ActionAsync<TArg1, TArg2, TArg3>(Func<IElectronInterface, Func<int, TArg1, TArg2, TArg3, Task>> resolver, TArg1 arg1, TArg2 arg2, TArg3 arg3) =>
+			ActionAsync(NextRequestId, resolver, arg1, arg2, arg3);
+		internal async static Task ActionAsync<TArg1, TArg2, TArg3, TArg4>(int id, Func<IElectronInterface, Func<int, TArg1, TArg2, TArg3, TArg4, Task>> resolver,
 			TArg1 arg1, TArg2 arg2, TArg3 arg3, TArg4 arg4) {
 
-			int id = NextRequestId++;
 			lock (returnData) {
 				returnData[id] = new($"{resolver.Target.GetType().Name}::{resolver.Method.Name}");
 			}
@@ -176,9 +195,10 @@ namespace MZZT.ElectronNetCore.Api {
 			await resolver(ElectronHub.Electron)(id, arg1, arg2, arg3, arg4);
 			await WaitUntilVoidAsync(id);
 		}
+		internal static Task ActionAsync<TArg1, TArg2, TArg3, TArg4>(Func<IElectronInterface, Func<int, TArg1, TArg2, TArg3, TArg4, Task>> resolver, TArg1 arg1, TArg2 arg2, TArg3 arg3, TArg4 arg4) =>
+			ActionAsync(NextRequestId, resolver, arg1, arg2, arg3, arg4);
 
-		internal async static Task<TRet> FuncAsync<TRet>(Func<IElectronInterface, Func<int, Task>> resolver) {
-			int id = NextRequestId++;
+		internal async static Task<TRet> FuncAsync<TRet>(int id, Func<IElectronInterface, Func<int, Task>> resolver) {
 			lock (returnData) {
 				returnData[id] = new($"{resolver.Target.GetType().Name}::{resolver.Method.Name}");
 			}
@@ -188,8 +208,9 @@ namespace MZZT.ElectronNetCore.Api {
 			await resolver(ElectronHub.Electron)(id);
 			return await WaitUntilReturnAsync<TRet>(id);
 		}
-		internal async static Task<TRet> FuncAsync<TRet, TArg>(Func<IElectronInterface, Func<int, TArg, Task>> resolver, TArg arg) {
-			int id = NextRequestId++;
+		internal static Task<TRet> FuncAsync<TRet>(Func<IElectronInterface, Func<int, Task>> resolver) =>
+			FuncAsync<TRet>(NextRequestId, resolver);
+		internal async static Task<TRet> FuncAsync<TRet, TArg>(int id, Func<IElectronInterface, Func<int, TArg, Task>> resolver, TArg arg) {
 			lock (returnData) {
 				returnData[id] = new($"{resolver.Target.GetType().Name}::{resolver.Method.Name}");
 			}
@@ -199,10 +220,11 @@ namespace MZZT.ElectronNetCore.Api {
 			await resolver(ElectronHub.Electron)(id, arg);
 			return await WaitUntilReturnAsync<TRet>(id);
 		}
-		internal async static Task<TRet> FuncAsync<TRet, TArg1, TArg2>(
+		internal static Task<TRet> FuncAsync<TRet, TArg>(Func<IElectronInterface, Func<int, TArg, Task>> resolver, TArg arg) =>
+			FuncAsync<TRet, TArg>(NextRequestId, resolver, arg);
+		internal async static Task<TRet> FuncAsync<TRet, TArg1, TArg2>(int id,
 			Func<IElectronInterface, Func<int, TArg1, TArg2, Task>> resolver, TArg1 arg1, TArg2 arg2) {
 
-			int id = NextRequestId++;
 			lock (returnData) {
 				returnData[id] = new($"{resolver.Target.GetType().Name}::{resolver.Method.Name}");
 			}
@@ -212,10 +234,11 @@ namespace MZZT.ElectronNetCore.Api {
 			await resolver(ElectronHub.Electron)(id, arg1, arg2);
 			return await WaitUntilReturnAsync<TRet>(id);
 		}
-		internal async static Task<TRet> FuncAsync<TRet, TArg1, TArg2, TArg3>(
+		internal static Task<TRet> FuncAsync<TRet, TArg1, TArg2>(Func<IElectronInterface, Func<int, TArg1, TArg2, Task>> resolver, TArg1 arg1, TArg2 arg2) =>
+			FuncAsync<TRet, TArg1, TArg2>(NextRequestId, resolver, arg1, arg2);
+		internal async static Task<TRet> FuncAsync<TRet, TArg1, TArg2, TArg3>(int id,
 			Func<IElectronInterface, Func<int, TArg1, TArg2, TArg3, Task>> resolver, TArg1 arg1, TArg2 arg2, TArg3 arg3) {
 
-			int id = NextRequestId++;
 			lock (returnData) {
 				returnData[id] = new($"{resolver.Target.GetType().Name}::{resolver.Method.Name}");
 			}
@@ -225,10 +248,11 @@ namespace MZZT.ElectronNetCore.Api {
 			await resolver(ElectronHub.Electron)(id, arg1, arg2, arg3);
 			return await WaitUntilReturnAsync<TRet>(id);
 		}
-		internal async static Task<TRet> FuncAsync<TRet, TArg1, TArg2, TArg3, TArg4>(
+		internal static Task<TRet> FuncAsync<TRet, TArg1, TArg2, TArg3>(Func<IElectronInterface, Func<int, TArg1, TArg2, TArg3, Task>> resolver, TArg1 arg1, TArg2 arg2, TArg3 arg3) =>
+			FuncAsync<TRet, TArg1, TArg2, TArg3>(NextRequestId, resolver, arg1, arg2, arg3);
+		internal async static Task<TRet> FuncAsync<TRet, TArg1, TArg2, TArg3, TArg4>(int id,
 			Func<IElectronInterface, Func<int, TArg1, TArg2, TArg3, TArg4, Task>> resolver, TArg1 arg1, TArg2 arg2, TArg3 arg3, TArg4 arg4) {
 
-			int id = NextRequestId++;
 			lock (returnData) {
 				returnData[id] = new($"{resolver.Target.GetType().Name}::{resolver.Method.Name}");
 			}
@@ -238,6 +262,8 @@ namespace MZZT.ElectronNetCore.Api {
 			await resolver(ElectronHub.Electron)(id, arg1, arg2, arg3, arg4);
 			return await WaitUntilReturnAsync<TRet>(id);
 		}
+		internal static Task<TRet> FuncAsync<TRet, TArg1, TArg2, TArg3, TArg4>(Func<IElectronInterface, Func<int, TArg1, TArg2, TArg3, TArg4, Task>> resolver, TArg1 arg1, TArg2 arg2, TArg3 arg3, TArg4 arg4) =>
+			FuncAsync<TRet, TArg1, TArg2, TArg3, TArg4>(NextRequestId, resolver, arg1, arg2, arg3, arg4);
 
 		public static ElectronApp App { get; } = new();
 		public static ElectronAutoUpdater AutoUpdater { get; } = new();
@@ -245,7 +271,16 @@ namespace MZZT.ElectronNetCore.Api {
 		public static ElectronDialog Dialog { get; } = new();
 		public static ElectronGlobalShortcut GlobalShortcut { get; } = new();
 		public static ElectronInAppPurchase InAppPurchase { get; } = new();
+		public static ElectronIpcMain IpcMain { get; } = new();
+		public static ElectronNativeTheme NativeTheme { get; } = new();
+		public static ElectronNet Net { get; } = new();
+		public static NetLog NetLog { get; } = new(0);
+		public static ElectronPowerMonitor PowerMonitor { get; } = new();
+		public static ElectronPowerSaveBlocker PowerSaveBlocker { get; } = new();
 		public static ElectronProcess Process { get; } = new();
+		public static Protocol Protocol { get; } = new(0);
+		public static ElectronScreen Screen { get; } = new();
+		public static ElectronSystemPreferences SystemPreferences { get; } = new();
 
 		public static event EventHandler<ExitCodeEventArgs> ProcessExited;
 		internal static void OnProcessExited(int exitCode) {

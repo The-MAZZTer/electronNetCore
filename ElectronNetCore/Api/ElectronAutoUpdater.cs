@@ -1,5 +1,30 @@
-﻿using System.Threading.Tasks;
+﻿using MZZT.ElectronNetCore.Api;
 using System;
+using System.Threading.Tasks;
+
+namespace MZZT.ElectronNetCore {
+	public partial interface IElectronInterface {
+		Task AutoUpdater_SetFeedUrl(int requestId, FeedUrlOptions options);
+		Task AutoUpdater_GetFeedUrl(int requestId);
+		Task AutoUpdater_CheckForUpdates(int requestId);
+		Task AutoUpdater_QuitAndInstall(int requestId);
+	}
+
+	internal partial class ElectronHub {
+		public Task AutoUpdater_Error_Event(Error error) =>
+			Api.Electron.AutoUpdater.OnError(error);
+		public Task AutoUpdater_CheckingForUpdate_Event() =>
+			Api.Electron.AutoUpdater.OnCheckingForUpdate();
+		public Task AutoUpdater_UpdateAvailable_Event() =>
+			Api.Electron.AutoUpdater.OnUpdateAvailable();
+		public Task AutoUpdater_UpdateNotAvailable_Event() =>
+			Api.Electron.AutoUpdater.OnUpdateNotAvailable();
+		public Task AutoUpdater_UpdateDownloaded_Event(string releaseNotes, string releaseName, double releaseDate, string updateUrl) =>
+			Api.Electron.AutoUpdater.OnUpdateDownloaded(releaseNotes, releaseName, DateTime.SpecifyKind(DateTime.UnixEpoch + TimeSpan.FromMilliseconds(releaseDate), DateTimeKind.Utc), updateUrl);
+		public Task AutoUpdater_BeforeQuitForUpdate_Event() =>
+			Api.Electron.AutoUpdater.OnBeforeQuitForUpdate();
+	}
+}
 
 namespace MZZT.ElectronNetCore.Api {
 	public class ElectronAutoUpdater {

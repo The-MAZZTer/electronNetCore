@@ -1,10 +1,10 @@
-﻿using System.Threading.Tasks;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace MZZT.ElectronNetCore.Api {
-	internal static class ElectronDisposable {
+	public abstract class ElectronDisposable {
 		internal static readonly Dictionary<int, object> instances = new();
 
 		internal static object FromId(Type type, int id) {
@@ -14,43 +14,58 @@ namespace MZZT.ElectronNetCore.Api {
 			return instances.GetValueOrDefault(id) ?? Activator.CreateInstance(type, BindingFlags.NonPublic | BindingFlags.Instance, null, new object[] { id }, null);
 		}
 		internal static T FromId<T>(int id) where T : ElectronDisposable<T> => (T)FromId(typeof(T), id);
+
+		internal ElectronDisposable(int internalId) {
+			this.internalId = internalId;
+			if (internalId > 0) {
+				instances[internalId] = this;
+			}
+		}
+		protected int internalId;
+		internal int InternalId {
+			get {
+				if (this.disposed) {
+					throw new ObjectDisposedException(this.GetType().Name);
+				}
+				return this.internalId;
+			}
+		}
+		protected bool disposed = false;
 	}
 
-	public abstract class ElectronDisposable<T> : IDisposable, IAsyncDisposable where T : ElectronDisposable<T> {
-		internal ElectronDisposable(int id) {
-			this.Id = id;
-			ElectronDisposable.instances[id] = (T)this;
-		}
-		internal int Id { get; private set; }
+	public abstract class ElectronDisposable<T> : ElectronDisposable, IDisposable, IAsyncDisposable where T : ElectronDisposable<T> {
+		internal ElectronDisposable(int internalId) : base(internalId) { }
 
 		public void Dispose() {
-			Dispose(disposing: true);
+			this.Dispose(disposing: true);
 			GC.SuppressFinalize(this);
 		}
 
 		public async ValueTask DisposeAsync() {
-			await DisposeAsyncCore();
+			await this.DisposeAsyncCore();
 
-			Dispose(disposing: false);
+			this.Dispose(disposing: false);
 			GC.SuppressFinalize(this);
 		}
 
 		protected virtual void Dispose(bool disposing) {
-			if (disposing) {
+			if (disposing && this.internalId > 0) {
 				Electron.DisposeObjectAsync((T)this).GetAwaiter().GetResult();
-				ElectronDisposable.instances.Remove(this.Id);
+				instances.Remove(this.InternalId);
 			}
 
-			this.Id = 0;
+			this.internalId = 0;
+			this.disposed = true;
 		}
 
 		protected virtual async ValueTask DisposeAsyncCore() {
-			if (this.Id > 0) {
+			if (this.internalId > 0) {
 				await Electron.DisposeObjectAsync((T)this);
-				ElectronDisposable.instances.Remove(this.Id);
+				instances.Remove(this.InternalId);
 			}
 
-			this.Id = 0;
+			this.internalId = 0;
+			this.disposed = true;
 		}
 
 		~ElectronDisposable() {

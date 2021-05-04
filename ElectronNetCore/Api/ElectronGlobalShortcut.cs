@@ -1,6 +1,21 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using System;
+
+namespace MZZT.ElectronNetCore {
+	public partial interface IElectronInterface {
+		Task GlobalShortcut_Register(int requestId, string accelerator);
+		Task GlobalShortcut_RegisterAll(int requestId, string[] accelerators);
+		Task GlobalShortcut_IsRegistered(int requestId, string accelerator);
+		Task GlobalShortcut_Unregister(int requestId, string accelerator);
+		Task GlobalShortcut_UnregisterAll(int requestId);
+	}
+
+	internal partial class ElectronHub {
+		public Task GlobalShortcut_Register_Callback(int requestId) =>
+			Api.Electron.GlobalShortcut.OnCallback(requestId) ?? Task.CompletedTask;
+	}
+}
 
 namespace MZZT.ElectronNetCore.Api {
 	public class ElectronGlobalShortcut {
@@ -21,12 +36,12 @@ namespace MZZT.ElectronNetCore.Api {
 			}
 			map.Add(requestId);
 			this.callbacks[requestId] = callback;
-			return await Electron.FuncAsync<bool, string>(x => x.GlobalShortcut_Register, accelerator);
+			return await Electron.FuncAsync<bool, string>(requestId, x => x.GlobalShortcut_Register, accelerator);
 		}
 		public async Task<bool> RegisterAll(string[] accelerators, Action callback) {
 			int requestId = Electron.NextRequestId;
 			this.callbacks[requestId] = callback;
-			return await Electron.FuncAsync<bool, string[]>(x => x.GlobalShortcut_RegisterAll, accelerators);
+			return await Electron.FuncAsync<bool, string[]>(requestId, x => x.GlobalShortcut_RegisterAll, accelerators);
 		}
 		public Task<bool> IsRegistered(string accelerator) =>
 			Electron.FuncAsync<bool, string>(x => x.GlobalShortcut_IsRegistered, accelerator);

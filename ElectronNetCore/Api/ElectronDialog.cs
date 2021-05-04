@@ -1,4 +1,15 @@
-﻿using System.Threading.Tasks;
+﻿using MZZT.ElectronNetCore.Api;
+using System.Threading.Tasks;
+
+namespace MZZT.ElectronNetCore {
+	public partial interface IElectronInterface {
+		Task Dialog_ShowOpenDialog(int requestId, int browserWindow, OpenDialogOptions options);
+		Task Dialog_ShowSaveDialog(int requestId, int browserWindow, SaveDialogOptions options);
+		Task Dialog_ShowMessageBox(int requestId, int browserWindow, MessageBoxOptionsDto options);
+		Task Dialog_ShowErrorBox(int requestId, string title, string content);
+		Task Dialog_ShowCertificateTrustDialog(int requestId, int browserWindow, CertificateTrustDialogOptions options);
+	}
+}
 
 namespace MZZT.ElectronNetCore.Api {
 	public class ElectronDialog {

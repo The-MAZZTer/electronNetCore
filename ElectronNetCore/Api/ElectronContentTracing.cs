@@ -1,4 +1,15 @@
-﻿using System.Threading.Tasks;
+﻿using MZZT.ElectronNetCore.Api;
+using System.Threading.Tasks;
+
+namespace MZZT.ElectronNetCore {
+	public partial interface IElectronInterface {
+		Task ContentTracing_GetCategories(int requestId);
+		Task ContentTracing_StartRecording_TraceConfig(int requestId, TraceConfig options);
+		Task ContentTracing_StartRecording_TraceCategoriesAndOptions(int requestId, TraceCategoriesAndOptions options);
+		Task ContentTracing_StopRecording(int requestId, string resultFilePath);
+		Task ContentTracing_GetTraceBufferUsage(int requestId);
+	}
+}
 
 namespace MZZT.ElectronNetCore.Api {
 	public class ElectronContentTracing {

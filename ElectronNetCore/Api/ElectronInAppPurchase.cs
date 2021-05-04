@@ -1,5 +1,23 @@
-﻿using System.Threading.Tasks;
+﻿using MZZT.ElectronNetCore.Api;
 using System;
+using System.Threading.Tasks;
+
+namespace MZZT.ElectronNetCore {
+	public partial interface IElectronInterface {
+		Task InAppPurchase_PurchaseProduct(int requestId, string productId, int quantity);
+		Task InAppPurchase_GetProducts(int requestId, string[] productIds);
+		Task InAppPurchase_CanMakePayments(int requestId);
+		Task InAppPurchase_RestoreCompletedTransactions(int requestId);
+		Task InAppPurchase_GetReceiptUrl(int requestId);
+		Task InAppPurchase_FinishAllTransactions(int requestId);
+		Task InAppPurchase_FinishTransactionByDate(int requestId, string date);
+	}
+
+	internal partial class ElectronHub {
+		public Task InAppPurchase_TransactionsUpdated_Event(Transaction[] transactions) =>
+			Api.Electron.InAppPurchase.OnTransactionsUpdated(transactions);
+	}
+}
 
 namespace MZZT.ElectronNetCore.Api {
 	public class ElectronInAppPurchase {
