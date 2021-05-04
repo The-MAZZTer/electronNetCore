@@ -14,30 +14,30 @@ function hookSession(session: Session, id: number) {
 			delete sessionWillDownloadSavePath[id];
 		}
 
-		return api.send("Session_WillDownload_Event", id, api.store(item), webContents?.id ?? 0);
+		return api.send("WillDownload_Event", id, api.store(item), webContents?.id ?? 0);
 	});
 	session.on("extension-loaded", (_, extension) =>
-		api.send("Session_ExtensionLoaded_Event", id, extension));
+		api.send("ExtensionLoaded_Event", id, extension));
 	session.on("extension-unloaded", (_, extension) =>
-		api.send("Session_ExtensionUnloaded_Event", id, extension));
+		api.send("ExtensionUnloaded_Event", id, extension));
 	session.on("extension-ready", (_, extension) =>
-		api.send("Session_ExtensionReady_Event", id, extension));
+		api.send("ExtensionReady_Event", id, extension));
 	session.on("preconnect", (_, preconnectUrl, allowCredentials) =>
-		api.send("Session_Preconnect_Event", preconnectUrl, id, allowCredentials));
+		api.send("Preconnect_Event", preconnectUrl, id, allowCredentials));
 	session.on("spellcheck-dictionary-initialized", (_, languageCode) =>
-		api.send("Session_SpellcheckDictionaryInitialized_Event", id, languageCode));
+		api.send("SpellcheckDictionaryInitialized_Event", id, languageCode));
 	session.on("spellcheck-dictionary-download-begin", (_, languageCode) =>
-		api.send("Session_SpellcheckDictionaryDownloadBegin_Event", id, languageCode));
+		api.send("SpellcheckDictionaryDownloadBegin_Event", id, languageCode));
 	session.on("spellcheck-dictionary-download-success", (_, languageCode) =>
-		api.send("Session_SpellcheckDictionaryDownloadSuccess_Event", id, languageCode));
+		api.send("SpellcheckDictionaryDownloadSuccess_Event", id, languageCode));
 	session.on("spellcheck-dictionary-download-failure", (_, languageCode) =>
-		api.send("Session_SpellcheckDictionaryDownloadFailure_Event", id, languageCode));
+		api.send("SpellcheckDictionaryDownloadFailure_Event", id, languageCode));
 	session.on("select-serial-port", (_, portList, webContents, callback) =>
-		api.send("Session_SelectSerialPort_Event", id, portList, webContents?.id ?? 0, api.store(callback)));
+		api.send("SelectSerialPort_Event", id, portList, webContents?.id ?? 0, api.store(callback)));
 	session.on("serial-port-added", (_, port, webContents) =>
-	api	.send("Session_SerialPortAdded_Event", id, port, webContents?.id ?? 0));
+		api.send("SerialPortAdded_Event", id, port, webContents?.id ?? 0));
 	session.on("serial-port-removed", (_, port, webContents) =>
-		api.send("Session_SerialPortRemoved_Event", id, port, webContents?.id ?? 0));
+		api.send("SerialPortRemoved_Event", id, port, webContents?.id ?? 0));
 }
 
 let api: SignalRApi;
