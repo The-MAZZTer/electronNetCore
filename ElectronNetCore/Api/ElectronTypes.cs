@@ -398,7 +398,7 @@ namespace MZZT.ElectronNetCore.Api {
 		public const string Unknown = "unknown";
 	}
 
-	public static class MenuItemsRoles {
+	public static class MenuItemRoles {
 		public const string Undo = "undo";
 		public const string Redo = "redo";
 		public const string Cut = "cut";
