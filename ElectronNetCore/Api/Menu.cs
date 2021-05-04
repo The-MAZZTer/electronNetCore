@@ -77,20 +77,20 @@ namespace MZZT.ElectronNetCore.Api {
 			}
 			return Task.CompletedTask;
 		}
-		public Task Popup(PopupOptions options) {
+		public Task PopupAsync(PopupOptions options) {
 			int requestId = Electron.NextRequestId;
 			if (options != null && options.Callback != null) {
 				this.popupClosedCallbacks[requestId] = options.Callback;
 			}
 			return Electron.ActionAsync(requestId, x => x.Menu_Popup, this.InternalId, options?.ToPopupOptionsDto());
 		}
-		public Task ClosePopup(BrowserWindow browserWindow) =>
+		public Task ClosePopupAsync(BrowserWindow browserWindow) =>
 			Electron.ActionAsync(x => x.Menu_ClosePopup, this.InternalId, browserWindow?.Id ?? 0);
-		public Task Append(MenuItem menuItem) =>
+		public Task AppendAsync(MenuItem menuItem) =>
 			Electron.ActionAsync(x => x.Menu_Append, this.InternalId, menuItem?.InternalId ?? 0);
-		public Task<MenuItem> GetMenuItemById(string id) =>
+		public Task<MenuItem> GetMenuItemByIdAsync(string id) =>
 			Electron.FuncAsync<MenuItem, int, string>(x => x.Menu_GetMenuItemById, this.InternalId, id);
-		public Task Insert(int pos, MenuItem menuItem) =>
+		public Task InsertAsync(int pos, MenuItem menuItem) =>
 			Electron.ActionAsync(x => x.Menu_Insert, this.InternalId, pos, menuItem?.InternalId ?? 0);
 
 		public event EventHandler MenuWillShow;
