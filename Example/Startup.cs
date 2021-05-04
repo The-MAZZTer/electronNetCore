@@ -83,7 +83,7 @@ namespace Example {
 				Task.Run(async () => {
 					await Electron.App.Name.SetAsync("Example");
 					await Electron.App.SetAppUserModelIdAsync("Example");
-					if (!await Electron.App.RequestSingleInstanceLockAsync()) {
+					if (! await Electron.App.RequestSingleInstanceLockAsync()) {
 						Environment.Exit(0);
 						return;
 					}

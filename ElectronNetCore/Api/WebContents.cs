@@ -89,9 +89,9 @@ namespace MZZT.ElectronNetCore {
 		Task WebContents_InspectSharedWorker(int requestId, int id);
 		Task WebContents_InspectSharedWorkerById(int requestId, int id, string workerId);
 		Task WebContents_GetAllSharedWorkers(int requestId, int id);
-		Task WebContents_InspectServiceWorker(int requestId, int id);
+		Task WebContents_InspectServiceWorker(int requestId, int id);*/
 		Task WebContents_Send(int requestId, int id, string channel, object[] args);
-		Task WebContents_SendToFrame(int requestId, int id, int frameId, string channel, object[] args);
+		/*Task WebContents_SendToFrame(int requestId, int id, int frameId, string channel, object[] args);
 		Task WebContents_SendToFrame_OutOfProcess(int requestId, int id, int[] frameId, string channel, object[] args);
 		Task WebContents_PostMessage(int requestId, int id, string channel, object message, int[] transfer);
 		Task WebContents_EnableDeviceEmulation(int requestId, int id, Parameters parameters);
@@ -651,6 +651,7 @@ namespace MZZT.ElectronNetCore.Api {
 			return Task.CompletedTask;
 		}*/
 
-
+		public Task SendAsync(string channel, object[] args) =>
+			Electron.ActionAsync(x => x.WebContents_Send, this.Id, channel, args);
 	}
 }

@@ -4,13 +4,7 @@ import { ElectronApi, SignalRApi } from "./api";
 let api: SignalRApi;
 export const ElectronMenu: ElectronApi = {
 	type: "Menu",
-	instanceOf: x => {
-		const ret = !!x.getMenuItemById
-		if (ret) {
-			console.log(`Does this menu check work? ${x instanceof Menu}`);
-		}
-		return ret;
-	},
+	instanceOf: x => x instanceof Menu,
 	fromId: x => api.get<Menu>(x),
 	toId: (x: Menu) => api.store(x),
 	init: x => api = x,

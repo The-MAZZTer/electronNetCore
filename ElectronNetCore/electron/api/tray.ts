@@ -4,7 +4,7 @@ import { ElectronApi, SignalRApi } from "./api";
 let api: SignalRApi;
 export const ElectronTray : ElectronApi = {
 	type: "Tray",
-	instanceOf: x => !!x.setIgnoreDoubleClickEvents,
+	instanceOf: x => x instanceof Tray,
 	fromId: x => api.get<Tray>(x),
 	toId: (x: Tray) => api.store(x),
 	init: x => api = x,

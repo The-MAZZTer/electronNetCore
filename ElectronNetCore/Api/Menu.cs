@@ -58,8 +58,8 @@ namespace MZZT.ElectronNetCore.Api {
 				MenuItem[] items = await menu.Items.GetAsync();
 				foreach ((MenuItem menuItem, MenuItemConstructorOptions options) in items
 					.Zip(template)
-					.OfType<(MenuItem, MenuItemConstructorOptions)>()
-					.Where(x => x.Item2.Click != null)) {
+					.Where(x => x.Item2 is MenuItemConstructorOptions options && options.Click != null)
+					.Select(x => (x.First, (MenuItemConstructorOptions)x.Second))) {
 
 					await menuItem.ClickSetAsync(options.Click);
 				}
