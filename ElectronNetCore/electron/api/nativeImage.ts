@@ -9,6 +9,8 @@ export const ElectronNativeImage: ElectronApi = {
 	toId: (x: NativeImage) => api.store(x),
 	init: x => api = x,
 	handlers: {
+		"CreateFromPath": (_: null, path) => NativeImage.createFromPath(path),
+
 		"GetSize": (self: NativeImage, scaleFactor) => self.getSize(scaleFactor),
 		"ToDataUrl": (self: NativeImage, options) => self.toDataURL(options)
 	}
