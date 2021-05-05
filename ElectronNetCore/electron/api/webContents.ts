@@ -1,5 +1,5 @@
 import { app, BrowserWindow, BrowserWindowConstructorOptions, Item, LoadURLOptions, MessagePortMain,
-	NativeImage, PrintToPDFOptions, Session, WebContents, WebContentsPrintOptions } from "electron";
+	NativeImage, PrintToPDFOptions, Session, webContents, WebContents, WebContentsPrintOptions } from "electron";
 import { ElectronApi, SignalRApi } from "./api";
 
 const willNavigatePreventDefault: Record<number, true> = {};
@@ -14,8 +14,8 @@ const setWindowOpenHandlerReturn: Record<number, { action: "deny"; } | { action:
 let api: SignalRApi;
 export const ElectronWebContents : ElectronApi = {
 	type: "WebContents",
-	instanceOf: x => x?.constructor?.name === "WebContents",
-	fromId: x => WebContents.fromId(x),
+	instanceOf: x => !!x.forcefullyCrashRenderer,
+	fromId: x => webContents.fromId(x),
 	toId: (x: WebContents) => x.id,
 	init: x => {
 		api = x;
@@ -411,9 +411,9 @@ export const ElectronWebContents : ElectronApi = {
 		"EnableDeviceEmulation": (self: WebContents, parameters) => self.enableDeviceEmulation(parameters),
 		"DisableDeviceEmulation": (self: WebContents) => self.disableDeviceEmulation(),
 		"SendInputEvent": (self: WebContents, inputEvent) => self.sendInputEvent(inputEvent),
-		"BeginFrameSubstitution": (self: WebContents, onlyDirty) => self.beginFrameSubscription(onlyDirty, (image, dirtyRect) =>
-			api.send("BeginFrameSubstitution_Callback", self.id, api.store(image), dirtyRect)),
-		"EndFrameSubstitution": (self: WebContents) => self.endFrameSubscription(),
+		"BeginFrameSubscription": (self: WebContents, onlyDirty) => self.beginFrameSubscription(onlyDirty, (image, dirtyRect) =>
+			api.send("BeginFrameSubscription_Callback", self.id, api.store(image), dirtyRect)),
+		"EndFrameSubscription": (self: WebContents) => self.endFrameSubscription(),
 		"StartDrag": (self: WebContents, item: Item) => {
 			if (item) {
 				if ((<any>item).iconImage) {

@@ -14,10 +14,13 @@ export const ElectronIpcMain: ElectronApi = {
 			const callback = async (e: IpcMainEvent, ...args: any[]) => {
 				const id = api.store(e.reply);
 
-				const portIds: number[] = [];
-				for (const port of e.ports) {
-					const id = api.store(port);
-					portIds.push(id);
+				let portIds: number[] = null;
+				if (e.ports) {
+					portIds = [];
+					for (const port of e.ports) {
+						const id = api.store(port);
+						portIds.push(id);
+					}
 				}
 
 				await api.send("On_Callback", requestId, e.processId, e.frameId, e.sender?.id ?? 0, portIds, id, args.map((x: any) => JSON.stringify(x)));

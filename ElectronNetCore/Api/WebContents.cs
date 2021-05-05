@@ -1,11 +1,12 @@
 ﻿using MZZT.ElectronNetCore.Api;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace MZZT.ElectronNetCore {
 	public partial interface IElectronInterface {
-		/*Task WebContents_WillNavigate_PreventDefault(int requestId, bool value);
+		Task WebContents_WillNavigate_PreventDefault(int requestId, bool value);
 		Task WebContents_WillRedirect_PreventDefault(int requestId, bool value);
 		Task WebContents_WillPreventUnload_PreventDefault(int requestId, bool value);
 		Task WebContents_BeforeInputEvent_PreventDefault(int requestId, bool value);
@@ -15,6 +16,7 @@ namespace MZZT.ElectronNetCore {
 		Task WebContents_SetWindowOpenHandler_Return(int requestId, WebContentsSetWindowOpenHandlerReturnValueDto value);
 
 		Task WebContents_GetFocusedWebContents(int requestId, int id);
+
 		Task WebContents_LoadUrl(int requestId, int id, string url, LoadUrlOptionsDto options);
 		Task WebContents_LoadFile(int requestId, int id, string filePath, LoadFileOptions options);
 		Task WebContents_DownloadUrl(int requestId, int id, string url);
@@ -89,16 +91,16 @@ namespace MZZT.ElectronNetCore {
 		Task WebContents_InspectSharedWorker(int requestId, int id);
 		Task WebContents_InspectSharedWorkerById(int requestId, int id, string workerId);
 		Task WebContents_GetAllSharedWorkers(int requestId, int id);
-		Task WebContents_InspectServiceWorker(int requestId, int id);*/
+		Task WebContents_InspectServiceWorker(int requestId, int id);
 		Task WebContents_Send(int requestId, int id, string channel, object[] args);
-		/*Task WebContents_SendToFrame(int requestId, int id, int frameId, string channel, object[] args);
+		Task WebContents_SendToFrame(int requestId, int id, int frameId, string channel, object[] args);
 		Task WebContents_SendToFrame_OutOfProcess(int requestId, int id, int[] frameId, string channel, object[] args);
 		Task WebContents_PostMessage(int requestId, int id, string channel, object message, int[] transfer);
 		Task WebContents_EnableDeviceEmulation(int requestId, int id, Parameters parameters);
 		Task WebContents_DisableDeviceEmulation(int requestId, int id);
 		Task WebContents_SendInputEvent(int requestId, int id, InputEvent inputEvent);
-		Task WebContents_BeginFrameSubstitution(int requestId, int id, bool onlyDirty);
-		Task WebContents_EndFrameSubstitution(int requestId, int id);
+		Task WebContents_BeginFrameSubscription(int requestId, int id, bool onlyDirty);
+		Task WebContents_EndFrameSubscription(int requestId, int id);
 		Task WebContents_StartDrag(int requestId, int id, ItemDto item);
 		Task WebContents_SavePage(int requestId, int id, string fullPath, string saveType);
 		Task WebContents_ShowDefinitionForSelection(int requestId, int id);
@@ -134,11 +136,11 @@ namespace MZZT.ElectronNetCore {
 		Task WebContents_Debugger_Get(int requestId, int id);
 		Task WebContents_BackgroundThrottling_Get(int requestId, int id);
 		Task WebContents_BackgroundThrottling_Set(int requestId, int id, bool value);
-		Task WebContents_MainFrame_Get(int requestId, int id);*/
+		Task WebContents_MainFrame_Get(int requestId, int id);
 	}
 
 	internal partial class ElectronHub {
-		/*public Task WebContents_DidFinishLoad_Event(int id) =>
+		public Task WebContents_DidFinishLoad_Event(int id) =>
 			WebContents.FromId(id)?.OnDidFinishLoad() ?? Task.CompletedTask;
 		public Task WebContents_DidFailLoad_Event(int id, int errorCode, string errorDescription, string validatedUrl, bool isMainFrame, int frameProcessId, int frameRoutingId) =>
 			WebContents.FromId(id)?.OnDidFailLoad(errorCode, errorDescription, validatedUrl, isMainFrame, frameProcessId, frameRoutingId) ?? Task.CompletedTask;
@@ -159,7 +161,7 @@ namespace MZZT.ElectronNetCore {
 		public Task WebContents_DidCreateWindow_Event(int id, int window, DidCreateWindowDetailsDto details) =>
 			WebContents.FromId(id)?.OnDidCreateWindow(BrowserWindow.FromId(window), details?.ToDidCreateWindowDetails()) ?? Task.CompletedTask;
 		public Task WebContents_WillNavigate_Event(int id, string url) =>
-			WebContents.FromId(id)?.OnWillNavigate(ur) ?? Task.CompletedTask;
+			WebContents.FromId(id)?.OnWillNavigate(url) ?? Task.CompletedTask;
 		public Task WebContents_DidStartNavigation_Event(int id, string url, bool isInPlace, bool isMainFrame, int frameProcessId, int frameRoutingId) =>
 			WebContents.FromId(id)?.OnDidStartNavigation(url, isInPlace, isMainFrame, frameProcessId, frameRoutingId) ?? Task.CompletedTask;
 		public Task WebContents_WillRedirect_Event(int id, string url, bool isInPlace, bool isMainFrame, int frameProcessId, int frameRoutingId) =>
@@ -174,17 +176,17 @@ namespace MZZT.ElectronNetCore {
 			WebContents.FromId(id)?.OnDidNavigateInPage(url, isMainFrame, frameProcessId, frameRoutingId) ?? Task.CompletedTask;
 		public Task WebContents_WillPreventUnload_Event(int id) =>
 			WebContents.FromId(id)?.OnWillPreventUnload() ?? Task.CompletedTask;
-		public Task WebContents_RenderProcessGone_Event(int id, RenderProcessGoneDetails details) =>
+		public Task WebContents_RenderProcessGone_Event(int id, RenderProcessGone details) =>
 			WebContents.FromId(id)?.OnRenderProcessGone(details) ?? Task.CompletedTask;
 		public Task WebContents_Unresponsive_Event(int id) =>
 			WebContents.FromId(id)?.OnUnresponsive() ?? Task.CompletedTask;
 		public Task WebContents_Responsive_Event(int id) =>
 			WebContents.FromId(id)?.OnResponsive() ?? Task.CompletedTask;
 		public Task WebContents_PluginCrashed_Event(int id, string name, string version) =>
-			WebContents.FromId(id)?.OnPluginCrashed(name, version) ?? Task.CompletedTask;*/
+			WebContents.FromId(id)?.OnPluginCrashed(name, version) ?? Task.CompletedTask;
 		public Task WebContents_Destroyed_Event(int id) =>
 			WebContents.FromId(id)?.OnDestroyed() ?? Task.CompletedTask;
-		/*public Task WebContents_BeforeInputEvent_Event(int id, Input input) =>
+		public Task WebContents_BeforeInputEvent_Event(int id, Input input) =>
 			WebContents.FromId(id)?.OnBeforeInputEvent(input) ?? Task.CompletedTask;
 		public Task WebContents_EnterHtmlFullScreen_Event(int id) =>
 			WebContents.FromId(id)?.OnEnterHtmlFullScreen() ?? Task.CompletedTask;
@@ -218,12 +220,12 @@ namespace MZZT.ElectronNetCore {
 			WebContents.FromId(id)?.OnCursorChanged(type, ElectronDisposable.FromId<NativeImage>(image), scale, size, hotspot) ?? Task.CompletedTask;
 		public Task WebContents_ContextMenu_Event(int id, ContextMenuParams @params) =>
 			WebContents.FromId(id)?.OnContextMenu(@params) ?? Task.CompletedTask;
-		public Task WebContents_SelectBluetoothDevice_Event(int id, BlueToothDevice[] devices, int callback) =>
-			WebContents.FromId(id)?.OnSelectBluetoothDevice(id, devices, ElectronDisposable.FromId<ElectronFunction<string>>(callback)) ?? Task.CompletedTask;
+		public Task WebContents_SelectBluetoothDevice_Event(int id, BluetoothDevice[] devices, int callback) =>
+			WebContents.FromId(id)?.OnSelectBluetoothDevice(devices, ElectronDisposable.FromId<ElectronFunction<string>>(callback)) ?? Task.CompletedTask;
 		public Task WebContents_Paint_Event(int id, Rectangle dirtyRect, int image) =>
 			WebContents.FromId(id)?.OnPaint(dirtyRect, ElectronDisposable.FromId<NativeImage>(image)) ?? Task.CompletedTask;
 		public Task WebContents_DevtoolsReloadPage_Event(int id) =>
-			WebContents.FromId(id)?.OnDevtoolsReloadPage(id) ?? Task.CompletedTask;
+			WebContents.FromId(id)?.OnDevtoolsReloadPage() ?? Task.CompletedTask;
 		public Task WebContents_WillAttachWebview_Event(int id, WebPreferencesDto webPreferences, Dictionary<string, string> @params) =>
 			WebContents.FromId(id)?.OnWillAttachWebview(webPreferences?.ToWebPreferences(), @params) ?? Task.CompletedTask;
 		public Task WebContents_DidAttachWebview_Event(int id, int webContents) =>
@@ -244,7 +246,10 @@ namespace MZZT.ElectronNetCore {
 		public Task WebContents_SetWindowOpenHandler_Callback(int id, HandlerDetails details) =>
 			WebContents.FromId(id)?.OnWindowOpenHandler(details);
 		public Task WebContents_Print_Callback(int id, bool success, string failureReason) =>
-			WebContents.OnPrintCallback(id, success, failureReason);*/
+			WebContents.OnPrintCallback(id, success, failureReason);
+		public Task WebContents_BeginFrameSubscription_Callback(int id, int image, Rectangle dirtyRect) =>
+			WebContents.FromId(id)?.OnFrameSubscription(ElectronDisposable.FromId<NativeImage>(image), dirtyRect);
+
 	}
 }
 
@@ -254,8 +259,8 @@ namespace MZZT.ElectronNetCore.Api {
 
 		public static IEnumerable<WebContents> GetAllWebContents() =>
 			instances.Values;
-		/*public static Task<WebContents> GetFocusedWebContentsAsync() =>
-			Electron.FuncAsync<WebContents, int>(x => x.WebContents_GetFocusedWebContents, 0);*/
+		public static Task<WebContents> GetFocusedWebContentsAsync() =>
+			Electron.FuncAsync<WebContents, int>(x => x.WebContents_GetFocusedWebContents, 0);
 		public static WebContents FromId(int id) =>
 			instances.GetValueOrDefault(id);
 
@@ -264,9 +269,8 @@ namespace MZZT.ElectronNetCore.Api {
 
 			instances[id] = this;
 		}
-		public int Id { get; }
 
-		/*public event EventHandler DidFinishLoad;
+		public event EventHandler DidFinishLoad;
 		internal Task OnDidFinishLoad() {
 			this.DidFinishLoad?.Invoke(this, new());
 			return Task.CompletedTask;
@@ -388,7 +392,7 @@ namespace MZZT.ElectronNetCore.Api {
 			return Task.CompletedTask;
 		}
 
-		public event EventHandler<WebContentsNavigationEventArgs> DidNavigateInPage;
+		public event EventHandler<WebContentsDidNavigateInPageEventArgs> DidNavigateInPage;
 		internal Task OnDidNavigateInPage(string url, bool isMainFrame, int frameProcessId, int frameRoutingId) {
 			this.DidNavigateInPage?.Invoke(this, new(url, isMainFrame, frameProcessId, frameRoutingId));
 			return Task.CompletedTask;
@@ -413,8 +417,8 @@ namespace MZZT.ElectronNetCore.Api {
 			return Task.CompletedTask;
 		}
 
-		public event EventHandler<RenderProcessGoneDetailsEventArgs> RenderProcessGone;
-		internal Task OnRenderProcessGone(RenderProcessGoneDetails details) {
+		public event EventHandler<RenderProcessGoneEventArgs> RenderProcessGone;
+		internal Task OnRenderProcessGone(RenderProcessGone details) {
 			this.RenderProcessGone?.Invoke(this, new(details));
 			return Task.CompletedTask;
 		}
@@ -435,7 +439,7 @@ namespace MZZT.ElectronNetCore.Api {
 		internal Task OnPluginCrashed(string name, string version) {
 			this.PluginCrashed?.Invoke(this, new(name, version));
 			return Task.CompletedTask;
-		}*/
+		}
 
 		public event EventHandler Destroyed;
 		internal Task OnDestroyed() {
@@ -444,7 +448,7 @@ namespace MZZT.ElectronNetCore.Api {
 			return Task.CompletedTask;
 		}
 
-		/*private bool blockPageInputEvents;
+		private bool blockPageInputEvents;
 		public bool BlockPageInputEvents {
 			get => this.blockPageInputEvents;
 			set {
@@ -573,7 +577,7 @@ namespace MZZT.ElectronNetCore.Api {
 		}
 
 		public event EventHandler<WebContentsSelectBluetoothDeviceEventArgs> SelectBluetoothDevice;
-		internal Task OnSelectBluetoothDevice(BlueToothDevice[] devices, ElectronFunction<string> callback) {
+		internal Task OnSelectBluetoothDevice(BluetoothDevice[] devices, ElectronFunction<string> callback) {
 			this.SelectBluetoothDevice?.Invoke(this, new(devices, callback));
 			return Task.CompletedTask;
 		}
@@ -639,6 +643,19 @@ namespace MZZT.ElectronNetCore.Api {
 			return Task.CompletedTask;
 		}
 
+		private bool forceDesktopCapturerEmptySources;
+		public bool ForceDesktopCapturerEmptySources {
+			get => this.forceDesktopCapturerEmptySources;
+			set {
+				if (this.forceDesktopCapturerEmptySources == value) {
+					return;
+				}
+				this.forceDesktopCapturerEmptySources = value;
+
+				Task.Run(() => ElectronHub.Electron.WebContents_DesktopCapturerGetSources_PreventDefault(0, value));
+			}
+		}
+
 		public event EventHandler DesktopCapturerGetSources;
 		internal Task OnDesktopCapturerGetSources() {
 			this.DesktopCapturerGetSources?.Invoke(this, new());
@@ -649,9 +666,364 @@ namespace MZZT.ElectronNetCore.Api {
 		internal Task OnPreferredSizeChanged(Size preferredSize) {
 			this.PreferredSizeChanged?.Invoke(this, new(preferredSize));
 			return Task.CompletedTask;
-		}*/
+		}
 
-		public Task SendAsync(string channel, object[] args) =>
+		public Task LoadUrlAsync(string url, LoadUrlOptions options = null) =>
+			Electron.ActionAsync(x => x.WebContents_LoadUrl, this.Id, url, options?.ToLoadUrlOptionsDto());
+		public Task LoadFileAsync(string filePath, LoadFileOptions options = null) =>
+			Electron.ActionAsync(x => x.WebContents_LoadFile, this.Id, filePath, options);
+		public Task DownloadUrlAsync(string url) =>
+			Electron.ActionAsync(x => x.WebContents_DownloadUrl, this.Id, url);
+		public Task<string> GetUrlAsync() =>
+			Electron.FuncAsync<string, int>(x => x.WebContents_GetUrl, this.Id);
+		public Task<string> GetTitleAsync() =>
+			Electron.FuncAsync<string, int>(x => x.WebContents_GetTitle, this.Id);
+		public Task<bool> IsDestroyedAsync() =>
+			Electron.FuncAsync<bool, int>(x => x.WebContents_IsDestroyed, this.Id);
+		public Task FocusAsync() =>
+			Electron.ActionAsync(x => x.WebContents_Focus, this.Id);
+		public Task<bool> IsFocusedAsync() =>
+			Electron.FuncAsync<bool, int>(x => x.WebContents_IsFocused, this.Id);
+		public Task<bool> IsLoadingAsync() =>
+			Electron.FuncAsync<bool, int>(x => x.WebContents_IsLoading, this.Id);
+		public Task<bool> IsLoadingMainFrameAsync() =>
+			Electron.FuncAsync<bool, int>(x => x.WebContents_IsLoadingMainFrame, this.Id);
+		public Task<bool> IsWaitingForResponseAsync() =>
+			Electron.FuncAsync<bool, int>(x => x.WebContents_IsWaitingForResponse, this.Id);
+		public Task StopAsync() =>
+			Electron.ActionAsync(x => x.WebContents_Stop, this.Id);
+		public Task ReloadAsync() =>
+			Electron.ActionAsync(x => x.WebContents_Reload, this.Id);
+		public Task ReloadIgnoringCacheAsync() =>
+			Electron.ActionAsync(x => x.WebContents_ReloadIgnoringCache, this.Id);
+		public Task<bool> CanGoBackAsync() =>
+			Electron.FuncAsync<bool, int>(x => x.WebContents_CanGoBack, this.Id);
+		public Task<bool> CanGoForwardAsync() =>
+			Electron.FuncAsync<bool, int>(x => x.WebContents_CanGoForward, this.Id);
+		public Task<bool> CanGoToOffsetAsync(int offset) =>
+			Electron.FuncAsync<bool, int, int>(x => x.WebContents_CanGoToOffset, this.Id, offset);
+		public Task ClearHistoryAsync() =>
+			Electron.ActionAsync(x => x.WebContents_ClearHistory, this.Id);
+		public Task GoBackAsync() =>
+			Electron.ActionAsync(x => x.WebContents_GoBack, this.Id);
+		public Task GoForwardAsync() =>
+			Electron.ActionAsync(x => x.WebContents_GoForward, this.Id);
+		public Task GoToIndexAsync(int index) =>
+			Electron.ActionAsync(x => x.WebContents_GoToIndex, this.Id, index);
+		public Task GoToOffsetAsync(int offset) =>
+			Electron.ActionAsync(x => x.WebContents_GoToOffset, this.Id, offset);
+		public Task<bool> IsCrashedAsync() =>
+			Electron.FuncAsync<bool, int>(x => x.WebContents_IsCrashed, this.Id);
+		public Task ForcefullyCrashRendererAsync() =>
+			Electron.ActionAsync(x => x.WebContents_ForcefullyCrashRenderer, this.Id);
+		public Task SetUserAgentAsync(string userAgent) =>
+			Electron.ActionAsync(x => x.WebContents_SetUserAgent, this.Id, userAgent);
+		public Task<string> GetUserAgentAsync() =>
+			Electron.FuncAsync<string, int>(x => x.WebContents_GetUserAgent, this.Id);
+		public Task<string> InsertCssAsync(string css, InsertCssOptions options = null) =>
+			Electron.FuncAsync<string, int, string, InsertCssOptions>(x => x.WebContents_InsertCss, this.Id, css, options);
+		public Task RemoveInsertedCssAsync(string key) =>
+			Electron.ActionAsync(x => x.WebContents_RemoveInsertedCss, this.Id, key);
+		public Task<T> ExecuteJavascriptAsync<T>(string code, bool userGesture = false) =>
+			Electron.FuncAsync<T, int, string, bool>(x => x.WebContents_ExecuteJavaScript, this.Id, code, userGesture);
+		public Task ExecuteJavascriptAsync(string code, bool userGesture = false) =>
+			Electron.ActionAsync(x => x.WebContents_ExecuteJavaScript, this.Id, code, userGesture);
+		public Task<T> ExecuteJavascriptInIsolatedWorldAsync<T>(int worldId, WebSource[] scripts, bool userGesture = false) =>
+			Electron.FuncAsync<T, int, int, WebSource[], bool>(x => x.WebContents_ExecuteJavaScriptInIsolatedWorld, this.Id, worldId, scripts, userGesture);
+		public Task ExecuteJavascriptInIsolatedWorldAsync(int worldId, WebSource[] scripts, bool userGesture = false) =>
+			Electron.ActionAsync(x => x.WebContents_ExecuteJavaScriptInIsolatedWorld, this.Id, worldId, scripts, userGesture);
+		public Task SetIgnoreMenuShortcutsAsync(bool ignore) =>
+			Electron.ActionAsync(x => x.WebContents_SetIgnoreMenuShortcuts, this.Id, ignore);
+		private WebContentsSetWindowOpenHandlerReturnValue windowOpenHandlerReturnValue;
+		public WebContentsSetWindowOpenHandlerReturnValue WindowOpenHandlerReturnValue {
+			get => this.windowOpenHandlerReturnValue;
+			set {
+				if (this.windowOpenHandlerReturnValue == value) {
+					return;
+				}
+				this.windowOpenHandlerReturnValue = value;
+
+				Task.Run(() => ElectronHub.Electron.WebContents_SetWindowOpenHandler_Return(0, value?.ToWebContentsSetWindowOpenHandlerReturnValueDto()));
+			}
+		}
+		private Action<HandlerDetails> handler;
+		internal Task OnWindowOpenHandler(HandlerDetails details) {
+			this.handler?.Invoke(details);
+			return Task.CompletedTask;
+		}
+		public Task SetWindowOpenHandlerAsync(Action<HandlerDetails> handler) {
+			this.handler = handler;
+			return Electron.ActionAsync(x => x.WebContents_SetWindowOpenHandler, this.Id, handler != null);
+		}
+		public Task SetAudioMutedAsync(bool muted) =>
+			Electron.ActionAsync(x => x.WebContents_SetAudioMuted, this.Id, muted);
+		public Task<bool> IsAudioMutedAsync() =>
+			Electron.FuncAsync<bool, int>(x => x.WebContents_IsAudioMuted, this.Id);
+		public Task<bool> IsCurrentlyAudibleAsync() =>
+			Electron.FuncAsync<bool, int>(x => x.WebContents_IsCurrentlyAudible, this.Id);
+		public Task SetZoomFactorAsync(double factor) =>
+			Electron.ActionAsync(x => x.WebContents_SetZoomFactor, this.Id, factor);
+		public Task<double> GetZoomFactorAsync() =>
+			Electron.FuncAsync<double, int>(x => x.WebContents_GetZoomFactor, this.Id);
+		public Task SetZoomLevelAsync(int level) =>
+			Electron.ActionAsync(x => x.WebContents_SetZoomLevel, this.Id, level);
+		public Task<int> GetZoomLevelAsync() =>
+			Electron.FuncAsync<int, int>(x => x.WebContents_GetZoomLevel, this.Id);
+		public Task SetVisualZoomLevelLimitsAsync(int minimumLevel, int maximumLevel) =>
+			Electron.ActionAsync(x => x.WebContents_SetVisualZoomLevelLimits, this.Id, minimumLevel, maximumLevel);
+		public Task UndoAsync() =>
+			Electron.ActionAsync(x => x.WebContents_Undo, this.Id);
+		public Task RedoAsync() =>
+			Electron.ActionAsync(x => x.WebContents_Redo, this.Id);
+		public Task CutAsync() =>
+			Electron.ActionAsync(x => x.WebContents_Cut, this.Id);
+		public Task CopyAsync() =>
+			Electron.ActionAsync(x => x.WebContents_Copy, this.Id);
+		public Task CopyImageAtAsync(int x, int y) =>
+			Electron.ActionAsync(x => x.WebContents_CopyImageAt, this.Id, x, y);
+		public Task PasteAsync() =>
+			Electron.ActionAsync(x => x.WebContents_Paste, this.Id);
+		public Task PasteAndMatchStyleAsync() =>
+			Electron.ActionAsync(x => x.WebContents_PasteAndMatchStyle, this.Id);
+		public Task DeleteAsync() =>
+			Electron.ActionAsync(x => x.WebContents_Delete, this.Id);
+		public Task SelectAllAsync() =>
+			Electron.ActionAsync(x => x.WebContents_SelectAll, this.Id);
+		public Task UnselectAsync() =>
+			Electron.ActionAsync(x => x.WebContents_Unselect, this.Id);
+		public Task ReplaceAsync(string text) =>
+			Electron.ActionAsync(x => x.WebContents_Replace, this.Id, text);
+		public Task ReplaceMisspellingAsync(string text) =>
+			Electron.ActionAsync(x => x.WebContents_ReplaceMisspelling, this.Id, text);
+		public Task InsertTextAsync(string text) =>
+			Electron.ActionAsync(x => x.WebContents_InsertText, this.Id, text);
+		public Task<int> FindInPageAsync(string text, FindInPageOptions options = null) =>
+			Electron.FuncAsync<int, int, string, FindInPageOptions>(x => x.WebContents_FindInPage, this.Id, text, options);
+		public Task StopFindInPageAsync(string action) =>
+			Electron.ActionAsync(x => x.WebContents_StopFindInPage, this.Id, action);
+		public Task<NativeImage> CapturePageAsync(Rectangle rect = null) =>
+			Electron.FuncAsync<NativeImage, int, Rectangle>(x => x.WebContents_CapturePage, this.Id, rect);
+		public Task<bool> IsBeingCapturedAsync() =>
+			Electron.FuncAsync<bool, int>(x => x.WebContents_IsBeingCaptured, this.Id);
+		public Task IncrementCapturerCountAsync(Size size = null, bool stayHidden = false) =>
+			Electron.ActionAsync(x => x.WebContents_IncrementCapturerCount, this.Id, size, stayHidden);
+		public Task DecrementCapturerCountAsync(bool stayHidden = false) =>
+			Electron.ActionAsync(x => x.WebContents_DecrementCapturerCount, this.Id, stayHidden);
+		public Task<PrinterInfo[]> GetPrinters() =>
+			Electron.FuncAsync<PrinterInfo[], int>(x => x.WebContents_GetPrinters, this.Id);
+		private static readonly Dictionary<int, Action<bool, string>> printCallbacks = new();
+		internal static Task OnPrintCallback(int requestId, bool success, string failureReason) {
+			Action<bool, string> callback = printCallbacks.GetValueOrDefault(requestId);
+			callback?.Invoke(success, failureReason);
+			printCallbacks.Remove(requestId);
+			return Task.CompletedTask;
+		}
+		public Task PrintAsync(WebContentsPrintOptions options = null, Action<bool, string> callback = null) {
+			int requestId = Electron.NextRequestId;
+			if (callback != null) {
+				printCallbacks[requestId] = callback;
+			}
+			return Electron.ActionAsync(requestId, x => x.WebContents_Print, this.Id, options);
+		}
+		public async Task<byte[]> PrintToPdfAsync(PrintToPdfOptions options) =>
+			Convert.FromBase64String(await Electron.FuncAsync<string, int, PrintToPdfOptions>(x => x.WebContents_PrintToPdf, this.Id, options));
+		public Task AddWorkSpaceAsync(string path) =>
+			Electron.ActionAsync(x => x.WebContents_AddWorkSpace, this.Id, path);
+		public Task RemoveWorkSpaceAsync(string path) =>
+			Electron.ActionAsync(x => x.WebContents_RemoveWorkSpace, this.Id, path);
+		public Task SetDevToolsWebContentsAsync(WebContents devToolsWebContents) =>
+			Electron.ActionAsync(x => x.WebContents_SetDevToolsWebContents, this.Id, devToolsWebContents?.Id ?? 0);
+		public Task OpenDevToolsAsync(OpenDevToolsOptions options = null) =>
+			Electron.ActionAsync(x => x.WebContents_OpenDevTools, this.Id, options);
+		public Task CloseDevToolsAsync() =>
+			Electron.ActionAsync(x => x.WebContents_CloseDevTools, this.Id);
+		public Task<bool> IsDevToolsOpenedAsync() =>
+			Electron.FuncAsync<bool, int>(x => x.WebContents_IsDevToolsOpened, this.Id);
+		public Task<bool> IsDevToolsFocusedAsync() =>
+			Electron.FuncAsync<bool, int>(x => x.WebContents_IsDevToolsFocused, this.Id);
+		public Task ToggleDevToolsAsync() =>
+			Electron.ActionAsync(x => x.WebContents_ToggleDevTools, this.Id);
+		public Task InspectElementAsync(int x, int y) =>
+			Electron.ActionAsync(x => x.WebContents_InspectElement, this.Id, x, y);
+		public Task InspectSharedWorkerAsync() =>
+			Electron.ActionAsync(x => x.WebContents_InspectSharedWorker, this.Id);
+		public Task InspectSharedWorkerByIdAsync(string workerId) =>
+			Electron.ActionAsync(x => x.WebContents_InspectSharedWorkerById, this.Id, workerId);
+		public Task<SharedWorkerInfo[]> GetAllSharedWorkersAsync() =>
+			Electron.FuncAsync<SharedWorkerInfo[], int>(x => x.WebContents_GetAllSharedWorkers, this.Id);
+		public Task InspectServiceWorkerAsync() =>
+			Electron.ActionAsync(x => x.WebContents_InspectServiceWorker, this.Id);
+		public Task SendAsync(string channel, params object[] args) =>
 			Electron.ActionAsync(x => x.WebContents_Send, this.Id, channel, args);
+		public Task SendToFrameAsync(int frameId, string channel, params object[] args) =>
+			Electron.ActionAsync(x => x.WebContents_SendToFrame, this.Id, frameId, channel, args);
+		public Task SendToFrameAsync(int[] frameId, string channel, params object[] args) =>
+			Electron.ActionAsync(x => x.WebContents_SendToFrame_OutOfProcess, this.Id, frameId, channel, args);
+		public Task PostMessageAsync(string channel, object message, MessagePortMain[] transfer = null) =>
+			Electron.ActionAsync(x => x.WebContents_PostMessage, this.Id, channel, message, transfer?.Select(x => x.InternalId).ToArray());
+		public Task EnableDeviceEmulationAsync(Parameters parameters) =>
+			Electron.ActionAsync(x => x.WebContents_EnableDeviceEmulation, this.Id, parameters);
+		public Task DisableDeviceEmulationAsync() =>
+			Electron.ActionAsync(x => x.WebContents_DisableDeviceEmulation, this.Id);
+		public Task SendInputEventAsync(InputEvent inputEvent) =>
+			Electron.ActionAsync(x => x.WebContents_SendInputEvent, this.Id, inputEvent);
+		private Action<NativeImage, Rectangle> frameSubscription;
+		internal Task OnFrameSubscription(NativeImage image, Rectangle dirtyRect) {
+			this.frameSubscription?.Invoke(image, dirtyRect);
+			return Task.CompletedTask;
+		}
+		public Task BeginFrameSubscriptionAsync(Action<NativeImage, Rectangle> callback) =>
+			this.BeginFrameSubscriptionAsync(false, callback);
+		public Task BeginFrameSubscriptionAsync(bool onlyDirty, Action<NativeImage, Rectangle> callback) {
+			this.frameSubscription = callback;
+			return Electron.ActionAsync(x => x.WebContents_BeginFrameSubscription, this.Id, onlyDirty);
+		}
+		public async Task EndFrameSubscriptionAsync() {
+			await Electron.ActionAsync(x => x.WebContents_EndFrameSubscription, this.Id);
+			this.frameSubscription = null;
+		}
+		public Task StartDragAsync(Item item) =>
+			Electron.ActionAsync(x => x.WebContents_StartDrag, this.Id, item?.ToItemDto());
+		public Task SavePageAsync(string fullPath, string saveType) =>
+			Electron.ActionAsync(x => x.WebContents_SavePage, this.Id, fullPath, saveType);
+		public Task ShowDefinitionForSelectionAsync() =>
+			Electron.ActionAsync(x => x.WebContents_ShowDefinitionForSelection, this.Id);
+		public Task<bool> IsOffscreenAsync() =>
+			Electron.FuncAsync<bool, int>(x => x.WebContents_IsOffscreen, this.Id);
+		public Task StartPaintingAsync() =>
+			Electron.ActionAsync(x => x.WebContents_StartPainting, this.Id);
+		public Task StopPaintingAsync() =>
+			Electron.ActionAsync(x => x.WebContents_StopPainting, this.Id);
+		public Task<bool> IsPaintingAsync() =>
+			Electron.FuncAsync<bool, int>(x => x.WebContents_IsPainting, this.Id);
+		public Task SetFrameRateAsync(int fps) =>
+			Electron.ActionAsync(x => x.WebContents_SetFrameRate, this.Id, fps);
+		public Task<int> GetFrameRateAsync() =>
+			Electron.FuncAsync<int, int>(x => x.WebContents_GetFrameRate, this.Id);
+		public Task InvalidateAsync() =>
+			Electron.ActionAsync(x => x.WebContents_Invalidate, this.Id);
+		public Task<string> GetWebRtcIpHandlingPolicyAsync() =>
+			Electron.FuncAsync<string, int>(x => x.WebContents_GetWebRtcIpHandlingPolicy, this.Id);
+		public Task SetWebRtcIpHandlingPolicyAsync(string policy) =>
+			Electron.ActionAsync(x => x.WebContents_SetWebRtcIpHandlingPolicy, this.Id, policy);
+		public Task<int> GetOsProcessIdAsync() =>
+			Electron.FuncAsync<int, int>(x => x.WebContents_GetOsProcessId, this.Id);
+		public Task<int> GetProcessIdAsync() =>
+			Electron.FuncAsync<int, int>(x => x.WebContents_GetProcessId, this.Id);
+		public Task TakeHeapSnapshotAsync(string filePath) =>
+			Electron.ActionAsync(x => x.WebContents_TakeHeapSnapshot, this.Id, filePath);
+		public Task<bool> GetBackgroundThrottlingAsync() =>
+			Electron.FuncAsync<bool, int>(x => x.WebContents_GetBackgroundThrottling, this.Id);
+		public Task SetBackgroundThrottlingAsync(bool allowed) =>
+			Electron.ActionAsync(x => x.WebContents_SetBackgroundThrottling, this.Id, allowed);
+		public Task<string> GetTypeAsync() =>
+			Electron.FuncAsync<string, int>(x => x.WebContents_GetType, this.Id);
+
+		private ElectronInstanceProperty<bool> audioMuted;
+		public ElectronInstanceProperty<bool> AudioMuted {
+			get {
+				if (this.audioMuted == null) {
+					this.audioMuted = new(this.Id, x => x.WebContents_AudioMuted_Get,
+						x => x.WebContents_AudioMuted_Set);
+				}
+				return this.audioMuted;
+			}
+		}
+		private ElectronInstanceProperty<string> userAgent;
+		public ElectronInstanceProperty<string> UserAgent {
+			get {
+				if (this.userAgent == null) {
+					this.userAgent = new(this.Id, x => x.WebContents_UserAgent_Get,
+						x => x.WebContents_UserAgent_Set);
+				}
+				return this.userAgent;
+			}
+		}
+		private ElectronInstanceProperty<int> zoomLevel;
+		public ElectronInstanceProperty<int> ZoomLevel {
+			get {
+				if (this.zoomLevel == null) {
+					this.zoomLevel = new(this.Id, x => x.WebContents_ZoomLevel_Get,
+						x => x.WebContents_ZoomLevel_Set);
+				}
+				return this.zoomLevel;
+			}
+		}
+		private ElectronInstanceProperty<double> zoomFactor;
+		public ElectronInstanceProperty<double> ZoomFactor {
+			get {
+				if (this.zoomFactor == null) {
+					this.zoomFactor = new(this.Id, x => x.WebContents_ZoomFactor_Get,
+						x => x.WebContents_ZoomFactor_Set);
+				}
+				return this.zoomFactor;
+			}
+		}
+		private ElectronInstanceProperty<int> frameRate;
+		public ElectronInstanceProperty<int> FrameRate {
+			get {
+				if (this.frameRate == null) {
+					this.frameRate = new(this.Id, x => x.WebContents_FrameRate_Get,
+						x => x.WebContents_ZoomLevel_Set);
+				}
+				return this.frameRate;
+			}
+		}
+		public int Id { get; }
+		private ElectronInstanceReadOnlyProperty<Session> session;
+		public ElectronInstanceReadOnlyProperty<Session> Session {
+			get {
+				if (this.session == null) {
+					this.session = new(this.Id, x => x.WebContents_Session_Get);
+				}
+				return this.session;
+			}
+		}
+		private ElectronInstanceReadOnlyProperty<WebContents> hostWebContents;
+		public ElectronInstanceReadOnlyProperty<WebContents> HostWebContents {
+			get {
+				if (this.hostWebContents == null) {
+					this.hostWebContents = new(this.Id, x => x.WebContents_HostWebContents_Get);
+				}
+				return this.hostWebContents;
+			}
+		}
+		private ElectronInstanceReadOnlyProperty<WebContents> devToolstWebContents;
+		public ElectronInstanceReadOnlyProperty<WebContents> DevToolsWebContents {
+			get {
+				if (this.devToolstWebContents == null) {
+					this.devToolstWebContents = new(this.Id, x => x.WebContents_DevToolsWebContents_Get);
+				}
+				return this.devToolstWebContents;
+			}
+		}
+		private ElectronInstanceReadOnlyProperty<Debugger> debugger;
+		public ElectronInstanceReadOnlyProperty<Debugger> Debugger {
+			get {
+				if (this.debugger == null) {
+					this.debugger = new(this.Id, x => x.WebContents_Debugger_Get);
+				}
+				return this.debugger;
+			}
+		}
+		private ElectronInstanceProperty<bool> backgroundThrottling;
+		public ElectronInstanceProperty<bool> BackgroundThrottling {
+			get {
+				if (this.backgroundThrottling == null) {
+					this.backgroundThrottling = new(this.Id, x => x.WebContents_BackgroundThrottling_Get,
+						x => x.WebContents_BackgroundThrottling_Set);
+				}
+				return this.backgroundThrottling;
+			}
+		}
+		private ElectronInstanceReadOnlyProperty<WebFrameMain> mainFrame;
+		public ElectronInstanceReadOnlyProperty<WebFrameMain> MainFrame {
+			get {
+				if (this.mainFrame == null) {
+					this.mainFrame = new(this.Id, x => x.WebContents_MainFrame_Get);
+				}
+				return this.mainFrame;
+			}
+		}
 	}
 }

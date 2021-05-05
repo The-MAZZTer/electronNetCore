@@ -43,18 +43,23 @@ namespace MZZT.ElectronNetCore.Api {
 			Electron.ActionAsync(this.setter, this.setTransformer(value));
 	}
 
-	public class ElectronInstanceReadOnlyProperty<TRet, TDto> {
-		internal ElectronInstanceReadOnlyProperty(int id, Func<IElectronInterface, Func<int, int, Task>> getter, Func<TDto, TRet> getTransformer) {
+	public class ElectronInstanceReadOnlyProperty<TRet, TDto, TId> {
+		internal ElectronInstanceReadOnlyProperty(TId id, Func<IElectronInterface, Func<int, TId, Task>> getter, Func<TDto, TRet> getTransformer) {
 			this.id = id;
 			this.getter = getter;
 			this.getTransformer = getTransformer;
 		}
-		private readonly Func<IElectronInterface, Func<int, int, Task>> getter;
+		private readonly Func<IElectronInterface, Func<int, TId, Task>> getter;
 		private readonly Func<TDto, TRet> getTransformer;
-		protected int id;
+		protected TId id;
 
 		public async Task<TRet> GetAsync() =>
-			this.getTransformer(await Electron.FuncAsync<TDto, int>(this.getter, this.id));
+			this.getTransformer(await Electron.FuncAsync<TDto, TId>(this.getter, this.id));
+	}
+
+	public class ElectronInstanceReadOnlyProperty<TRet, TDto> : ElectronInstanceReadOnlyProperty<TRet, TDto, int> {
+		internal ElectronInstanceReadOnlyProperty(int id, Func<IElectronInterface, Func<int, int, Task>> getter, Func<TDto, TRet> getTransformer) :
+			base(id, getter, getTransformer) { }
 	}
 
 	public class ElectronInstanceReadOnlyProperty<T> : ElectronInstanceReadOnlyProperty<T, T> {
@@ -71,7 +76,6 @@ namespace MZZT.ElectronNetCore.Api {
 			Electron.ActionAsync(this.setter, this.id, value);
 	}
 
-
 	public class ElectronInstanceProperty<TRet, TDto> : ElectronInstanceReadOnlyProperty<TRet, TDto> {
 		internal ElectronInstanceProperty(int id, Func<IElectronInterface, Func<int, int, Task>> getter, Func<TDto, TRet> getTransformer,
 			Func<IElectronInterface, Func<int, int, TDto, Task>> setter, Func<TRet, TDto> setTransformer) : base(id, getter, getTransformer) {
@@ -80,6 +84,20 @@ namespace MZZT.ElectronNetCore.Api {
 			this.setTransformer = setTransformer;
 		}
 		private readonly Func<IElectronInterface, Func<int, int, TDto, Task>> setter;
+		private readonly Func<TRet, TDto> setTransformer;
+
+		public Task SetAsync(TRet value) =>
+			Electron.ActionAsync(this.setter, this.id, this.setTransformer(value));
+	}
+
+	public class ElectronInstanceProperty<TRet, TDto, TId> : ElectronInstanceReadOnlyProperty<TRet, TDto, TId> {
+		internal ElectronInstanceProperty(TId id, Func<IElectronInterface, Func<int, TId, Task>> getter, Func<TDto, TRet> getTransformer,
+			Func<IElectronInterface, Func<int, TId, TDto, Task>> setter, Func<TRet, TDto> setTransformer) : base(id, getter, getTransformer) {
+
+			this.setter = setter;
+			this.setTransformer = setTransformer;
+		}
+		private readonly Func<IElectronInterface, Func<int, TId, TDto, Task>> setter;
 		private readonly Func<TRet, TDto> setTransformer;
 
 		public Task SetAsync(TRet value) =>

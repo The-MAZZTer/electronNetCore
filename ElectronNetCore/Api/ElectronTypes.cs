@@ -237,6 +237,11 @@ namespace MZZT.ElectronNetCore.Api {
 		public static string Strict = "strict";
 	}
 
+	public static class CssOrigins {
+		public static string Author = "author";
+		public static string User = "user";
+	}
+
 	public static class CursorTypes {
 		public static string Default = "default";
 		public static string Crosshair = "crosshair";
@@ -282,6 +287,18 @@ namespace MZZT.ElectronNetCore.Api {
 		public static string Grab = "grab";
 		public static string Grabbing = "grabbing";
 		public static string Custom = "custom";
+	}
+
+	public static class DeviceEmulationScreenPositions {
+		public static string Desktop = "desktop";
+		public static string Mobile = "mobile";
+	}
+
+	public static class DevToolModes {
+		public static string Right = "right";
+		public static string Bottom = "bottom";
+		public static string Undocked = "undocked";
+		public static string Detach = "detach";
 	}
 
 	public static class DisplayMetrics {
@@ -343,6 +360,19 @@ namespace MZZT.ElectronNetCore.Api {
 		public const string Subsampling420 = "4:2:0";
 		public const string Subsampling422 = "4:2:2";
 		public const string Subsampling444 = "4:4:4";
+	}
+
+	public static class InputEventTypes {
+		public const string KeyDown = "keyDown";
+		public const string KeyUp = "keyUp";
+		public const string Char = "char";
+		public const string MouseDown = "mouseDown";
+		public const string MouseUp = "mouseUp";
+		public const string MouseEnter = "mouseEnter";
+		public const string MouseLeave = "mouseLeave";
+		public const string ContextMenu = "contextMenu";
+		public const string MouseWheel = "mouseWheel";
+		public const string MouseMove = "mouseMove";
 	}
 
 	public static class InputFieldTypes {
@@ -459,6 +489,12 @@ namespace MZZT.ElectronNetCore.Api {
 		public const string Warning = "warning";
 	}
 
+	public static class MouseButtons {
+		public const string Left = "left";
+		public const string Middle = "middle";
+		public const string Right = "right";
+	}
+
 	public static class NativeThemeSources {
 		public const string System = "system";
 		public const string Light = "light";
@@ -504,6 +540,21 @@ namespace MZZT.ElectronNetCore.Api {
 		public const string Scaling = "SCALING";
 	}
 
+	public static class PageSaveTypes {
+		public const string HtmlOnly = "HTMLOnly";
+		public const string HtmlComplete = "HTMLComplete";
+		public const string Mhtml = "MHTML";
+	}
+
+	public static class PageSizes {
+		public const string A3 = "A3";
+		public const string A4 = "A4";
+		public const string A5 = "A5";
+		public const string Letter = "Letter";
+		public const string Legal = "Legal";
+		public const string Tabloid = "Tabloid";
+	}
+
 	public static class Paths {
 		public const string Home = "home"; // User's home directory.
 		public const string AppData = "appData"; // Per-user application data directory, which by default points to:
@@ -538,9 +589,33 @@ namespace MZZT.ElectronNetCore.Api {
 		public const string Serial = "serial";
 	}
 
+	public static class PostBodyContentTypes {
+		public const string FormUrlEncoded = "application/x-www-form-urlencoded";
+		public const string MultipartFormData = "multipart/form-data";
+	}
+
+	public static class PostDataTypes {
+		public const string File = "file";
+		public const string RawData = "rawData";
+		public const string Blob = "blob";
+	}
+
 	public static class PowerSaveBlockerTypes {
 		public const string PreventAppSuspension = "prevent-app-suspension";
 		public const string PreventDisplaySleep = "prevent-display-sleep";
+	}
+
+	public static class PrintMarginTypes {
+		public const string Default = "default";
+		public const string None = "none";
+		public const string PrintableArea = "printableArea";
+		public const string Custom = "custom";
+	}
+
+	public static class PrintToPdfMarginTypes {
+		public const int Default = 0;
+		public const int NoMargin = 1;
+		public const int MinimumMargin = 2;
 	}
 
 	public static class ProcessGoneReasons {
@@ -618,6 +693,12 @@ namespace MZZT.ElectronNetCore.Api {
 		public const string Tls11 = "tls1.1";
 		public const string Tls12 = "tls1.2";
 		public const string Tls13 = "tls1.3";
+	}
+
+	public static class StopFindInPageActions {
+		public const string ClearSelection = "clearSelection";
+		public const string KeepSeelction = "keepSelection";
+		public const string ActivateSelection = "activateSelection";
 	}
 
 	public static class StorageQuotaTypes {
@@ -731,11 +812,6 @@ namespace MZZT.ElectronNetCore.Api {
 		public const string MonospacedDigit = "monospacedDigit";
 	}
 
-	public static class UploadRawDataOrFileTypes {
-		public const string File = "file";
-		public const string RawData = "rawData";
-	}
-
 	public static class UserDefaultTypes {
 		public const string String = "string";
 		public const string Boolean = "boolean";
@@ -754,6 +830,22 @@ namespace MZZT.ElectronNetCore.Api {
 		public const string BypassHeatCheckAndEagerCompile = "bypassHeatCheckAndEagerCompile";
 	}
 
+	public static class WebContentTypes {
+		public const string BackgroundPage = "backgroundPage";
+		public const string Window = "window";
+		public const string BrowserView = "browserView";
+		public const string Remote = "remote";
+		public const string Webview = "webview";
+		public const string Offscreen = "offscreen";
+	}
+
+	public static class WebRtcIpHandlingPolicies {
+		public const string Default = "default";
+		public const string DefaultPublicInterfaceOnly = "default_public_interface_only";
+		public const string DefaultPublicAndPrivateInterfaces = "default_public_and_private_interfaces";
+		public const string DisableNonProxiedUdp = "disable_non_proxied_udp";
+	}
+
 	public static class WindowOpenHandlerActions {
 		public const string Allow = "allow";
 		public const string Deny = "deny";
@@ -769,6 +861,12 @@ namespace MZZT.ElectronNetCore.Api {
 	}
 
 	public class WebFrameMainId {
+		internal WebFrameMainId() { }
+		internal WebFrameMainId(WebFrameMain frame) {
+			this.ProcessId = frame.ProcessId;
+			this.RoutingId = frame.RoutingId;
+		}
+
 		public int ProcessId { get; set; }
 		public int RoutingId { get; set; }
 	}
@@ -858,6 +956,11 @@ namespace MZZT.ElectronNetCore.Api {
 		public int Allocated { get; set; }
 		public int Marked { get; set; }
 		public int Total { get; set; }
+	}
+
+	public class BluetoothDevice {
+		public string DeviceName { get; set; }
+		public string DeviceId { get; set; }
 	}
 
 	public class Buffer {
@@ -1037,6 +1140,59 @@ namespace MZZT.ElectronNetCore.Api {
 		public bool ZoomToPageWidth { get; set; }
 		public string TabbingIdentifier { get; set; }
 		public WebPreferencesDto WebPreferences { get; set; }
+
+		internal BrowserWindowConstructorOptions ToBrowserWindowConstructorOptions() => new() {
+			Width = this.Width,
+			Height = this.Height,
+			X = this.X,
+			Y = this.Y,
+			UseContentSize = this.UseContentSize,
+			Center = this.Center,
+			MinWidth = this.MinWidth,
+			MinHeight = this.MinHeight,
+			MaxWidth = this.MaxWidth,
+			MaxHeight = this.MaxHeight,
+			Resizable = this.Resizable,
+			Movable = this.Movable,
+			Minimizable = this.Minimizable,
+			Mazimizable = this.Mazimizable,
+			Closable = this.Closable,
+			Focusable = this.Focusable,
+			AlwaysOnTop = this.AlwaysOnTop,
+			Fullscreen = this.Fullscreen,
+			Fullscreenable = this.Fullscreenable,
+			SimpleFullscreen = this.SimpleFullscreen,
+			SkipTaskbar = this.SkipTaskbar,
+			Kiosk = this.Kiosk,
+			Title = this.Title,
+			IconImage = ElectronDisposable.FromId<NativeImage>(this.IconImage),
+			IconPath = this.IconPath,
+			Show = this.Show,
+			PaintWhenInitiallyHidden = this.PaintWhenInitiallyHidden,
+			Frame = this.Frame,
+			Parent = BrowserWindow.FromId(this.Parent),
+			Modal = this.Modal,
+			AcceptFirstMouse = this.AcceptFirstMouse,
+			DisableAutoHideCursor = this.DisableAutoHideCursor,
+			AutoHideMenuBar = this.AutoHideMenuBar,
+			EnableLargerThanScreen = this.EnableLargerThanScreen,
+			BackgroundColor = this.BackgroundColor,
+			HasShadow = this.HasShadow,
+			Opacity = this.Opacity,
+			DarkTheme = this.DarkTheme,
+			Transparent = this.Transparent,
+			Type = this.Type,
+			VisualEffectState = this.VisualEffectState,
+			TitleBarStyle = this.TitleBarStyle,
+			CustomButtonsOnHover = this.CustomButtonsOnHover,
+			TrafficLightPosition = this.TrafficLightPosition,
+			FullscreenWindowTitle = this.FullscreenWindowTitle,
+			ThickFrame = this.ThickFrame,
+			Vibrancy = this.Vibrancy,
+			ZoomToPageWidth = this.ZoomToPageWidth,
+			TabbingIdentifier = this.TabbingIdentifier,
+			WebPreferences = this.WebPreferences?.ToWebPreferences()
+		};
 	}
 
 	public class Certificate {
@@ -1094,6 +1250,32 @@ namespace MZZT.ElectronNetCore.Api {
 		public string PacScript { get; set; }
 		public string ProxyRules { get; set; }
 		public string ProxyBypassRules { get; set; }
+	}
+
+	public class ContextMenuParams {
+		public int X { get; set; }
+		public int Y { get; set; }
+		[JsonPropertyName("linkURL")]
+		public string LinkUrl { get; set; }
+		public string LinkText { get; set; }
+		[JsonPropertyName("pageURL")]
+		public string PageUrl { get; set; }
+		[JsonPropertyName("frameURL")]
+		public string FrameUrl { get; set; }
+		[JsonPropertyName("srcURL")]
+		public string SrcUrl { get; set; }
+		public string MediaType { get; set; }
+		public bool HasImageContents { get; set; }
+		public bool IsEditable { get; set; }
+		public string SelectionText { get; set; }
+		public string TitleText { get; set; }
+		public string MisspelledWord { get; set; }
+		public string[] DictionarySuggestions { get; set; }
+		public string FrameCharset { get; set; }
+		public string InputFieldType { get; set; }
+		public string MenuSourceType { get; set; }
+		public MediaFlags MediaFlags { get; set; }
+		public EditFlags EditFlags { get; set; }
 	}
 
 	public class Cookie {
@@ -1216,6 +1398,33 @@ namespace MZZT.ElectronNetCore.Api {
 		public string Fantasy { get; set; }
 	}
 
+	public class DidCreateWindowDetails {
+		public string Url { get; set; }
+		public string FrameName { get; set; }
+		public BrowserWindowConstructorOptions Options { get; set; }
+		public Referrer Referrer { get; set; }
+		public PostBody PostBody { get; set; }
+		public string Disposition { get; set; }
+	}
+
+	public class DidCreateWindowDetailsDto {
+		public string Url { get; set; }
+		public string FrameName { get; set; }
+		public BrowserWindowConstructorOptionsDto Options { get; set; }
+		public Referrer Referrer { get; set; }
+		public PostBodyDto PostBody { get; set; }
+		public string Disposition { get; set; }
+
+		internal DidCreateWindowDetails ToDidCreateWindowDetails() => new() {
+			Url = this.Url,
+			FrameName = this.FrameName,
+			Options = this.Options?.ToBrowserWindowConstructorOptions(),
+			Referrer = this.Referrer,
+			PostBody = this.PostBody?.ToPostBody(),
+			Disposition = this.Disposition
+		};
+	}
+
 	public class Display {
 		public long Id { get; set; }
 		public int Rotation { get; set; }
@@ -1266,6 +1475,16 @@ namespace MZZT.ElectronNetCore.Api {
 		public bool RespectQuietTime { get; set; }
 	}
 
+	public class EditFlags {
+		public bool CanUndo { get; set; }
+		public bool CanRedo { get; set; }
+		public bool CanCut { get; set; }
+		public bool CanCopy { get; set; }
+		public bool CanPaste { get; set; }
+		public bool CanDelete { get; set; }
+		public bool CanSelectAll { get; set; }
+	}
+
 	public class EnableNetworkEmulationOptions {
 		public bool Offline { get; set; }
 		public double Latency { get; set; }
@@ -1305,6 +1524,12 @@ namespace MZZT.ElectronNetCore.Api {
 
 	public class Filter {
 		public string[] Urls { get; set; }
+	}
+
+	public class FindInPageOptions {
+		public bool Forward { get; set; } = true;
+		public bool FindNext { get; set; }
+		public bool MatchCase { get; set; }
 	}
 
 	public class FocusOptions {
@@ -1412,6 +1637,12 @@ namespace MZZT.ElectronNetCore.Api {
 		public bool SubpixelFontRendering { get; set; }
 	}
 
+	public class HandlerDetails {
+		public string Url { get; set; }
+		public string FrameName { get; set; }
+		public string Features { get; set; }
+	}
+
 	public class HeadersReceivedResponse : BeforeSendResponse {
 		public string StatusLine { get; set; }
 	}
@@ -1444,6 +1675,52 @@ namespace MZZT.ElectronNetCore.Api {
 		public string Password { get; set; }
 	}
 
+	public class Input {
+		public string Type { get; set; }
+		public string Key { get; set; }
+		public string Code{ get; set; }
+		public bool IsAutoRepeat { get; set; }
+		public bool IsComposing { get; set; }
+		public bool Shift { get; set; }
+		public bool Control { get; set; }
+		public bool Alt { get; set; }
+		public bool Meta { get; set; }
+	}
+
+	public abstract class InputEvent {
+		public string Type { get; set; }
+	}
+
+	public class KeyboardInputEvent : InputEvent {
+		public string KeyCode { get; set; }
+	}
+
+	public class MouseInputEvent : InputEvent {
+		public int X { get; set; }
+		public int Y { get; set; }
+		public string Button { get; set; }
+		public int GlobalX { get; set; }
+		public int GlobalY { get; set; }
+		public int MovementX { get; set; }
+		public int MovementY { get; set; }
+		public int ClickCount { get; set; }
+	}
+
+	public class MouseWheelInputEvent : MouseInputEvent {
+		public int DeltaX { get; set; }
+		public int DeltaY { get; set; }
+		public int WheelTicksX { get; set; }
+		public int WheelTicksY { get; set; }
+		public int AccelerationRatioX { get; set; }
+		public int AccelerationRatioY { get; set; }
+		public bool HasPreciseScrollingDeltas { get; set; }
+		public bool CanScroll { get; set; }
+	}
+
+	public class InsertCssOptions {
+		public string CssOrigin { get; set; } = CssOrigins.Author;
+	}
+
 	public class IoCounters {
 		public double ReadOperationCount { get; set; }
 		public double WriteOperationCount { get; set; }
@@ -1465,6 +1742,24 @@ namespace MZZT.ElectronNetCore.Api {
 		public int FrameId { get; internal set; }
 		public WebContents Sender { get; internal set; }
 		public WebFrameMain SenderFrame { get; internal set; }
+	}
+
+	public class Item {
+		public string[] File { get; set; }
+		public NativeImage IconImage { get; set; }
+		public string IconPath { get; set; }
+
+		internal ItemDto ToItemDto() => new() {
+			File = this.File,
+			IconImage = this.IconImage?.InternalId ?? 0,
+			IconPath = this.IconPath
+		};
+	}
+
+	public class ItemDto {
+		public string[] File { get; set; }
+		public int IconImage { get; set; }
+		public string IconPath { get; set; }
 	}
 
 	public class JumpListCategory {
@@ -1521,7 +1816,7 @@ namespace MZZT.ElectronNetCore.Api {
 		public Referrer HttpReferrerReferrer { get; set; }
 		public string UserAgent { get; set; }
 		public string ExtraHeaders { get; set; }
-		public UploadRawDataOrFile[] PostData { get; set; }
+		public PostData[] PostData { get; set; }
 		public string BaseUrlForDataUrl { get; set; }
 
 		public LoadUrlOptionsDto ToLoadUrlOptionsDto() => new() {
@@ -1529,7 +1824,7 @@ namespace MZZT.ElectronNetCore.Api {
 			HttpReferrerReferrer = this.HttpReferrerReferrer,
 			UserAgent = this.UserAgent,
 			ExtraHeaders = this.ExtraHeaders,
-			PostData = this.PostData?.Select(x => x.ToUploadRawDataOrFileDto()).ToArray(),
+			PostData = this.PostData?.Select(x => x.ToPostDataDto()).ToArray(),
 			BaseUrlForDataUrl = this.BaseUrlForDataUrl
 		};
 	}
@@ -1539,7 +1834,7 @@ namespace MZZT.ElectronNetCore.Api {
 		public Referrer HttpReferrerReferrer { get; set; }
 		public string UserAgent { get; set; }
 		public string ExtraHeaders { get; set; }
-		public UploadRawDataOrFileDto[] PostData { get; set; }
+		public PostDataDto[] PostData { get; set; }
 		[JsonPropertyName("baseURLForDataURL")]
 		public string BaseUrlForDataUrl { get; set; }
 	}
@@ -1557,6 +1852,25 @@ namespace MZZT.ElectronNetCore.Api {
 	public class LoginItemSettingsOptions {
 		public string Path { get; set; }
 		public string[] Args { get; set; }
+	}
+
+	public class Margins {
+		public string MarginType { get; set; }
+		public double Top { get; set; }
+		public double Bottom { get; set; }
+		public double Left { get; set; }
+		public double Right { get; set; }
+	}
+
+	public class MediaFlags {
+		public bool InError { get; set; }
+		public bool InPaused { get; set; }
+		public bool InMuted { get; set; }
+		public bool HasAudio { get; set; }
+		public bool InLooping { get; set; }
+		public bool InControlsVisible { get; set; }
+		public bool CanToggleControls { get; set; }
+		public bool CanRotate { get; set; }
 	}
 
 	public class MemoryInfo {
@@ -2119,6 +2433,11 @@ namespace MZZT.ElectronNetCore.Api {
 		}
 	}
 
+	public class OpenDevToolsOptions {
+		public string Mode { get; set; }
+		public bool Activate { get; set; } = true;
+	}
+
 	public class OpenDialogOptions {
 		public string Title { get; set; }
 		public string DefaultPath { get; set; }
@@ -2142,6 +2461,20 @@ namespace MZZT.ElectronNetCore.Api {
 		public string Nv12OverlaySupport { get; set; }
 	}
 
+	public class PageRanges {
+		public int From { get; set; }
+		public int To { get; set; }
+	}
+
+	public class Parameters {
+		public string ScreenPosition { get; set; }
+		public Size ScreenSize { get; set; }
+		public Point ViewPosition { get; set; }
+		public double DeviceScaleFactor { get; set; }
+		public Size ViewSize { get; set; }
+		public double Scale { get; set; } = 1;
+	}
+
 	public class Payment {
 		public string ProductIdentifier { get; set; }
 		public int Quantity { get; set; }
@@ -2160,6 +2493,11 @@ namespace MZZT.ElectronNetCore.Api {
 		public string[] MediaTypes { get; set; }
 		public string RequestingUrl { get; set; }
 		public bool IsMainFrame { get; set; }
+	}
+
+	public class PrintDpi {
+		public double? Horizontal { get; set; }
+		public double? Vertical { get; set; }
 	}
 
 	public class Point {
@@ -2198,9 +2536,94 @@ namespace MZZT.ElectronNetCore.Api {
 		public int PositioningItem { get; set; } = -1;
 	}
 
+	public class PostBody {
+		public PostData[] PostData { get; set; }
+		public string ContentType { get; set; }
+		public string Boundary { get; set; }
+	}
+
+	public class PostBodyDto {
+		public PostDataDto[] PostData { get; set; }
+		public string ContentType { get; set; }
+		public string Boundary { get; set; }
+
+		internal PostBody ToPostBody() => new() {
+			PostData = this.PostData?.Select(x => x.ToPostData()).ToArray(),
+			ContentType = this.ContentType,
+			Boundary = this.Boundary
+		};
+	}
+
+	public class PostData {
+		public string Type { get; set; }
+		public byte[] Bytes { get; set; }
+		public string FilePath { get; set; }
+		public string BlobUuid { get; set; }
+		public long Offset { get; set; }
+		public long Length { get; set; }
+		public DateTime ModificationTime { get; set; }
+
+		internal PostDataDto ToPostDataDto() => new() {
+			Type = this.Type,
+			Bytes = this.Bytes != null ? Convert.ToBase64String(this.Bytes) : null,
+			FilePath = this.FilePath,
+			BlobUuid = this.BlobUuid,
+			Offset = this.Offset,
+			Length = this.Length,
+			ModificationTime = (this.ModificationTime.ToUniversalTime() - DateTime.UnixEpoch).TotalSeconds
+		};
+	}
+
+	public class PostDataDto {
+		public string Type { get; set; }
+		public string Bytes { get; set; }
+		public string FilePath { get; set; }
+		[JsonPropertyName("blobUUID")]
+		public string BlobUuid { get; set; }
+		public long Offset { get; set; }
+		public long Length { get; set; }
+		public double ModificationTime { get; set; }
+
+		internal PostData ToPostData() => new() {
+			Type = this.Type,
+			Bytes = this.Bytes != null ? Convert.FromBase64String(this.Bytes) : null,
+			FilePath = this.FilePath,
+			BlobUuid = this.BlobUuid,
+			Offset = this.Offset,
+			Length = this.Length,
+			ModificationTime = DateTime.SpecifyKind(DateTime.UnixEpoch + TimeSpan.FromSeconds(this.ModificationTime), DateTimeKind.Utc)
+		};
+	}
+
 	public class PreconnectOptions {
 		public string Url { get; set; }
 		public int NumSockets { get; set; } = 1;
+	}
+
+	public class PrinterInfo {
+		public string Name { get; set; }
+		public string DisplayName { get; set; }
+		public string Description { get; set; }
+		public int Status { get; set; }
+		public bool IsDefault { get; set; }
+		public Dictionary<string, string> Options { get; set; }
+	}
+
+	public class PrintHeaderFooter {
+		public string Title { get; set; }
+		public string Url { get; set; }
+	}
+
+	public class PrintToPdfOptions {
+		public PrintHeaderFooter HeaderFooter { get; set; }
+		public bool Landscape { get; set; }
+		public int MarginsType { get; set; }
+		public double ScaleFactor { get; set; } = 100;
+		public PageRanges PageRanges { get; set; }
+		public string PageSizeString { get; set; }
+		public Size PageSizeSize { get; set; }
+		public bool PrintBackground { get; set; }
+		public bool PrintSelectionOnly { get; set; }
 	}
 
 	public class ProcessMemoryInfo {
@@ -2405,6 +2828,14 @@ namespace MZZT.ElectronNetCore.Api {
 		public string RedirectUrl { get; set; }
 	}
 
+	public class Result {
+		public int RequestId { get; set; }
+		public int ActiveMatchOrdinal { get; set; }
+		public int Matches { get; set; }
+		public Rectangle SelectionArea { get; set; }
+		public bool FinalUpdate { get; set; }
+	}
+
 	public class SaveDialogOptions {
 		public string Title { get; set; }
 		public string DefaultPath { get; set; }
@@ -2491,6 +2922,11 @@ namespace MZZT.ElectronNetCore.Api {
 		public string[] Args { get; set; }
 		public bool Enabled { get; set; }
 		public string Name { get; set; }
+	}
+
+	public class SharedWorkerInfo {
+		public string Id { get; set; }
+		public string Url { get; set; }
 	}
 
 	public class SharingItem {
@@ -2804,33 +3240,6 @@ namespace MZZT.ElectronNetCore.Api {
 		public string BlobUuid { get; set; }
 	}
 
-	public class UploadRawDataOrFile {
-		public string Type { get; set; }
-		public byte[] Bytes { get; set; }
-		public string FilePath { get; set; }
-		public long Offset { get; set; }
-		public long Length { get; set; }
-		public DateTime ModificationTime { get; set; }
-
-		internal UploadRawDataOrFileDto ToUploadRawDataOrFileDto() => new() {
-			Type = this.Type,
-			Bytes = this.Bytes != null ? Convert.ToBase64String(this.Bytes) : null,
-			FilePath = this.FilePath,
-			Offset = this.Offset,
-			Length = this.Length,
-			ModificationTime = (this.ModificationTime.ToUniversalTime() - DateTime.UnixEpoch).TotalSeconds
-		};
-	}
-
-	public class UploadRawDataOrFileDto {
-		public string Type { get; set; }
-		public string Bytes { get; set; }
-		public string FilePath { get; set; }
-		public long Offset { get; set; }
-		public long Length { get; set; }
-		public double ModificationTime { get; set; }
-	}
-
 	public class VideoDecodeAcceleratorSupportedProfile {
 		public int Profile { get; set; }
 		public int MaxResolutionWidth { get; set; }
@@ -2853,6 +3262,26 @@ namespace MZZT.ElectronNetCore.Api {
 
 	public class VisibleOnAllWorkspacesOptions {
 		public bool VisibleOnFullScreen { get; set; }
+	}
+
+	public class WebContentsPrintOptions {
+		public bool Silent { get; set; }
+		public bool PrintBackground { get; set; }
+		public string DeviceName { get; set; }
+		public bool Color { get; set; } = true;
+		public Margins Margins { get; set; }
+		public bool Landscape { get; set; }
+		public double ScaleFactor { get; set; } = 1;
+		public int PagesPerSheet { get; set; } = 1;
+		public bool Collate { get; set; }
+		public int Copies { get; set; } = 1;
+		public PageRanges[] PageRanges { get; set; }
+		public string DuplexMode { get; set; }
+		public PrintDpi Dpi { get; set; }
+		public string Header { get; set; }
+		public string Footer { get; set; }
+		public string PageSizeString { get; set; }
+		public Size PageSizeSize { get; set; }
 	}
 
 	public class WebContentsSetWindowOpenHandlerReturnValue {
@@ -3005,5 +3434,56 @@ namespace MZZT.ElectronNetCore.Api {
 		public bool EnableWebSql { get; set; } = true;
 		public string V8CacheOptions { get; set; }
 		public bool EnablePreferredSizeMode { get; set; }
+
+		internal WebPreferences ToWebPreferences() => new() {
+			DevTools = this.DevTools,
+			NodeIntegration = this.NodeIntegration,
+			NodeIntegrationInWorker = this.NodeIntegrationInWorker,
+			NodeIntegrationInSubFrames = this.NodeIntegrationInSubFrames,
+			Preload = this.Preload,
+			Sandbox = this.Sandbox,
+			EnableRemoteModule = this.EnableRemoteModule,
+			Session = ElectronDisposable.FromId<Session>(this.Session),
+			Partition = this.Partition,
+			ZoomFactor = this.ZoomFactor,
+			JavaScript = this.JavaScript,
+			WebSecurity = this.WebSecurity,
+			AllowRunningInsecureContent = this.AllowRunningInsecureContent,
+			Images = this.Images,
+			TextAreasAreResizable = this.TextAreasAreResizable,
+			WebGl = this.WebGl,
+			Plugins = this.Plugins,
+			ExperimentalFeatures = this.ExperimentalFeatures,
+			ScrollBounce = this.ScrollBounce,
+			EnableBlinkFeatures = this.EnableBlinkFeatures,
+			DisableBlinkFeatures = this.DisableBlinkFeatures,
+			DefaultFontFamily = this.DefaultFontFamily,
+			DefaultFontSize = this.DefaultFontSize,
+			DefaultMonospaceFontSize = this.DefaultMonospaceFontSize,
+			MinimumFontSize = this.MinimumFontSize,
+			DefaultEncoding = this.DefaultEncoding,
+			BackgroundThrottling = this.BackgroundThrottling,
+			Offscreen = this.Offscreen,
+			ContextIsolation = this.ContextIsolation,
+			WebviewTag = this.WebviewTag,
+			AdditionalArguments = this.AdditionalArguments,
+			SafeDialogs = this.SafeDialogs,
+			SafeDialogMessage = this.SafeDialogMessage,
+			DisableDialogs = this.DisableDialogs,
+			NavigateOnDragDrop = this.NavigateOnDragDrop,
+			AutoplayPolicy = this.AutoplayPolicy,
+			DisableHtmlFullscreenWindowResize = this.DisableHtmlFullscreenWindowResize,
+			AccessibleTitle = this.AccessibleTitle,
+			Spellcheck = this.Spellcheck,
+			EnableWebSql = this.EnableWebSql,
+			V8CacheOptions = this.V8CacheOptions,
+			EnablePreferredSizeMode = this.EnablePreferredSizeMode
+		};
+	}
+
+	public class WebSource {
+		public string Code { get; set; }
+		public string Url { get; set; }
+		public int StartLine { get; set; } = 1;
 	}
 }

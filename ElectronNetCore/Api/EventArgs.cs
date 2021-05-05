@@ -203,6 +203,36 @@ namespace MZZT.ElectronNetCore.Api {
 		public string Direction { get; }
 	}
 
+	public class ColorEventArgs : EventArgs {
+		public ColorEventArgs(string color) : base() {
+			this.Color = color;
+		}
+
+		public string Color { get; }
+	}
+
+	public class ConsoleMessageEventArgs : EventArgs {
+		public ConsoleMessageEventArgs(int level, string message, int line, string sourceId) : base() {
+			this.Level = level;
+			this.Message = message;
+			this.Line = line;
+			this.SourceId = sourceId;
+		}
+
+		public int Level { get; }
+		public string Message { get; }
+		public int Line { get; }
+		public string SourceId { get; }
+	}
+
+	public class ContextMenuParamsEventArgs : EventArgs {
+		public ContextMenuParamsEventArgs(ContextMenuParams @params) : base() {
+			this.Params = @params;
+		}
+
+		public ContextMenuParams Params { get; }
+	}
+
 	public class CookiesChangedEventArgs : EventArgs {
 		public CookiesChangedEventArgs(Cookie cookie, string cause, bool removed) : base() {
 			this.Cookie = cookie;
@@ -213,6 +243,18 @@ namespace MZZT.ElectronNetCore.Api {
 		public Cookie Cookie { get; }
 		public string Cause { get; }
 		public bool Removed { get; }
+	}
+
+	public class DebuggerMessageEventArgs : EventArgs {
+		public DebuggerMessageEventArgs(string method, object @params, string sessionId) {
+			this.Method = method;
+			this.Params = @params;
+			this.SessionId = sessionId;
+		}
+
+		public string Method { get; }
+		public object Params { get; }
+		public string SessionId { get; }
 	}
 
 	public class DisplayEventArgs : EventArgs {
@@ -263,12 +305,46 @@ namespace MZZT.ElectronNetCore.Api {
 		public Extension Extension { get; }
 	}
 
+	public class FaviconsEventArgs : EventArgs {
+		public FaviconsEventArgs(string[] favicons) {
+			this.Favicons = favicons;
+		}
+
+		public string[] Favicons { get; }
+	}
+
 	public class FileEventArgs : EventArgs {
-		public FileEventArgs(string path): base() {
+		public FileEventArgs(string path) : base() {
 			this.Path = path;
 		}
 
 		public string Path { get; }
+	}
+
+	public class FoundInPageEventArgs : EventArgs {
+		public FoundInPageEventArgs(Result result) : base() {
+			this.Result = result;
+		}
+
+		public Result Result { get; }
+	}
+
+	public class InputEventArgs : EventArgs {
+		public InputEventArgs(Input input) : base() {
+			this.Input = input;
+		}
+
+		public Input Input { get; }
+	}
+
+	public class IpcMessageEventArgs : EventArgs {
+		public IpcMessageEventArgs(string channel, object[] args) : base() {
+			this.Channel = channel;
+			this.Args = args;
+		}
+
+		public string Channel { get; }
+		public object[] Args { get; }
 	}
 
 	public class LanguageCodeEventArgs : EventArgs {
@@ -329,12 +405,28 @@ namespace MZZT.ElectronNetCore.Api {
 		public Point Point { get; }
 	}
 
+	public class PreferredSizeEventArgs : EventArgs {
+		public PreferredSizeEventArgs(Size preferredSize) : base() {
+			this.PreferredSize = preferredSize;
+		}
+
+		public Size PreferredSize { get; }
+	}
+
 	public class RectangleEventArgs : EventArgs {
 		public RectangleEventArgs(Rectangle newBounds) : base() {
 			this.NewBounds = newBounds;
 		}
 
 		public Rectangle NewBounds { get; }
+	}
+
+	public class RenderProcessGoneEventArgs : EventArgs {
+		public RenderProcessGoneEventArgs(RenderProcessGone details) : base() {
+			this.Details = details;
+		}
+
+		public RenderProcessGone Details { get; }
 	}
 
 	public class SessionEventArgs : EventArgs {
@@ -461,5 +553,153 @@ namespace MZZT.ElectronNetCore.Api {
 		}
 
 		public WebContents WebContents { get; }
+	}
+
+	public class WebContentsCursorChangedEventArgs : EventArgs {
+		public WebContentsCursorChangedEventArgs(string type, NativeImage image, double scale, Size size, Point hotspot) : base() {
+			this.Type = type;
+			this.Image = image;
+			this.Scale = scale;
+			this.Size = size;
+			this.Hotspot = hotspot;
+		}
+
+		public string Type { get; }
+		public NativeImage Image { get; }
+		public double Scale { get; }
+		public Size Size { get; }
+		public Point Hotspot { get; }
+	}
+
+	public class WebContentsDidCreateWindowEventArgs : BrowserWindowEventArgs {
+		public WebContentsDidCreateWindowEventArgs(BrowserWindow window, DidCreateWindowDetails details) : base(window) {
+			this.Details = details;
+		}
+
+		public DidCreateWindowDetails Details { get; }
+	}
+
+	public class WebContentsDidFrameNavigateEventArgs : WebContentsFrameEventArgs {
+		public WebContentsDidFrameNavigateEventArgs(string url, int httpResponseCode, string httpStatusText, bool isMainFrame, int frameProcessId, int frameRoutingId) : base(isMainFrame, frameProcessId, frameRoutingId) {
+			this.Url = url;
+			this.HttpResponseCode = httpResponseCode;
+			this.HttpStatusText = httpStatusText;
+		}
+
+		public string Url { get; }
+		public int HttpResponseCode { get; }
+		public string HttpStatusText { get; }
+	}
+
+	public class WebContentsDidNavigateEventArgs : EventArgs {
+		public WebContentsDidNavigateEventArgs(string url, int httpResponseCode, string httpStatusText) : base() {
+			this.Url = url;
+			this.HttpResponseCode = httpResponseCode;
+			this.HttpStatusText = httpStatusText;
+		}
+
+		public string Url { get; }
+		public int HttpResponseCode { get; }
+		public string HttpStatusText { get; }
+	}
+
+	public class WebContentsDidNavigateInPageEventArgs : WebContentsFrameEventArgs {
+		public WebContentsDidNavigateInPageEventArgs(string url, bool isMainFrame, int frameProcessId, int frameRoutingId) : base(isMainFrame, frameProcessId, frameRoutingId) {
+			this.Url = url;
+		}
+
+		public string Url { get; }
+	}
+
+	public class WebContentsFailLoadEventArgs : WebContentsFrameEventArgs {
+		public WebContentsFailLoadEventArgs(int errorCode, string errorDescription, string validatedUrl, bool isMainFrame, int frameProcessId, int frameRoutingId) : base(isMainFrame, frameProcessId, frameRoutingId) {
+			this.ErrorCode = errorCode;
+			this.ErrorDescription = errorDescription;
+			this.ValidatedUrl = validatedUrl;
+		}
+
+		public int ErrorCode { get; }
+		public string ErrorDescription { get; }
+		public string ValidatedUrl { get; }
+	}
+
+	public class WebContentsFrameEventArgs : EventArgs {
+		public WebContentsFrameEventArgs(bool isMainFrame, int frameProcessId, int frameRoutingId) : base() {
+			this.IsMainFrame = isMainFrame;
+			this.FrameProcessId = frameProcessId;
+			this.FrameRoutingId = frameRoutingId;
+		}
+
+		public bool IsMainFrame { get; }
+		public int FrameProcessId { get; }
+		public int FrameRoutingId { get; }
+	}
+
+	public class WebContentsNavigationEventArgs : WebContentsFrameEventArgs {
+		public WebContentsNavigationEventArgs(string url, bool isInPlace, bool isMainFrame, int frameProcessId, int frameRoutingId) : base(isMainFrame, frameProcessId, frameRoutingId) {
+			this.Url = url;
+			this.IsInPlace = isInPlace;
+		}
+
+		public string Url { get; }
+		public bool IsInPlace { get; }
+	}
+
+	public class WebContentsPaintEventArgs : EventArgs {
+		public WebContentsPaintEventArgs(Rectangle dirtyRect, NativeImage image) : base() {
+			this.DirtyRect = dirtyRect;
+			this.Image = image;
+		}
+
+		public Rectangle DirtyRect { get; }
+		public NativeImage Image { get; }
+	}
+
+	public class WebContentsPluginCrashedEventArgs : EventArgs {
+		public WebContentsPluginCrashedEventArgs(string name, string version) : base() {
+			this.Name = name;
+			this.Version = version;
+		}
+
+		public string Name { get; }
+		public string Version { get; }
+	}
+
+	public class WebContentsPreloadErrorEventArgs : EventArgs {
+		public WebContentsPreloadErrorEventArgs(string preloadPath, Error error) : base() {
+			this.PreloadPath = preloadPath;
+			this.Error = error;
+		}
+
+		public string PreloadPath { get; }
+		public Error Error { get; }
+	}
+
+	public class WebContentsSelectBluetoothDeviceEventArgs : EventArgs {
+		public WebContentsSelectBluetoothDeviceEventArgs(BluetoothDevice[] devices, ElectronFunction<string> callback) : base() {
+			this.Devices = devices;
+			this.Callback = callback;
+		}
+
+		public BluetoothDevice[] Devices { get; }
+		public ElectronFunction<string> Callback { get; }
+	}
+
+	public class WebContentsWillAttachWebviewEventArgs : EventArgs {
+		public WebContentsWillAttachWebviewEventArgs(WebPreferences webPreferences, Dictionary<string, string> @params) : base() {
+			this.WebPreferences = webPreferences;
+			this.Params = @params;
+		}
+
+		public WebPreferences WebPreferences { get; }
+		public Dictionary<string, string> Params { get; }
+	}
+
+	public class ZoomDirectionEventArgs : EventArgs {
+		public ZoomDirectionEventArgs(string zoomDirection) : base() {
+			this.ZoomDirection = zoomDirection;
+		}
+
+		public string ZoomDirection { get; }
 	}
 }

@@ -18,7 +18,7 @@ namespace MZZT.ElectronNetCore {
 
 	internal partial class ElectronHub {
 		public Task IpcMain_On_Callback(int callbackId, int processId, int frameId, int sender, int[] ports, int reply, string[] args) =>
-			Api.Electron.IpcMain.OnCallback(callbackId, processId, frameId, WebContents.FromId(sender), ports.Select(x => ElectronDisposable.FromId<MessagePortMain>(x)).ToArray(), reply, args);
+			Api.Electron.IpcMain.OnCallback(callbackId, processId, frameId, WebContents.FromId(sender), ports?.Select(x => ElectronDisposable.FromId<MessagePortMain>(x)).ToArray(), reply, args);
 		public Task<object> IpcMain_Handle_Callback(int callbackId, int processId, int frameId, int sender, string[] args) =>
 			Api.Electron.IpcMain.OnHandleCallback(callbackId, processId, frameId, WebContents.FromId(sender), args);
 	}
@@ -60,8 +60,10 @@ namespace MZZT.ElectronNetCore.Api {
 					this.callbacks.Remove(callbackId);
 				}
 			} finally {
-				foreach (MessagePortMain port in ports) {
-					await port.DisposeAsync();
+				if (ports != null) {
+					foreach (MessagePortMain port in ports) {
+						await port.DisposeAsync();
+					}
 				}
 			}
 		}

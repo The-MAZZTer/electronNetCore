@@ -1,5 +1,5 @@
 import { HubConnection, HubConnectionBuilder, HubConnectionState } from "@microsoft/signalr";
-import { app, NodeEventEmitter } from "electron";
+import { app } from "electron";
 import { ElectronApi } from "./api/api";
 import { ElectronApp } from "./api/app";
 import { ElectronAppCommandLine } from "./api/appCommandLine";
@@ -144,8 +144,6 @@ export class SignalR {
 						if (ret === undefined) {
 							await this.send("Return", args[0], "undefined");
 						} else {
-							//console.log(ret);
-	
 							for (const type of this.types) {
 								if (type.instanceOf && type.instanceOf(ret)) {
 									ret = type.toId(ret);
@@ -236,7 +234,7 @@ export class SignalR {
 		let obj = this.objects[id];
 		delete this.objects[id];
 
-		if (obj instanceof NodeEventEmitter) {
+		if (obj.removeAllListeners) {
 			obj.removeAllListeners();
 		}
 	}

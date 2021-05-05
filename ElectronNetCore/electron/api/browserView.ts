@@ -1,4 +1,4 @@
-import { BrowserView, BrowserViewConstructorOptions, Session, WebContents } from "electron";
+import { BrowserView, BrowserViewConstructorOptions, Session, webContents } from "electron";
 import { ElectronApi, SignalRApi } from "./api";
 
 let api: SignalRApi;
@@ -17,7 +17,7 @@ export const ElectronBrowserView: ElectronApi = {
 		},
 
 		"WebContents_Get": (self: BrowserView) => self,
-		"WebContents_Set": (self: BrowserView, value: number) => { self.webContents = value ? WebContents.fromId(value) : null },
+		"WebContents_Set": (self: BrowserView, value: number) => { self.webContents = value ? webContents.fromId(value) : null },
 
 		"SetAutoResize": (self: BrowserView, options) => self.setAutoResize(options),
 		"SetBounds": (self: BrowserView, bounds) => self.setBounds(bounds),

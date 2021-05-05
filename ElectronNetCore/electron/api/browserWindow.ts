@@ -1,5 +1,5 @@
 import { app, BrowserView, BrowserWindow, BrowserWindowConstructorOptions, LoadURLOptions, Menu,
-	NativeImage, Session, TouchBar, WebContents } from "electron";
+	NativeImage, Session, TouchBar, webContents } from "electron";
 import { ElectronApi, SignalRApi } from "./api";
 
 const browserWindowPageTitleUpdatedPreventDefault: Record<number, true> = {};
@@ -190,7 +190,7 @@ export const ElectronBrowserWindow: ElectronApi = {
 		"SystemContextMenu_PreventDefault": (self: BrowserWindow, value) => { browserWindowSystemContextMenuPreventDefault[self.id] = value; },
 
 		"GetFocusedWindow": (_: null) => BrowserWindow.getFocusedWindow(),
-		"FromWebContents": (_: null, webContents) => BrowserWindow.fromWebContents(webContents ? WebContents.fromId(webContents) : null),
+		"FromWebContents": (_: null, contents) => BrowserWindow.fromWebContents(contents ? webContents.fromId(contents) : null),
 		"FromBrowserView": (_: null, browserView) => BrowserWindow.fromBrowserView(api.get<BrowserView>(browserView)),
 
 		"WebContents_Get": (self: BrowserWindow) => self.webContents,
