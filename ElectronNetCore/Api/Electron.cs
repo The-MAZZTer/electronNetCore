@@ -267,7 +267,10 @@ namespace MZZT.ElectronNetCore.Api {
 
 		public static ElectronApp App { get; } = new();
 		public static ElectronAutoUpdater AutoUpdater { get; } = new();
+		public static ElectronClipboard Clipboard { get; } = new();
 		public static ElectronContentTracing ContentTracing { get; } = new();
+		public static ElectronCrashReporter CrashReporter { get; } = new();
+		public static ElectronDesktopCapturer DesktopCapturer { get; } = new();
 		public static ElectronDialog Dialog { get; } = new();
 		public static ElectronGlobalShortcut GlobalShortcut { get; } = new();
 		public static ElectronInAppPurchase InAppPurchase { get; } = new();
@@ -280,6 +283,7 @@ namespace MZZT.ElectronNetCore.Api {
 		public static ElectronProcess Process { get; } = new();
 		public static Protocol Protocol { get; } = new(0);
 		public static ElectronScreen Screen { get; } = new();
+		public static ElectronShell Shell { get; } = new();
 		public static ElectronSystemPreferences SystemPreferences { get; } = new();
 
 		public static event EventHandler<ExitCodeEventArgs> ProcessExited;

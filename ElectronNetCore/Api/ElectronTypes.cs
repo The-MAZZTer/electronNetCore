@@ -110,6 +110,11 @@ namespace MZZT.ElectronNetCore.Api {
 		public const string Unknown = "Unknown";
 	}
 
+	public static class ClipboardType {
+		public const string Clipboard = "clipboard";
+		public const string Selection = "selection";
+	}
+
 	public static class ColorNames {
 		public const string ThreeDDarkShadow = "3d-dark-shadow";
 		public const string ThreeDFace = "3d-face";
@@ -289,6 +294,11 @@ namespace MZZT.ElectronNetCore.Api {
 		public static string Custom = "custom";
 	}
 
+	public static class DesktopCapturerSourcesTypes {
+		public static string Screen = "screen";
+		public static string Window = "window";
+	}
+
 	public static class DeviceEmulationScreenPositions {
 		public static string Desktop = "desktop";
 		public static string Mobile = "mobile";
@@ -360,6 +370,12 @@ namespace MZZT.ElectronNetCore.Api {
 		public const string Subsampling420 = "4:2:0";
 		public const string Subsampling422 = "4:2:2";
 		public const string Subsampling444 = "4:4:4";
+	}
+
+	public static class ImageResizeQualities {
+		public const string Good = "good";
+		public const string Better = "better";
+		public const string Best = "best";
 	}
 
 	public static class InputEventTypes {
@@ -688,6 +704,12 @@ namespace MZZT.ElectronNetCore.Api {
 		public const string DontAddToRecent = "dontAddToRecent";
 	}
 
+	public static class ShortcutOperations {
+		public const string Create = "create";
+		public const string Update = "update";
+		public const string Replace = "replace";
+	}
+
 	public static class SslVersions {
 		public const string Tls1 = "tls1";
 		public const string Tls11 = "tls1.1";
@@ -896,6 +918,30 @@ namespace MZZT.ElectronNetCore.Api {
 		public string IconPath { get; set; }
 	}
 
+	public class AddRepresentationOptions {
+		public double ScaleFactor { get; set; }
+		public int Width { get; set; }
+		public int Height { get; set; }
+		public byte[] Buffer { get; set; }
+		public string DataUrl { get; set; }
+
+		internal AddRepresentationOptionsDto ToAddRepresentationOptionsDto() => new() {
+			ScaleFactor = this.ScaleFactor,
+			Width = this.Width,
+			Height = this.Height,
+			Buffer = Convert.ToBase64String(this.Buffer),
+			DataUrl = this.DataUrl
+		};
+	}
+
+	public class AddRepresentationOptionsDto {
+		public double ScaleFactor { get; set; }
+		public int Width { get; set; }
+		public int Height { get; set; }
+		public string Buffer { get; set; }
+		public string DataUrl { get; set; }
+	}
+
 	public class AnimationSettings {
 		public bool ShouldRenderRichAnimation { get; set; }
 		public bool ScrollAnimationsEnabledBySystem { get; set; }
@@ -951,6 +997,8 @@ namespace MZZT.ElectronNetCore.Api {
 		public bool Cancel { get; set; }
 		public Dictionary<string, object> RequestHeaders { get; set; }
 	}
+
+	public class BitmapOptions : ToPngOptions { }
 
 	public class BlinkMemoryInfo {
 		public int Allocated { get; set; }
@@ -1330,6 +1378,21 @@ namespace MZZT.ElectronNetCore.Api {
 		public double IdleWakeupsPerSecond { get; set; }
 	}
 
+	public class CrashReport {
+		public DateTime Date { get; set; }
+		public string Id { get; set; }
+	}
+
+	public class CrashReportDto {
+		public double Date { get; set; }
+		public string Id { get; set; }
+
+		internal CrashReport ToCrashReport() => new() {
+			Date = DateTime.SpecifyKind(DateTime.UnixEpoch + TimeSpan.FromSeconds(this.Date), DateTimeKind.Utc),
+			Id = this.Id
+		};
+	}
+
 	public class CrashReporterStartOptions {
 		[JsonPropertyName("submitURL")]
 		public string SubmitUrl { get; set; }
@@ -1341,6 +1404,14 @@ namespace MZZT.ElectronNetCore.Api {
 		public Dictionary<string, string> Extra { get; set; }
 		public Dictionary<string, string> GlobalExtra { get; set; }
 	}
+
+	public class CreateFromBitmapOptions {
+		public int Width { get; set; } 
+		public int Height { get; set; }
+		public double ScaleFactor { get; set; } = 1;
+	}
+
+	public class CreateFromBufferOptions : CreateFromBitmapOptions { }
 
 	public class CreateInterruptedDownloadOptions {
 		public string Path { get; set; }
@@ -1389,6 +1460,30 @@ namespace MZZT.ElectronNetCore.Api {
 		public bool Stream { get; set; }
 	}
 
+	public class Data {
+		public string Text { get; set; }
+		public string Html { get; set; }
+		public NativeImage Image { get; set; }
+		public string Rtf { get; set; }
+		public string Bookmark { get; set; }
+
+		internal DataDto ToDataDto() => new() {
+			Text = this.Text,
+			Html = this.Html,
+			Image = this.Image?.InternalId ?? 0,
+			Rtf = this.Rtf,
+			Bookmark = this.Bookmark
+		};
+	}
+
+	public class DataDto {
+		public string Text { get; set; }
+		public string Html { get; set; }
+		public int Image { get; set; }
+		public string Rtf { get; set; }
+		public string Bookmark { get; set; }
+	}
+
 	public class DefaultFontFamily {
 		public string Standard { get; set; }
 		public string Serif { get; set; }
@@ -1396,6 +1491,31 @@ namespace MZZT.ElectronNetCore.Api {
 		public string Monospace { get; set; }
 		public string Cursive { get; set; }
 		public string Fantasy { get; set; }
+	}
+
+	public class DesktopCapturerSource {
+		public string Id { get; set; }
+		public string Name { get; set; }
+		public NativeImage Thumbnail { get; set; }
+		public string DisplayId { get; set; }
+		public NativeImage AppIcon { get; set; }
+	}
+
+	public class DesktopCapturerSourceDto {
+		public string Id { get; set; }
+		public string Name { get; set; }
+		public int Thumbnail { get; set; }
+		[JsonPropertyName("display_id")]
+		public string DisplayId { get; set; }
+		public int AppIcon { get; set; }
+
+		internal DesktopCapturerSource ToDesktopCapturerSource() => new() {
+			Id = this.Id,
+			Name = this.Name,
+			Thumbnail = ElectronDisposable.FromId<NativeImage>(this.Thumbnail),
+			DisplayId = this.DisplayId,
+			AppIcon = ElectronDisposable.FromId<NativeImage>(this.AppIcon)
+		};
 	}
 
 	public class DidCreateWindowDetails {
@@ -2454,6 +2574,11 @@ namespace MZZT.ElectronNetCore.Api {
 		public string[] Bookmarks { get; set; }
 	}
 
+	public class OpenExternalOptions {
+		public bool Activate { get; set; } = true;
+		public string WorkingDirectory { get; set; }
+	}
+
 	public class OverlayInfo {
 		public bool DirectComposition { get; set; }
 		public bool SupportsOverlays { get; set; }
@@ -2772,6 +2897,11 @@ namespace MZZT.ElectronNetCore.Api {
 		public Dictionary<string, string> Headers { get; set; }
 	}
 
+	public class ReadBookmark {
+		public string Title { get; set; }
+		public string Url { get; set; }
+	}
+
 	public class Rectangle {
 		public double X { get; set; }
 		public double Y { get; set; }
@@ -2820,6 +2950,12 @@ namespace MZZT.ElectronNetCore.Api {
 		public Certificate ValidatedCertificate { get; set; }
 		public string VerificationResult { get; set; }
 		public int ErrorCode { get; set; }
+	}
+
+	public class ResizeOptions {
+		public int? Width { get; set; }
+		public int? Height { get; set; }
+		public string Quality { get; set; } = ImageResizeQualities.Best;
 	}
 
 	public class Response {
@@ -2935,6 +3071,17 @@ namespace MZZT.ElectronNetCore.Api {
 		public string[] Urls { get; set; }
 	}
 
+	public class ShortcutDetails {
+		public string Target { get; set; }
+		public string Cwd { get; set; }
+		public string Args { get; set; }
+		public string Description { get; set; }
+		public string Icon { get; set; }
+		public int IconIndex { get; set; }
+		public string AppUserModelId { get; set; }
+		public string ToastActivatorClsId { get; set; }
+	}
+
 	public class Size {
 		public double Width { get; set; }
 		public double Height { get; set; }
@@ -2947,6 +3094,12 @@ namespace MZZT.ElectronNetCore.Api {
 			Width = x.Width,
 			Height = x.Height
 		};
+	}
+
+	public class SourcesOptions {
+		public string[] Types { get; set; }
+		public Size ThumbnailSize { get; set; } = new() { Width = 150, Height = 150 };
+		public bool FetchWindowIcons { get; set; }
 	}
 
 	public class SslConfigConfig {
@@ -3000,7 +3153,11 @@ namespace MZZT.ElectronNetCore.Api {
 		public string FontType { get; set; }
 	}
 
-	public class ToDataUrlOptions {
+	public class ToBitmapOptions : ToPngOptions { }
+
+	public class ToDataUrlOptions : ToPngOptions { }
+
+	public class ToPngOptions {
 		public double ScaleFactor { get; set; }
 	}
 

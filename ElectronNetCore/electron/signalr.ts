@@ -7,9 +7,12 @@ import { ElectronAppDock } from "./api/appDock";
 import { ElectronAutoUpdater } from "./api/autoUpdater";
 import { ElectronBrowserView } from "./api/browserView";
 import { ElectronBrowserWindow } from "./api/browserWindow";
+import { ElectronClipboard } from "./api/clipboard";
 import { ElectronContentTracing } from "./api/contentTracing";
 import { ElectronCookies } from "./api/cookies";
+import { ElectronCrashReporter } from "./api/crashReporter";
 import { ElectronDebugger } from "./api/debugger";
+import { ElectronDesktopCapturer } from "./api/desktopCapturer";
 import { ElectronDialog } from "./api/dialog";
 import { ElectronDownloadItem } from "./api/downloadItem";
 import { ElectronFunction } from "./api/function";
@@ -32,6 +35,7 @@ import { ElectronProtocol } from "./api/protocol";
 import { ElectronScreen } from "./api/screen";
 import { ElectronServiceWorkers } from "./api/serviceWorkers";
 import { ElectronSession } from "./api/session";
+import { ElectronShell } from "./api/shell";
 import { ElectronSystemPreferences } from "./api/systemPreferences";
 import { ElectronTouchBar } from "./api/touchBar";
 import { ElectronTouchBarButton } from "./api/touchBarButton";
@@ -77,9 +81,12 @@ export class SignalR {
 			ElectronAutoUpdater,
 			ElectronBrowserView,
 			ElectronBrowserWindow,
+			ElectronClipboard,
 			ElectronContentTracing,
 			ElectronCookies,
+			ElectronCrashReporter,
 			ElectronDebugger,
+			ElectronDesktopCapturer,
 			ElectronDialog,
 			ElectronDownloadItem,
 			ElectronFunction,
@@ -102,6 +109,7 @@ export class SignalR {
 			ElectronScreen,
 			ElectronServiceWorkers,
 			ElectronSession,
+			ElectronShell,
 			ElectronSystemPreferences,
 			ElectronTouchBar,
 			ElectronTouchBarButton,
