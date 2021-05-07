@@ -153,8 +153,6 @@ namespace Example {
 
 				BrowserWindow win = await this.CreateWindowAsync();
 			};
-
-			Task.Run(() => Electron.App.Name.SetAsync("Example"));
 		}
 
 		private string AppPath {

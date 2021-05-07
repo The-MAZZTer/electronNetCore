@@ -4,7 +4,7 @@ import { ElectronApi, SignalRApi } from "./api";
 let api: SignalRApi;
 export const ElectronNotification: ElectronApi = {
 	type: "Notification",
-	instanceOf: x => x?.constructor?.name === "Notification",
+	instanceOf: x => x instanceof Notification,
 	fromId: x => api.get<Notification>(x),
 	toId: (x: Notification) => api.store(x),
 	init: x => api = x,
@@ -15,7 +15,7 @@ export const ElectronNotification: ElectronApi = {
 		x.on("reply", (_, reply) => api.send("Reply_Event", id, reply));
 		x.on("action", (_, index) => api.send("Action_Event", id, index));
 		x.on("failed", (_, error) => api.send("Failed_Event", id, error));
-},
+	},
 	handlers: {
 		"IsSupported": (_: null) => Notification.isSupported(),
 		
