@@ -3,6 +3,8 @@ using System.Collections.Generic;
 
 namespace MZZT.ElectronNetCore {
 	public class LaunchElectronOptions {
+		public bool SingleInstance { get; set; } = true;
+		public string[] SecondInstanceArgv { get; set; }
 		public string[] ElectronCommandLineFlags { get; set; }
 		public Dictionary<string, string> ElectronEnvironment { get; set; }
 		public Dictionary<string, string> ChromiumCommandLineFlags { get; set; }

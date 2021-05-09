@@ -54,27 +54,7 @@ import { ElectronWebFrameMain } from "./api/webFrameMain";
 import { ElectronWebRequest } from "./api/webRequest";
 
 export class SignalR {
-	private nextGeneratedObjectId = 1;
-	private readonly objects: Record<number | string, any> = {};
-
-	private readonly types: ElectronApi[] = [];
-
-	private signalr: HubConnection;
-
-	public async start(url: string): Promise<void> {
-		const signalr = this.signalr = new HubConnectionBuilder()
-			.withAutomaticReconnect([0, 250, 500, null])
-			.withUrl(new URL("/electronnetcoreproxy", url).href)
-			.build();
-
-		signalr.onclose(e => {
-			console.error("Can't reconnect to ASP.NET Core!");
-			console.error(e);
-			app.quit();
-		});
-
-		signalr.on("DisposeObject", this.delete.bind(this));
-
+	constructor() {
 		this.types.push(
 			ElectronAppCommandLine,
 			ElectronAppDock,
@@ -137,6 +117,31 @@ export class SignalR {
 				get:  (...args) => this.get(...args),
 				delete:  (...args) => this.delete(...args)
 			});
+		}
+	}
+
+	private nextGeneratedObjectId = 1;
+	private readonly objects: Record<number | string, any> = {};
+
+	private readonly types: ElectronApi[] = [];
+
+	private signalr: HubConnection;
+
+	public async start(url: string): Promise<void> {
+		const signalr = this.signalr = new HubConnectionBuilder()
+			.withAutomaticReconnect([0, 250, 500, null])
+			.withUrl(new URL("/electronnetcoreproxy", url).href)
+			.build();
+
+		signalr.onclose(e => {
+			console.error("Can't reconnect to ASP.NET Core!");
+			console.error(e);
+			app.quit();
+		});
+
+		signalr.on("DisposeObject", this.delete.bind(this));
+
+		for (const type of this.types) {
 			for (let name in type.handlers) {
 				const handler = type.handlers[name];
 				signalr.on(`${type.type}_${name}`, async (...args: any[]) => {
@@ -183,7 +188,7 @@ export class SignalR {
 	}
 
 	private async invoke<T>(method: string, ...args: any[]): Promise<T> {
-		while (this.signalr.state !== HubConnectionState.Connected) {
+		while (!this.signalr || this.signalr.state !== HubConnectionState.Connected) {
 			await new Promise(resolve => setTimeout(resolve, 5));
 		}
 
@@ -191,7 +196,7 @@ export class SignalR {
 	}
 
 	private async send(method: string, ...args: any[]): Promise<void> {
-		while (this.signalr.state !== HubConnectionState.Connected) {
+		while (!this.signalr || this.signalr.state !== HubConnectionState.Connected) {
 			await new Promise(resolve => setTimeout(resolve, 5));
 		}
 

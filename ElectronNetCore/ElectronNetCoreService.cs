@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -15,20 +16,22 @@ using System.Threading.Tasks;
 
 namespace MZZT.ElectronNetCore {
 	internal class ElectronNetCoreService : IHostedService {
+		private Process electron;
+		private readonly ILogger<ElectronNetCoreService> logger;
+		private readonly IServer server;
+		private string tempFile;
 		internal static Uri BaseUri { get; private set; }
+		internal static LaunchElectronOptions options;
 
-		public ElectronNetCoreService(ILogger<ElectronNetCoreService> logger, ILoggerFactory logFactory) {
+		public ElectronNetCoreService(IServer server, ILogger<ElectronNetCoreService> logger,
+			ILoggerFactory logFactory) {
+
 			this.logger = logger;
+			this.server = server;
 			Electron.Log = logFactory.CreateLogger(typeof(Electron).FullName);
 		}
 
 		public Task StartAsync(CancellationToken cancellationToken) {
-			return Task.CompletedTask;
-		}
-
-		internal void LaunchElectron(IApplicationBuilder app, LaunchElectronOptions options = null) {
-			IServerAddressesFeature serverAddressesFeature = app.ServerFeatures.Get<IServerAddressesFeature>();
-
 			string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "electron");
 			this.electron = new Process();
 			this.electron.StartInfo.FileName = Path.Combine(path, "node_modules", ".bin", "electron");
@@ -36,8 +39,9 @@ namespace MZZT.ElectronNetCore {
 				this.electron.StartInfo.FileName += ".cmd";
 			}
 			this.electron.StartInfo.CreateNoWindow = true;
-			this.electron.StartInfo.RedirectStandardError = true;
+			//this.electron.StartInfo.RedirectStandardInput = true;
 			this.electron.StartInfo.RedirectStandardOutput = true;
+			this.electron.StartInfo.RedirectStandardError = true;
 			this.electron.StartInfo.UseShellExecute = false;
 			this.electron.StartInfo.WorkingDirectory = path;
 
@@ -47,25 +51,67 @@ namespace MZZT.ElectronNetCore {
 				}
 			}
 
-			if (options?.ElectronCommandLineFlags != null ) {
+			if (options?.ElectronCommandLineFlags != null) {
 				foreach (string arg in options.ElectronCommandLineFlags) {
 					this.electron.StartInfo.ArgumentList.Add(arg);
 				}
 			}
 
 			this.electron.StartInfo.ArgumentList.Add("--");
-
 			this.electron.StartInfo.ArgumentList.Add(path);
 
-			Regex urlRegex = new(@"^(https?):\/\/(.*?)(:(\d+))?$", RegexOptions.IgnoreCase);
+			this.tempFile = Path.GetTempFileName();
+
+			this.electron.StartInfo.ArgumentList.Add(this.tempFile);
+
+			if (options == null) {
+				options = new();
+			}
+
+			options.ElectronEnvironment = null;
+			options.ElectronCommandLineFlags = null;
+			string[] argv = options.SecondInstanceArgv;
+			options.SecondInstanceArgv = null;
+			if (options.InitScriptPath != null) {
+				options.InitScriptPath = Path.Combine("..", options.InitScriptPath);
+			}
+
+			this.electron.StartInfo.ArgumentList.Add(JsonSerializer.Serialize(options, new() {
+				PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+			}));
+
+			this.electron.StartInfo.ArgumentList.Add("--");
+
+			if (argv != null) {
+				foreach (string arg in argv) {
+					this.electron.StartInfo.ArgumentList.Add(arg);
+				}
+			}
+
+			this.electron.ErrorDataReceived += this.Electron_ErrorDataReceived;
+			this.electron.OutputDataReceived += this.Electron_OutputDataReceived;
+			this.electron.Exited += this.Electron_Exited;
+			this.electron.EnableRaisingEvents = true;
+			this.electron.Start();
+			this.electron.BeginErrorReadLine();
+			this.electron.BeginOutputReadLine();
+			//this.electron.StandardInput.AutoFlush = true;
+
+			if (this.electron.HasExited) {
+				this.Electron_Exited(this.electron, new EventArgs());
+			}
 
 			Task.Run(async () => {
+				Regex urlRegex = new(@"^(https?):\/\/(.*?)(:(\d+))?$", RegexOptions.IgnoreCase);
+				IServerAddressesFeature serverAddressesFeature = this.server.Features.Get<IServerAddressesFeature>();
+
 				string scheme = "http";
 				int port = 0;
 				while (port == 0) {
 					Match match = serverAddressesFeature.Addresses.Select(x => urlRegex.Match(x)).FirstOrDefault(x => x.Success);
 					if (match == null) {
-						throw new InvalidOperationException("Can't find a bound port for ASP.NET Core!");
+						await Task.Delay(250);
+						continue;
 					}
 					scheme = match.Groups[1].Value;
 					if (!match.Groups[4].Success) {
@@ -85,32 +131,14 @@ namespace MZZT.ElectronNetCore {
 				} else {
 					address = $"{scheme}://127.0.0.1:{port}";
 				}
+
 				BaseUri = new Uri(address);
-				this.electron.StartInfo.ArgumentList.Add(address);
 
-				if (options != null) {
-					if (options.InitScriptPath != null) {
-						options.ElectronEnvironment = null;
-						options.ElectronCommandLineFlags = null;
-						options.InitScriptPath = Path.Combine("..", options.InitScriptPath);
-					}
-					this.electron.StartInfo.ArgumentList.Add(JsonSerializer.Serialize(options, new() {
-						PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-					}));
-				}
-
-				this.electron.ErrorDataReceived += this.Electron_ErrorDataReceived;
-				this.electron.OutputDataReceived += this.Electron_OutputDataReceived;
-				this.electron.Exited += this.Electron_Exited;
-				this.electron.EnableRaisingEvents = true;
-				this.electron.Start();
-				this.electron.BeginErrorReadLine();
-				this.electron.BeginOutputReadLine();
-
-				if (this.electron.HasExited) {
-					this.Electron_Exited(this.electron, new EventArgs());
-				}
+				using FileStream stream = new(this.tempFile, FileMode.Create, FileAccess.Write, FileShare.None);
+				await stream.WriteAsync(Encoding.UTF8.GetBytes(address));
 			});
+
+			return Task.CompletedTask;
 		}
 
 		private void Electron_OutputDataReceived(object sender, DataReceivedEventArgs e) {
@@ -131,11 +159,12 @@ namespace MZZT.ElectronNetCore {
 		}
 
 		private void Electron_Exited(object sender, EventArgs e) {
+			if (this.tempFile != null && File.Exists(this.tempFile)) {
+				File.Delete(this.tempFile);
+			}
+
 			Electron.OnProcessExited(this.electron.ExitCode);
 		}
-
-		private Process electron;
-		private readonly ILogger<ElectronNetCoreService> logger;
 
 		public Task StopAsync(CancellationToken cancellationToken) {
 			if (this.electron != null) {

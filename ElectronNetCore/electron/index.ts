@@ -1,8 +1,14 @@
-﻿import { app, crashReporter, CrashReporterStartOptions, CustomScheme, protocol } from "electron";
+﻿import fs from "fs/promises";
 import process from "process";
+import { app, crashReporter, CrashReporterStartOptions, CustomScheme, protocol } from "electron";
 import { SignalR } from "./signalr";
 
+const delay = (time: number): Promise<void> => 
+  new Promise(resolve => setTimeout(resolve, time));
+
 type LaunchElectronOptions = {
+  singleInstance?: boolean;
+  secondInstanceArgv?: string[],
 	chromiumCommandLineFlags?: Record<string, string>;
 	paths?: Record<string, string>;
 	hardwareAcceleration?: boolean;
@@ -31,8 +37,8 @@ class ElectronNetCoreProxy {
 
   public static async main(argv: string[]): Promise<void> {
     const args = this.getArgs(argv);
-    const url = args[0];
-    if (!url) {
+    const urlFile = args[0];
+    if (!urlFile) {
       console.log("This component is part of a larger application, please do not run it directly.");
       app.quit();
       return;
@@ -54,6 +60,12 @@ class ElectronNetCoreProxy {
         for (const name in init.paths) {
           const value = init.paths[name];
           app.setPath(name, value);
+        }
+      }
+      if (init.singleInstance) {
+        if (!app.requestSingleInstanceLock()) {
+          app.quit();
+          return;
         }
       }
       if (init.hardwareAcceleration === false) {
@@ -83,8 +95,26 @@ class ElectronNetCoreProxy {
         }
       }
     }
-    
+
     this.signalR = new SignalR();
+
+    while (!(await fs.stat(urlFile)).size) {
+      await delay(25);
+    }
+
+    let url: string = null;
+    while (!url) {
+      try {
+        url = await fs.readFile(urlFile, { encoding: "utf-8", flag: "r"});
+        await fs.unlink(urlFile);
+      } catch {
+      }  
+
+      if (!url) {
+        await delay(25);
+      }
+    }
+    
     await this.signalR.start(url);
   }
 }
