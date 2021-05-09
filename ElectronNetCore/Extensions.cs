@@ -7,7 +7,7 @@ namespace Microsoft.AspNetCore.Hosting {
 	public static class ElectronNetCoreBuilderExtensions {
 		public static IWebHostBuilder UseElectron(this IWebHostBuilder builder, LaunchElectronOptions options = null) =>
 			builder.ConfigureServices(services => {
-				ElectronNetCoreService.options = options;
+				ElectronNetCoreService.options = options ?? new LaunchElectronOptions();
 				services.AddHostedService<ElectronNetCoreService>();
 				services.AddTransient<IStartupFilter, ElectronStartupFilter>();
 			});
@@ -18,7 +18,7 @@ namespace Microsoft.AspNetCore.Hosting {
 			builder => {
 				builder.UseRouting();
 				builder.UseEndpoints(endpoints => {
-					endpoints.MapHub<ElectronHub>("/electronnetcoreproxy", options => {
+					endpoints.MapHub<ElectronHub>(ElectronNetCoreService.options.SignalRHubPath, options => {
 						options.ApplicationMaxBufferSize = 0;
 						options.TransportMaxBufferSize = 0;
 					});

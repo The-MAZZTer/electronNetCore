@@ -64,24 +64,13 @@ namespace MZZT.ElectronNetCore {
 
 			this.electron.StartInfo.ArgumentList.Add(this.tempFile);
 
-			if (options == null) {
-				options = new();
-			}
-
-			options.ElectronEnvironment = null;
-			options.ElectronCommandLineFlags = null;
-			string[] argv = options.SecondInstanceArgv;
-			options.SecondInstanceArgv = null;
-			if (options.InitScriptPath != null) {
-				options.InitScriptPath = Path.Combine("..", options.InitScriptPath);
-			}
-
-			this.electron.StartInfo.ArgumentList.Add(JsonSerializer.Serialize(options, new() {
+			this.electron.StartInfo.ArgumentList.Add(JsonSerializer.Serialize(options.ToElectronArgs(), new() {
 				PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
 			}));
 
 			this.electron.StartInfo.ArgumentList.Add("--");
 
+			string[] argv = options.SecondInstanceArgv;
 			if (argv != null) {
 				foreach (string arg in argv) {
 					this.electron.StartInfo.ArgumentList.Add(arg);
@@ -134,8 +123,13 @@ namespace MZZT.ElectronNetCore {
 
 				BaseUri = new Uri(address);
 
+				string hubPath = options.SignalRHubPath;
+				if (!hubPath.StartsWith('/')) {
+					hubPath = $"/{hubPath}";
+				}
+
 				using FileStream stream = new(this.tempFile, FileMode.Create, FileAccess.Write, FileShare.None);
-				await stream.WriteAsync(Encoding.UTF8.GetBytes(address));
+				await stream.WriteAsync(Encoding.UTF8.GetBytes($"{address}{hubPath}"));
 			});
 
 			return Task.CompletedTask;

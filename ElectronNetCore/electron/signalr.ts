@@ -127,10 +127,10 @@ export class SignalR {
 
 	private signalr: HubConnection;
 
-	public async start(url: string): Promise<void> {
+	public async start(url: string): Promise<boolean> {
 		const signalr = this.signalr = new HubConnectionBuilder()
 			.withAutomaticReconnect([0, 250, 500, null])
-			.withUrl(new URL("/electronnetcoreproxy", url).href)
+			.withUrl(url)
 			.build();
 
 		signalr.onclose(e => {
@@ -184,7 +184,10 @@ export class SignalR {
 			console.error("Can't connect to ASP.NET Core!");
 			console.error(e);
 			app.quit();
+			return false;
 		}
+
+		return signalr.state === HubConnectionState.Connected;
 	}
 
 	private async invoke<T>(method: string, ...args: any[]): Promise<T> {

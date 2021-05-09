@@ -117,10 +117,6 @@ namespace Example {
 
 				await Electron.App.Name.SetAsync("Example");
 				await Electron.App.SetAppUserModelIdAsync("Example");
-				if (!await Electron.App.RequestSingleInstanceLockAsync()) {
-					Environment.Exit(0);
-					return;
-				}
 
 				await Electron.IpcMain.OnAsync("maximize", async e => {
 					WebContents contents = e.Sender;

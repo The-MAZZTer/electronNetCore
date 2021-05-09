@@ -8,7 +8,6 @@ const delay = (time: number): Promise<void> =>
 
 type LaunchElectronOptions = {
   singleInstance?: boolean;
-  secondInstanceArgv?: string[],
 	chromiumCommandLineFlags?: Record<string, string>;
 	paths?: Record<string, string>;
 	hardwareAcceleration?: boolean;
@@ -19,10 +18,17 @@ type LaunchElectronOptions = {
 	initScriptPath?: string
 };
 
+type UserInit = {
+  init?(): void;
+  onSignalRConnect?(): void;
+};
+
 class ElectronNetCoreProxy {
   private constructor() {}
 
   private static signalR: SignalR;
+
+  private static user: UserInit;
 
   private static getArgs(args: string[]): string[] {
     for (let i = 1; i < args.length; i++) {
@@ -84,14 +90,13 @@ class ElectronNetCoreProxy {
         crashReporter.start(init.crashReporterOptions);
       }
       if (init.initScriptPath) {
-        type UserInit = {
-          init(): void;
-        };
-        let user: UserInit = require(init.initScriptPath);
-        try {
-          user.init();
-        } catch (e) {
-          console.error(e);
+        this.user = require(init.initScriptPath);
+        if (this.user.init) {
+          try {
+            this.user.init();
+          } catch (e) {
+            console.error(e);
+          }  
         }
       }
     }
@@ -115,7 +120,15 @@ class ElectronNetCoreProxy {
       }
     }
     
-    await this.signalR.start(url);
+    if (await this.signalR.start(url)) {
+      if (this.user?.onSignalRConnect) {
+        try {
+          this.user.onSignalRConnect();
+        } catch (e) {
+          console.error(e);
+        }  
+      }
+    }
   }
 }
 
