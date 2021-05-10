@@ -162,17 +162,17 @@ namespace MZZT.ElectronNetCore {
 		}
 
 		public Task StopAsync(CancellationToken cancellationToken) {
-			if (this.tempFile != null && File.Exists(this.tempFile)) {
-				File.Delete(this.tempFile);
-			}
-			this.tempFile = null;
-
 			if (this.electron != null) {
 				this.electron.EnableRaisingEvents = false;
 				if (!this.electron.HasExited) {
 					this.electron.Kill();
 				}
 			}
+
+			if (this.tempFile != null && File.Exists(this.tempFile)) {
+				File.Delete(this.tempFile);
+			}
+			this.tempFile = null;
 
 			return Task.CompletedTask;
 		}
