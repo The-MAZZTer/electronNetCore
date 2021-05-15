@@ -4,6 +4,7 @@ using System.IO;
 
 namespace MZZT.ElectronNetCore {
 	public class LaunchElectronOptions {
+		public string ElectronFolder { get; set; } = "electron";
 		public string[] ElectronCommandLineFlags { get; set; }
 		public Dictionary<string, string> ElectronEnvironment { get; set; }
 		public string[] SecondInstanceArgv { get; set; }

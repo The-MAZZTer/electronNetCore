@@ -90,14 +90,18 @@ class ElectronNetCoreProxy {
         crashReporter.start(init.crashReporterOptions);
       }
       if (init.initScriptPath) {
-        this.user = require(init.initScriptPath);
-        if (this.user.init) {
-          try {
-            this.user.init();
-          } catch (e) {
-            console.error(e);
-          }  
-        }
+        try {
+          this.user = require(init.initScriptPath);
+          if (this.user.init) {
+            try {
+              this.user.init();
+            } catch (e) {
+              console.error(e);
+            }  
+          }
+        } catch (e) {
+          console.error(e);
+        }  
       }
     }
 

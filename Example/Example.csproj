@@ -11,5 +11,11 @@
 		<ProjectReference Include="..\ElectronNetCore\ElectronNetCore.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <None Update="user.js">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
+
 
 </Project>

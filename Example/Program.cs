@@ -240,16 +240,17 @@ namespace Example {
 
 		public static IHostBuilder CreateHostBuilder(string[] args) =>
 			Host.CreateDefaultBuilder(args)
-				.ConfigureWebHostDefaults(webBuilder => {
-					webBuilder.UseElectron(new() {
+				.ConfigureWebHostDefaults(webBuilder => webBuilder
+					.UseElectron(new() {
 						SingleInstance = true,
 						SecondInstanceArgv = args,
 						Paths = new() {
 							[Paths.UserData] = Path.Combine(AppContext.BaseDirectory, "profile")
-						}
-					});
-					webBuilder.UseUrls("http://127.0.0.1:0");
-					webBuilder.UseStartup<Startup>();
-				});
+						},
+						InitScriptPath = Path.Combine(AppContext.BaseDirectory, "user.js")
+					})
+					.UseUrls("http://127.0.0.1:0")
+					.UseStartup<Startup>()
+				);
 	}
 }

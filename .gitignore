@@ -350,3 +350,5 @@ MigrationBackup/
 .ionide/
 *.js
 *.map
+
+ElectronNetCore/electron/out

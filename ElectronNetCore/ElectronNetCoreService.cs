@@ -32,11 +32,19 @@ namespace MZZT.ElectronNetCore {
 		}
 
 		public Task StartAsync(CancellationToken cancellationToken) {
-			string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "electron");
+			string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, options?.ElectronFolder ?? "electron");
 			this.electron = new Process();
+#if DEBUG
 			this.electron.StartInfo.FileName = Path.Combine(path, "node_modules", ".bin", "electron");
+#else
+			this.electron.StartInfo.FileName = Path.Combine(path, "electronnetcoreproxy");
+#endif
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
+#if DEBUG
 				this.electron.StartInfo.FileName += ".cmd";
+#else
+				this.electron.StartInfo.FileName += ".exe";
+#endif
 			}
 			this.electron.StartInfo.CreateNoWindow = true;
 			//this.electron.StartInfo.RedirectStandardInput = true;
