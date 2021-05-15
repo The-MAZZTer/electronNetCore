@@ -151,7 +151,9 @@ namespace Example {
 					}
 				});
 
-				Tray tray = Program.tray = await Tray.CreateAsync(@"C:\Windows\WebManagement\www\default\favicon.ico");
+				await Menu.SetApplicationMenuAsync(null);
+
+				Tray tray = await Tray.CreateAsync(@"C:\Windows\WebManagement\www\default\favicon.ico");
 				tray.DoubleClick += async (sender, e) => {
 					await CreateWindowAsync();
 				};
@@ -208,8 +210,6 @@ namespace Example {
 			CreateHostBuilder(args).Build().Run();
 		}
 
-		private static Tray tray;
-
 		private static string AppPath {
 			get {
 				string path = Assembly.GetEntryAssembly().Location;
@@ -227,6 +227,7 @@ namespace Example {
 			BrowserWindow win = await BrowserWindow.CreateAsync(new() {
 				Width = 1280,
 				Height = 720,
+				UseContentSize = true,
 				Frame = false,
 				WebPreferences = new() {
 					NodeIntegration = true,

@@ -15,7 +15,8 @@ export const ElectronMenu: ElectronApi = {
 	handlers: {
 		"Ctor": (_: null) => new Menu(),
 
-		"SetApplicationMenu": (_ : null, menu: number) => Menu.setApplicationMenu(api.get<Menu>(menu)),
+		// setApplicationMenu returns a useless value, ignore.
+		"SetApplicationMenu": (_ : null, menu: number) => { Menu.setApplicationMenu(api.get<Menu>(menu)) },
 		"GetApplicationMenu": (_ : null) => Menu.getApplicationMenu(),
 		"SendActionToFirstResponder": (_: null, action) => Menu.sendActionToFirstResponder(action),
 		"BuildFromTemplate": (_: null, template: (MenuItemConstructorOptions | number)[]) => {
