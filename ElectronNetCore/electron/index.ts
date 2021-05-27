@@ -111,6 +111,12 @@ class ElectronNetCoreProxy {
 
     while (!(await fs.stat(urlFile)).size) {
       await delay(25);
+
+      if (new Date().valueOf() - start.valueOf() > 5000) {
+        console.log(`Timed out, aborting!`);
+        app.quit();
+        return;
+      }
     }
 
     let url: string = null;
@@ -123,6 +129,12 @@ class ElectronNetCoreProxy {
 
       if (!url) {
         await delay(25);
+
+        if (new Date().valueOf() - start.valueOf() > 5000) {
+          console.log(`Timed out, aborting!`);
+          app.quit();
+          return;
+        }
       }
     }
 
