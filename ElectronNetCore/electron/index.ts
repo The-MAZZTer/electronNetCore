@@ -107,6 +107,8 @@ class ElectronNetCoreProxy {
 
     this.signalR = new SignalR();
 
+    const start = new Date();
+
     while (!(await fs.stat(urlFile)).size) {
       await delay(25);
     }
@@ -123,6 +125,8 @@ class ElectronNetCoreProxy {
         await delay(25);
       }
     }
+
+    console.log(`Waited ${new Date().valueOf() - start.valueOf()}ms for connection URL.`);
     
     if (await this.signalR.start(url)) {
       if (this.user?.onSignalRConnect) {
