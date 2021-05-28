@@ -176,7 +176,21 @@ namespace Example {
 								Title = "Title",
 								Body = "Body"
 							});
+							notification.Show += async (sender, e) => {
+								Console.WriteLine($"Notification Shown");
+							};
+							notification.Click += async (sender, e) => {
+								Console.WriteLine("Notification Clicked");
+								await notification.DisposeAsync();
+							};
+							notification.Action += async (sender, e) => {
+								Console.WriteLine($"Notification Action {e.Index}");
+							};
+							notification.Failed += async (sender, e) => {
+								Console.WriteLine($"Notification Failed");
+							};
 							notification.Close += async (sender, e) => {
+								Console.WriteLine("Notification Closed");
 								await notification.DisposeAsync();
 							};
 							await notification.ShowAsync();
