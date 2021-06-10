@@ -216,7 +216,7 @@ namespace MZZT.ElectronNetCore {
 			WebContents.FromId(id)?.OnDidChangeThemeColor(color) ?? Task.CompletedTask;
 		public Task WebContents_UpdateTargetUrl_Event(int id, string url) =>
 			WebContents.FromId(id)?.OnUpdateTargetUrl(url) ?? Task.CompletedTask;
-		public Task WebContents_CursorChanged_Event(int id, string type, int image, double scale, Size size, Point hotspot) =>
+		public Task WebContents_CursorChanged_Event(int id, string type, int image, double? scale, Size size, Point hotspot) =>
 			WebContents.FromId(id)?.OnCursorChanged(type, ElectronDisposable.FromId<NativeImage>(image), scale, size, hotspot) ?? Task.CompletedTask;
 		public Task WebContents_ContextMenu_Event(int id, ContextMenuParams @params) =>
 			WebContents.FromId(id)?.OnContextMenu(@params) ?? Task.CompletedTask;
@@ -552,7 +552,7 @@ namespace MZZT.ElectronNetCore.Api {
 		}
 
 		public event EventHandler<WebContentsCursorChangedEventArgs> CursorChanged;
-		internal Task OnCursorChanged(string type, NativeImage image, double scale, Size size, Point hotspot) {
+		internal Task OnCursorChanged(string type, NativeImage image, double? scale, Size size, Point hotspot) {
 			this.CursorChanged?.Invoke(this, new(type, image, scale, size, hotspot));
 			return Task.CompletedTask;
 		}

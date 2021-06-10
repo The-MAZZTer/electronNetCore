@@ -556,7 +556,7 @@ namespace MZZT.ElectronNetCore.Api {
 	}
 
 	public class WebContentsCursorChangedEventArgs : EventArgs {
-		public WebContentsCursorChangedEventArgs(string type, NativeImage image, double scale, Size size, Point hotspot) : base() {
+		public WebContentsCursorChangedEventArgs(string type, NativeImage image, double? scale, Size size, Point hotspot) : base() {
 			this.Type = type;
 			this.Image = image;
 			this.Scale = scale;
@@ -566,7 +566,7 @@ namespace MZZT.ElectronNetCore.Api {
 
 		public string Type { get; }
 		public NativeImage Image { get; }
-		public double Scale { get; }
+		public double? Scale { get; }
 		public Size Size { get; }
 		public Point Hotspot { get; }
 	}

@@ -1045,7 +1045,7 @@ namespace MZZT.ElectronNetCore.Api {
 		public bool Resizable { get; set; } = true;
 		public bool Movable { get; set; } = true;
 		public bool Minimizable { get; set; } = true;
-		public bool Mazimizable { get; set; } = true;
+		public bool Maximizable { get; set; } = true;
 		public bool Closable { get; set; } = true;
 		public bool Focusable { get; set; } = true;
 		public bool AlwaysOnTop { get; set; }
@@ -1097,7 +1097,7 @@ namespace MZZT.ElectronNetCore.Api {
 			Resizable = this.Resizable,
 			Movable = this.Movable,
 			Minimizable = this.Minimizable,
-			Mazimizable = this.Mazimizable,
+			Maximizable = this.Maximizable,
 			Closable = this.Closable,
 			Focusable = this.Focusable,
 			AlwaysOnTop = this.AlwaysOnTop,
@@ -1151,7 +1151,7 @@ namespace MZZT.ElectronNetCore.Api {
 		public bool Resizable { get; set; } = true;
 		public bool Movable { get; set; } = true;
 		public bool Minimizable { get; set; } = true;
-		public bool Mazimizable { get; set; } = true;
+		public bool Maximizable { get; set; } = true;
 		public bool Closable { get; set; } = true;
 		public bool Focusable { get; set; } = true;
 		public bool AlwaysOnTop { get; set; }
@@ -1203,7 +1203,7 @@ namespace MZZT.ElectronNetCore.Api {
 			Resizable = this.Resizable,
 			Movable = this.Movable,
 			Minimizable = this.Minimizable,
-			Mazimizable = this.Mazimizable,
+			Maximizable = this.Maximizable,
 			Closable = this.Closable,
 			Focusable = this.Focusable,
 			AlwaysOnTop = this.AlwaysOnTop,

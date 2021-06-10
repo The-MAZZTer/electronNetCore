@@ -172,26 +172,25 @@ namespace Example {
 						Label = "Test notification",
 						Click = async (e, win, contents) => {
 							Notification notification = await Notification.CreateAsync(new() {
-								IconPath = @"C:\Windows\WebManagement\www\default\favicon.ico",
+								/*IconPath = @"C:\Windows\WebManagement\www\default\favicon.ico",
 								Title = "Title",
-								Body = "Body"
+								Body = "Body"*/
+								ToastXml = "<toast launch=\"test\" duration=\"long\"><visual><binding template=\"ToastImageAndText01\"><image id=\"1\" src=\"file:///C:/Windows/WebManagement/www/default/favicon.ico\" /><text id=\"1\">TEST</text></binding></visual></toast>"
 							});
-							notification.Show += async (sender, e) => {
+							notification.Show += (sender, e) => {
 								Console.WriteLine($"Notification Shown");
 							};
-							notification.Click += async (sender, e) => {
+							notification.Click += (sender, e) => {
 								Console.WriteLine("Notification Clicked");
-								await notification.DisposeAsync();
 							};
-							notification.Action += async (sender, e) => {
+							notification.Action += (sender, e) => {
 								Console.WriteLine($"Notification Action {e.Index}");
 							};
-							notification.Failed += async (sender, e) => {
-								Console.WriteLine($"Notification Failed");
+							notification.Failed += (sender, e) => {
+								Console.WriteLine($"Notification Failed ({e.Error})");
 							};
-							notification.Close += async (sender, e) => {
+							notification.Close += (sender, e) => {
 								Console.WriteLine("Notification Closed");
-								await notification.DisposeAsync();
 							};
 							await notification.ShowAsync();
 						}
