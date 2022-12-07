@@ -151,7 +151,7 @@ namespace Example {
 					}
 				});
 
-				await Menu.SetApplicationMenuAsync(null);
+				//await Menu.SetApplicationMenuAsync(null);
 
 				Tray tray = await Tray.CreateAsync(@"C:\Windows\WebManagement\www\default\favicon.ico");
 				tray.DoubleClick += async (sender, e) => {
@@ -247,20 +247,24 @@ namespace Example {
 					ContextIsolation = false
 				}
 			});
-			await win.LoadUrlAsync("/");
+			WebContents contents = await win.WebContents.GetAsync();
+			_ = Task.Run(async () => {
+				await win.LoadUrlAsync("/");
+			});
+			await contents.ExecuteJavascriptAsync("window.opener = \'!\'; alert('Inject')");
 			return win;
 		}
 
 		public static IHostBuilder CreateHostBuilder(string[] args) =>
 			Host.CreateDefaultBuilder(args)
 				.ConfigureWebHostDefaults(webBuilder => webBuilder
-					.UseElectron(new() {
-						SingleInstance = true,
-						SecondInstanceArgv = args,
-						Paths = new() {
+					.UseElectron(options => {
+						options.SingleInstance = true;
+						options.SecondInstanceArgv = args;
+						options.Paths = new() {
 							[Paths.UserData] = Path.Combine(AppContext.BaseDirectory, "profile")
-						},
-						InitScriptPath = Path.Combine(AppContext.BaseDirectory, "user.js")
+						};
+						options.InitScriptPath = Path.Combine(AppContext.BaseDirectory, "user.js");
 					})
 					.UseUrls("http://127.0.0.1:0")
 					.UseStartup<Startup>()

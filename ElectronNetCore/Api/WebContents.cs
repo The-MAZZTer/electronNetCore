@@ -230,6 +230,7 @@ namespace MZZT.ElectronNetCore {
 			WebContents.FromId(id)?.OnWillAttachWebview(webPreferences?.ToWebPreferences(), @params) ?? Task.CompletedTask;
 		public Task WebContents_DidAttachWebview_Event(int id, int webContents) =>
 			WebContents.FromId(id)?.OnDidAttachWebview(WebContents.FromId(webContents)) ?? Task.CompletedTask;
+		// TODO Json decode error here (one of the ints is wrong type)
 		public Task WebContents_ConsoleMessage_Event(int id, int level, string message, int line, string sourceId) =>
 			WebContents.FromId(id)?.OnConsoleMessage(level, message, line, sourceId) ?? Task.CompletedTask;
 		public Task WebContents_PreloadError_Event(int id, string preloadPath, Error error) =>

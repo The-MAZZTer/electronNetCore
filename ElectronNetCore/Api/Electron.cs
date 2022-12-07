@@ -83,19 +83,19 @@ namespace MZZT.ElectronNetCore.Api {
 
 			Type type = typeof(T);
 			if (type == typeof(BrowserWindow)) {
-				int id = (int)JsonSerializer.Deserialize(json, typeof(int), new() {
+				int id = (int)JsonSerializer.Deserialize(json, typeof(int), new JsonSerializerOptions() {
 					PropertyNameCaseInsensitive = true,
 					PropertyNamingPolicy = JsonNamingPolicy.CamelCase
 				});
 				return (T)(object)BrowserWindow.FromId(id);
 			} else if (type == typeof(WebContents)) {
-				int id = (int)JsonSerializer.Deserialize(json, typeof(int), new() {
+				int id = (int)JsonSerializer.Deserialize(json, typeof(int), new JsonSerializerOptions() {
 					PropertyNameCaseInsensitive = true,
 					PropertyNamingPolicy = JsonNamingPolicy.CamelCase
 				});
 				return (T)(object)WebContents.FromId(id);
 			} else if (type == typeof(WebFrameMain)) {
-				WebFrameMainId id = (WebFrameMainId)JsonSerializer.Deserialize(json, typeof(WebFrameMainId), new() {
+				WebFrameMainId id = (WebFrameMainId)JsonSerializer.Deserialize(json, typeof(WebFrameMainId), new JsonSerializerOptions() {
 					PropertyNameCaseInsensitive = true,
 					PropertyNamingPolicy = JsonNamingPolicy.CamelCase
 				});
@@ -108,7 +108,7 @@ namespace MZZT.ElectronNetCore.Api {
 			Type electronType = type;
 			while (electronType != null) {
 				if (electronType.IsConstructedGenericType && electronType.GetGenericTypeDefinition() == typeof(ElectronDisposable<>)) {
-					int id = (int)JsonSerializer.Deserialize(json, typeof(int), new() {
+					int id = (int)JsonSerializer.Deserialize(json, typeof(int), new JsonSerializerOptions() {
 						PropertyNameCaseInsensitive = true,
 						PropertyNamingPolicy = JsonNamingPolicy.CamelCase
 					});
@@ -118,14 +118,14 @@ namespace MZZT.ElectronNetCore.Api {
 			}
 			
 			if (typeof(ElectronDisposable).IsAssignableFrom(type)) {
-				int id = (int)JsonSerializer.Deserialize(json, typeof(int), new() {
+				int id = (int)JsonSerializer.Deserialize(json, typeof(int), new JsonSerializerOptions() {
 					PropertyNameCaseInsensitive = true,
 					PropertyNamingPolicy = JsonNamingPolicy.CamelCase
 				});
 				return (T)ElectronDisposable.FromId(typeof(T), id);
 			}
 
-			return (T)JsonSerializer.Deserialize(json, type, new() {
+			return (T)JsonSerializer.Deserialize(json, type, new JsonSerializerOptions() {
 				PropertyNameCaseInsensitive = true,
 				PropertyNamingPolicy = JsonNamingPolicy.CamelCase
 			});

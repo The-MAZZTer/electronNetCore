@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MZZT.ElectronNetCore.Api;
 using System;
 using System.Diagnostics;
@@ -18,21 +19,23 @@ namespace MZZT.ElectronNetCore {
 	internal class ElectronNetCoreService : IHostedService {
 		private Process electron;
 		private readonly ILogger<ElectronNetCoreService> logger;
+		private readonly IOptions<LaunchElectronOptions> options;
 		private readonly IServer server;
 		private string tempFile;
 		internal static Uri BaseUri { get; private set; }
-		internal static LaunchElectronOptions options;
 
 		public ElectronNetCoreService(IServer server, ILogger<ElectronNetCoreService> logger,
-			ILoggerFactory logFactory) {
+			ILoggerFactory logFactory, IOptions<LaunchElectronOptions> options) {
 
 			this.logger = logger;
+			this.options = options;
 			this.server = server;
 			Electron.Log = logFactory.CreateLogger(typeof(Electron).FullName);
 		}
 
+
 		public Task StartAsync(CancellationToken cancellationToken) {
-			string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, options?.ElectronFolder ?? "electron");
+			string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, this.options.Value.ElectronFolder);
 			this.electron = new Process();
 			this.electron.StartInfo.FileName = Path.Combine(path, "electronnetcoreproxy");
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
@@ -54,14 +57,14 @@ namespace MZZT.ElectronNetCore {
 			this.electron.StartInfo.UseShellExecute = false;
 			this.electron.StartInfo.WorkingDirectory = path;
 
-			if (options?.ElectronEnvironment != null) {
-				foreach ((string key, string value) in options.ElectronEnvironment) {
+			if (this.options.Value.ElectronEnvironment != null) {
+				foreach ((string key, string value) in this.options.Value.ElectronEnvironment) {
 					this.electron.StartInfo.EnvironmentVariables[key] = value;
 				}
 			}
 
-			if (options?.ElectronCommandLineFlags != null) {
-				foreach (string arg in options.ElectronCommandLineFlags) {
+			if (this.options.Value.ElectronCommandLineFlags != null) {
+				foreach (string arg in this.options.Value.ElectronCommandLineFlags) {
 					this.electron.StartInfo.ArgumentList.Add(arg);
 				}
 			}
@@ -73,13 +76,13 @@ namespace MZZT.ElectronNetCore {
 
 			this.electron.StartInfo.ArgumentList.Add(this.tempFile);
 
-			this.electron.StartInfo.ArgumentList.Add(JsonSerializer.Serialize(options.ToElectronArgs(), new() {
+			this.electron.StartInfo.ArgumentList.Add(JsonSerializer.Serialize(this.options.Value.ToElectronArgs(), new JsonSerializerOptions() {
 				PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
 			}));
 
 			this.electron.StartInfo.ArgumentList.Add("--");
 
-			string[] argv = options.SecondInstanceArgv;
+			string[] argv = this.options.Value.SecondInstanceArgv;
 			if (argv != null) {
 				foreach (string arg in argv) {
 					this.electron.StartInfo.ArgumentList.Add(arg);
@@ -132,7 +135,7 @@ namespace MZZT.ElectronNetCore {
 
 				BaseUri = new Uri(address);
 
-				string hubPath = options.SignalRHubPath;
+				string hubPath = this.options.Value.SignalRHubPath;
 				if (!hubPath.StartsWith('/')) {
 					hubPath = $"/{hubPath}";
 				}

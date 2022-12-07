@@ -146,13 +146,16 @@ export class SignalR {
 				const handler = type.handlers[name];
 				signalr.on(`${type.type}_${name}`, async (...args: any[]) => {
 					try {
+						console.log(`${args[0]}: ${type.type}_${name}`);
 						if (type.fromId) {
 							args[1] = type.fromId(args[1]);
 						}
 		
 						let ret = handler(...args.slice(1), args[0]);
+						console.log(`${args[0]}: ${ret}`);
 						if (ret instanceof Promise) {
 							ret = await ret;
+							console.log(`${args[0]}: ${ret}`);
 						}
 						if (ret === undefined) {
 							await this.send("Return", args[0], "undefined");

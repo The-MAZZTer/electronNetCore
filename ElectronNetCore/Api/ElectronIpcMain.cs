@@ -50,7 +50,7 @@ namespace MZZT.ElectronNetCore.Api {
 					Ports = ports,
 					Reply = reply
 				};
-				object[] decodedArgs = callback.ArgTypes.Zip(args).Select(x => JsonSerializer.Deserialize(x.Second, x.First, new() {
+				object[] decodedArgs = callback.ArgTypes.Zip(args).Select(x => JsonSerializer.Deserialize(x.Second, x.First, new JsonSerializerOptions() {
 					PropertyNameCaseInsensitive = true,
 					PropertyNamingPolicy = JsonNamingPolicy.CamelCase
 				})).Prepend(@event).ToArray();
@@ -149,7 +149,7 @@ namespace MZZT.ElectronNetCore.Api {
 				Sender = sender,
 				SenderFrame = webFrameMain
 			};
-			object[] decodedArgs = callback.ArgTypes.Zip(args).Select(x => JsonSerializer.Deserialize(x.Second, x.First, new() {
+			object[] decodedArgs = callback.ArgTypes.Zip(args).Select(x => JsonSerializer.Deserialize(x.Second, x.First, new JsonSerializerOptions() {
 				PropertyNameCaseInsensitive = true,
 				PropertyNamingPolicy = JsonNamingPolicy.CamelCase
 			})).Prepend(@event).ToArray();
