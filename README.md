@@ -2,6 +2,8 @@
 
 Sorry, I can't think of a better name.
 
+THIS IS A WORK IN PROGRESS. Still need to do a lot of work on figuring out how to generate the electron API interface bridging automatically.
+
 ## What is it?
 
 This is designed as a replacement for Electron.NET with a focus on improving the development experience for .NET applications leveraging Electron for UI, as well as filling in some of the blind spots Electron.NET has.
